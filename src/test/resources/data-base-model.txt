@@ -1,0 +1,21 @@
+@startuml
+entity "gender" as g {
+    * id : INT <<generated>>
+    --
+    * name : VARCHAR(10)
+}
+
+entity "client"{
+    * id : INT <<generated>>
+    --
+    * last_name : VARCHAR(128)
+    * first_name : VARCHAR(128)
+    middle_name : VARCHAR(128)
+    full_name : VARCHAR(128)
+    gender_id : INT <<FK>>
+    * phone_number : VARCHAR(128)
+    * registration_date : DATETIME
+}
+
+client }|..|| g
+@enduml

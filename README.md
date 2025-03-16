@@ -24,7 +24,7 @@
 
 Одним из условий является базовое знание синтаксиса UML. В любом случае, проверить корректность разработки схемы нужно в
 PlantUML Web Server (
-краткий [пример](https://www.plantuml.com/plantuml/uml/SoWkIImgAStDuU9ApIl9BAbKK4fFpKj9BLAgvb800Ys5p1G5AmLFln056nkWJ6fHOabgYfqTM59N5wecBp4t5QWgp378sSCnICFGG9Eh5c5WSauca4cIWJc9nINnwAOQMMX2fTCoY_38vsQcfEIaufHEAyt9mIa9yNmyaXlTlEtieDOMPEJd0SqjpKrABSBkiABKzCpY4g2NClFpubCIIq1sk3Y6k8Pu-hg2WeGB4XOAjJLwUZKrKDkuk1o0D30E0000))
+краткий [пример](https://www.plantuml.com/plantuml/uml/bP7HIuKm6CNVzrTy-9I2KZr5Y2Xb954F8htAQfzhiCtOvaEa_tjVAH5nlN3tDFWTpiuvAttWBan6CxH1XG-895g1BWBkGS8d0pe9A07Nq3nraEV4qV60eYX-O9fk6iiDakgvQc_kg_RiuZnc2_krVTMAhj4fXfhxqFztlRoADpmeTuGR9OJ6NJnCMk_2TOB-JyQxXorS0kzleoNVoRoWEnpCeLG-K2KrsbvGCvBTLbtTDO_rzoJh5B3CMJRF85b9pz4FV040))
 
 ---
 
@@ -52,3 +52,16 @@ PlantUML Web Server (
 7. Релиз MVP 2.0.
 8. Выявление дополнительных задач, плановое решение вместе с изначально определенными задачами.
 9. Формирование релизного процесса, попытка выхода в [Maven Repository](https://mvnrepository.com/).
+
+---
+
+Разработка парсера:
+
+1. Абстрактный класс для обертки сущности после парсинга для дальнейшей работы с ней с включением всех
+   ключевых свойств сущности.
+2. Сам парсер.
+3. Подключение первичного валидатора входящей схемы на тот случай, если пользователь не проверил ее адекватность в
+   PlantUML Web Server.
+4. Система проверок и исключений о некорректной структуре входящей схемы, что не предусмотрено базовым валидатором
+   PlantUML.
+5. Тесты.
