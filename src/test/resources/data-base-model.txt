@@ -5,7 +5,13 @@ entity "gender" as g {
     * name : VARCHAR(10)
 }
 
-entity "client"{
+class "state" as st{
+    * id : INT <<generated>>
+    --
+    * name : VARCHAR(128)
+}
+
+entity "client" {
     * id : INT <<generated>>
     --
     * last_name : VARCHAR(128)
@@ -13,9 +19,10 @@ entity "client"{
     middle_name : VARCHAR(128)
     full_name : VARCHAR(128)
     gender_id : INT <<FK>>
-    * phone_number : VARCHAR(128)
+    state_id : INT <<FK>>
     * registration_date : DATETIME
 }
 
 client }|..|| g
+client }|--|| st
 @enduml
