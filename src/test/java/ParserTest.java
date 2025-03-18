@@ -48,6 +48,7 @@ public class ParserTest {
 
 
         // System.out.println(entities.get(0)); // TODO DELETE
+        entities.forEach(System.out::println); // TODO DELETE
     }
 
     // STEP_1. Extracting every entity lines as map
@@ -61,7 +62,7 @@ public class ParserTest {
             String line = iterator.next();
 
             // get entity name between quotes ("..."). no single quotes used at entity naming
-            if (line.contains(TAG_TYPE_ENTITY) || line.contains(TAG_TYPE_CLASS)) {
+            if (line.toLowerCase().contains(TAG_TYPE_ENTITY) || line.toLowerCase().contains(TAG_TYPE_CLASS)) {
                 int first = line.indexOf("\"") + 1;
                 int second = line.lastIndexOf("\"");
                 entityNameAsLastKey = line.substring(first, second);
@@ -95,8 +96,10 @@ public class ParserTest {
 
             for (String line : entityLines) {
                 // check if entity has alias
-                if (line.contains(TAG_AS)) {
-                    int first = line.lastIndexOf(TAG_AS) + TAG_AS.length();
+                String lowCaseLine = line.toLowerCase();
+
+                if (lowCaseLine.contains(TAG_AS)) {
+                    int first = lowCaseLine.lastIndexOf(TAG_AS) + TAG_AS.length();
                     String alias = line.substring(first);
                 /*TODO! check is missing:
                    alias and its mentions at relations are not equals (see PUML situations with creating empty entity) */
@@ -110,31 +113,35 @@ public class ParserTest {
                 // check for other lines except entity name and curly brackets
                 // and parse properties
                 if (!line.contains(TAG_AS) && !line.contains(TAG_CURLY_BRACKET_OPENED) && !line.contains(TAG_CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
-                    boolean isMandatory = line.startsWith(TAG_MANDATORY);
-                    boolean isGenerated = false;
+                    PropertyBuilder propertyBuilder = new PropertyBuilder();
+                    propertyBuilder.isMandatory(line.startsWith(TAG_MANDATORY));
+                    propertyBuilder.isGenerated(false);
+                    propertyBuilder.isForeignKey(line.contains(TAG_FK));
 
                     if (line.contains(TAG_GENERATED)) {
-                        isMandatory = true;
-                        isGenerated = true;
+                        propertyBuilder.isMandatory(true);
+                        propertyBuilder.isMandatory(true);
                     }
-
-                    boolean isForeignKey = line.contains(TAG_FK);
 
                     List<String> propertyList = Arrays.asList(line.split(" "));
                     var newList = propertyList.stream()
+                            .filter(it -> !it.equals(TAG_MANDATORY))
+                            .filter(it -> !it.equals(":"))
                             // .map(it -> it.replaceAll("[^\\sa-zA-Z0-9]", ""))
-                            .map(it -> it.replaceAll("[^a-zA-Z ]", ""))
-                            .filter(it -> !it.isEmpty())
+                            // .map(it -> it.replaceAll("[^a-zA-Z ]", ""))
                             .toList();
 
-                    System.out.println("newList " + newList);
+                    propertyBuilder.name(newList.get(0));
+                    propertyBuilder.type(newList.get(1));
 
-                    Property property = new Property(line, "null", "null", isMandatory, isGenerated, isForeignKey);
+                    // System.out.println("newList " + newList); // TODO DELETE
+
+                    Property property = propertyBuilder.build();
 
                     properties.add(property);
 
-                    System.out.println(propertyList); // TODO DELETE
-                    System.out.println(property); // TODO DELETE
+                    // System.out.println(propertyList); // TODO DELETE
+                    // System.out.println(property); // TODO DELETE
                 }
             }
 
@@ -147,12 +154,12 @@ public class ParserTest {
     }
 
     static class Entity {
-        String name;
-        String alias;
-        List<Property> properties;
-        List<Relation> relations;
+        private String name;
+        private String alias;
+        private List<Property> properties;
+        private List<Relation> relations;
 
-        Entity(String name, String alias, List<Property> properties) {
+        public Entity(String name, String alias, List<Property> properties) {
             Objects.requireNonNull(name, "name");
 
             this.name = name;
@@ -171,17 +178,54 @@ public class ParserTest {
         }
     }
 
-    static class Property {
-        // String line;
-        String name;
-        String type;
-        boolean isMandatory;
-        boolean isGenerated;
-        boolean isPrimaryKey;
-        boolean isForeignKey;
+    static class PropertyBuilder {
+        private String name;
+        private String type;
+        private boolean isMandatory;
+        private boolean isGenerated;
+        private boolean isForeignKey;
 
-        Property(String line, String name, String type, boolean isMandatory, boolean isGenerated, boolean isForeignKey) {
-            Objects.requireNonNull(line, "line");
+        public PropertyBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public PropertyBuilder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public PropertyBuilder isMandatory(boolean isMandatory) {
+            this.isMandatory = isMandatory;
+            return this;
+        }
+
+        public PropertyBuilder isGenerated(boolean isGenerated) {
+            this.isGenerated = isGenerated;
+            return this;
+        }
+
+        public PropertyBuilder isForeignKey(boolean isForeignKey) {
+            this.isForeignKey = isForeignKey;
+            return this;
+        }
+
+        public Property build() {
+            return new Property(name, type, isMandatory, isGenerated, isForeignKey);
+        }
+    }
+
+    static class Property {
+        // private String line;
+        private String name;
+        private String type;
+        private boolean isMandatory;
+        private boolean isGenerated;
+        private boolean isPrimaryKey;
+        private boolean isForeignKey;
+
+        public Property(/*String line,*/ String name, String type, boolean isMandatory, boolean isGenerated, boolean isForeignKey) {
+            // Objects.requireNonNull(line, "line");
             Objects.requireNonNull(name, "name");
             Objects.requireNonNull(type, "type");
 
