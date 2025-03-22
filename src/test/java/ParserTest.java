@@ -153,7 +153,7 @@ public class ParserTest {
                 }
             }
 
-            entities.add(new Entity(entityName, entityAlias, properties, null));
+            entities.add(new Entity(entityName, entityAlias, properties));
         });
 
         assertEquals(3, entities.size()); // OK
@@ -175,8 +175,7 @@ public class ParserTest {
             Optional<Entity> leftEntity = filterEntities(entities, left);
             Optional<Entity> rightEntity = filterEntities(entities, right);
 
-            assertTrue(leftEntity.isPresent());
-            assertTrue(rightEntity.isPresent());
+            assertTrue(leftEntity.isPresent() && rightEntity.isPresent());
 
             if (leftEntity.isPresent() && rightEntity.isPresent()) {
                 Relations leftRelationSign = Relations.valueOfSign(arrow.substring(0, 2));
@@ -190,6 +189,8 @@ public class ParserTest {
                 relations.add(relation);
             }
         }
+
+        assertEquals(2, relations.size());
 
         return relations;
     }
@@ -212,15 +213,15 @@ public class ParserTest {
         private final String name;
         private final String alias;
         private final List<Property> properties;
-        private final List<Relation> relations;
+        /*private final List<Relation> relations;*/
 
-        public Entity(String name, String alias, List<Property> properties, List<Relation> relations) {
+        public Entity(String name, String alias, List<Property> properties/*, List<Relation> relations*/) {
             Objects.requireNonNull(name, "name");
 
             this.name = name;
             this.alias = alias;
             this.properties = properties;
-            this.relations = relations;
+            /*this.relations = relations;*/
         }
 
         public String getName() {
@@ -237,7 +238,7 @@ public class ParserTest {
                     "name=" + name +
                     ", alias=" + alias +
                     ", properties=" + properties +
-                    ", relations=" + relations +
+                    /*", relations=" + relations +*/
                     '}';
         }
     }
