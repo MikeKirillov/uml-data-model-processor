@@ -1,8 +1,8 @@
 @startuml
-entity "gender" as g {
+entity "gender" AS g {
     * id : INT <<generated>>
     --
-    * name : VARCHAR(10)
+    * name    : VARCHAR(10)
 }
 
 class "state" as st{
@@ -11,7 +11,7 @@ class "state" as st{
     * name : VARCHAR(128)
 }
 
-entity "client" {
+entity  client {
     * id : INT <<generated>>
     --
     * last_name : VARCHAR(128)

@@ -64,12 +64,20 @@ public class ParserTest {
         while (iterator.hasNext()) {
             String line = iterator.next();
 
-            // get entity/class name between quotes ("..."). no single quotes used at entity naming
-            // if no quotes then puml throws exception
+            // get entity/class name
             if (line.toLowerCase().contains(TAG_OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(TAG_OBJECT_TYPE_CLASS)) {
-                int first = line.indexOf("\"") + 1;
-                int second = line.lastIndexOf("\"");
-                entityNameAsLastKey = line.substring(first, second);
+                // between quotes ("...") when alias is given. if no quotes then PUML throws exception
+                if (line.toLowerCase().contains(TAG_AS)) {
+                    int first = line.indexOf("\"") + 1;
+                    int second = line.lastIndexOf("\"");
+                    entityNameAsLastKey = line.substring(first, second);
+                } else {
+                    // second word after entity/class declaring
+                    List<String> splitLine = Arrays.stream(line.split(" "))
+                            .filter(it -> !it.isBlank())
+                            .toList();
+                    entityNameAsLastKey = splitLine.get(1);
+                }
             }
 
             if (entityNameAsLastKey != null) {
