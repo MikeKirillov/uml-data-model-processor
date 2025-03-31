@@ -1,3 +1,7 @@
+import enums.RelationType;
+import model.Entity;
+import model.EntityRelation;
+import model.Property;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
@@ -6,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,17 +19,6 @@ public class ParserTest {
     private static final String TXT_FILE_PATH = "data-base-model.txt";
     private static final String PU_FILE_PATH = "data-base-model.pu";
     private static final String PUML_FILE_PATH = "data-base-model.puml";
-
-    private static final String TAG_START = "@startuml";
-    private static final String TAG_END = "@enduml";
-    private static final String TAG_OBJECT_TYPE_ENTITY = "entity";
-    private static final String TAG_OBJECT_TYPE_CLASS = "class";
-    private static final String TAG_AS = " as ";
-    private static final String TAG_CURLY_BRACKET_OPENED = "{";
-    private static final String TAG_CURLY_BRACKET_CLOSED = "}";
-    private static final String TAG_GENERATED = "generated";
-    private static final String TAG_FK = "FK";
-    private static final String TAG_MANDATORY = "*";
 
     @Test
     public void shouldReadLines() throws IOException {
@@ -39,15 +31,15 @@ public class ParserTest {
                 .map(String::trim)
                 .collect(Collectors.toList());
 
-        assertEquals(TAG_START, cleanSpaces.get(0));
-        assertEquals(TAG_END, cleanSpaces.get(cleanSpaces.size() - 1));
+        assertEquals(PumlSchemaTag.TAG_START, cleanSpaces.get(0));
+        assertEquals(PumlSchemaTag.TAG_END, cleanSpaces.get(cleanSpaces.size() - 1));
 
         // cleanSpaces.forEach(System.out::println); // TODO DELETE
 
         List<String> relationsStrings = new ArrayList<>();
         Map<String, List<String>> entitiesStringsAsMap = getEntitiesAsMap(cleanSpaces, relationsStrings);
         List<Entity> entities = processEntities(entitiesStringsAsMap);
-        List<Relation> relations = processRelations(relationsStrings, entities);
+        List<model.Relation> relations = processRelations(relationsStrings, entities);
 
         // System.out.println(relations); // TODO DELETE
         // System.out.println(entities.get(0)); // TODO DELETE
@@ -65,9 +57,9 @@ public class ParserTest {
             String line = iterator.next();
 
             // get entity/class name
-            if (line.toLowerCase().contains(TAG_OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(TAG_OBJECT_TYPE_CLASS)) {
+            if (line.toLowerCase().contains(PumlSchemaTag.TAG_OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PumlSchemaTag.TAG_OBJECT_TYPE_CLASS)) {
                 // between quotes ("...") when alias is given. if no quotes then PUML throws exception
-                if (line.toLowerCase().contains(TAG_AS)) {
+                if (line.toLowerCase().contains(PumlSchemaTag.TAG_AS)) {
                     int first = line.indexOf("\"") + 1;
                     int second = line.lastIndexOf("\"");
                     entityNameAsLastKey = line.substring(first, second);
@@ -82,7 +74,7 @@ public class ParserTest {
 
             if (entityNameAsLastKey != null) {
                 // check for line = "}", then it was last line of an entity
-                if (line.equals(TAG_CURLY_BRACKET_CLOSED)) {
+                if (line.equals(PumlSchemaTag.TAG_CURLY_BRACKET_CLOSED)) {
                     entityInnerLines.add(line);
                     entitiesMap.put(entityNameAsLastKey, entityInnerLines);
                     entityNameAsLastKey = null;
@@ -92,8 +84,8 @@ public class ParserTest {
                 }
             }
 
-            if (line.contains(Relations.ZERO_OR_ONE.getSign()) || line.contains(Relations.EXACTLY_ONE.getSign()) ||
-                    line.contains(Relations.ZERO_OR_MANY.getSign()) || line.contains(Relations.ONE_OR_MANY.getSign())) {
+            if (line.contains(RelationType.ZERO_OR_ONE.getType()) || line.contains(RelationType.EXACTLY_ONE.getType()) ||
+                    line.contains(RelationType.ZERO_OR_MANY.getType()) || line.contains(RelationType.ONE_OR_MANY.getType())) {
                 relationsStrings.add(line);
             }
         }
@@ -116,13 +108,13 @@ public class ParserTest {
                 // check if entity has alias
                 String lowCaseLine = line.toLowerCase();
 
-                if (lowCaseLine.contains(TAG_AS)) {
-                    int first = lowCaseLine.lastIndexOf(TAG_AS) + TAG_AS.length();
+                if (lowCaseLine.contains(PumlSchemaTag.TAG_AS)) {
+                    int first = lowCaseLine.lastIndexOf(PumlSchemaTag.TAG_AS) + PumlSchemaTag.TAG_AS.length();
                     String alias = line.substring(first);
                 /*TODO! check is missing:
                    alias and its mentions at relations are not equals (see PUML situations with creating empty entity) */
-                    if (alias.contains(TAG_CURLY_BRACKET_OPENED)) {
-                        entityAlias = alias.substring(0, alias.indexOf(TAG_CURLY_BRACKET_OPENED)).trim();
+                    if (alias.contains(PumlSchemaTag.TAG_CURLY_BRACKET_OPENED)) {
+                        entityAlias = alias.substring(0, alias.indexOf(PumlSchemaTag.TAG_CURLY_BRACKET_OPENED)).trim();
                     } else {
                         entityAlias = alias;
                     }
@@ -130,20 +122,20 @@ public class ParserTest {
 
                 // check for other lines except entity name and curly brackets
                 // and parse properties
-                if (!line.contains(TAG_AS) && !line.contains(TAG_CURLY_BRACKET_OPENED) && !line.contains(TAG_CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
+                if (!line.contains(PumlSchemaTag.TAG_AS) && !line.contains(PumlSchemaTag.TAG_CURLY_BRACKET_OPENED) && !line.contains(PumlSchemaTag.TAG_CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
                     PropertyBuilder propertyBuilder = new PropertyBuilder();
-                    propertyBuilder.isMandatory(line.startsWith(TAG_MANDATORY));
+                    propertyBuilder.isMandatory(line.startsWith(PumlSchemaTag.TAG_MANDATORY));
                     propertyBuilder.isGenerated(false);
-                    propertyBuilder.isForeignKey(line.contains(TAG_FK));
+                    propertyBuilder.isForeignKey(line.contains(PumlSchemaTag.TAG_FK));
 
-                    if (line.contains(TAG_GENERATED)) {
+                    if (line.contains(PumlSchemaTag.TAG_GENERATED)) {
                         propertyBuilder.isMandatory(true);
                         propertyBuilder.isMandatory(true);
                     }
 
                     List<String> propertyList = Arrays.asList(line.split(" "));
                     var newList = propertyList.stream()
-                            .filter(it -> !it.equals(TAG_MANDATORY))
+                            .filter(it -> !it.equals(PumlSchemaTag.TAG_MANDATORY))
                             .filter(it -> !it.equals(":"))
                             .toList();
 
@@ -170,8 +162,8 @@ public class ParserTest {
     }
 
     // STEP_3. Process each relation line
-    private List<Relation> processRelations(List<String> relationsStrings, List<Entity> entities) {
-        List<Relation> relations = new ArrayList<>();
+    private List<model.Relation> processRelations(List<String> relationsStrings, List<Entity> entities) {
+        List<model.Relation> relations = new ArrayList<>();
 
         // just one of signs (".", "-") uses between relation arrow signs. min count is 1
         for (String string : relationsStrings) {
@@ -186,13 +178,13 @@ public class ParserTest {
             assertTrue(leftEntity.isPresent() && rightEntity.isPresent());
 
             if (leftEntity.isPresent() && rightEntity.isPresent()) {
-                Relations leftRelationSign = Relations.valueOfSign(arrow.substring(0, 2));
-                EntityRelation leftEntityRelation = new EntityRelation(leftEntity.get(), leftRelationSign);
+                RelationType leftRelationType = RelationType.valueOfSign(arrow.substring(0, 2));
+                EntityRelation leftEntityRelation = new EntityRelation(leftEntity.get(), leftRelationType);
 
-                Relations rightRelationSign = Relations.valueOfSign(arrow.substring(arrow.length() - 2));
-                EntityRelation rightEntityRelation = new EntityRelation(rightEntity.get(), rightRelationSign);
+                RelationType rightRelationType = RelationType.valueOfSign(arrow.substring(arrow.length() - 2));
+                EntityRelation rightEntityRelation = new EntityRelation(rightEntity.get(), rightRelationType);
 
-                Relation relation = new Relation(leftEntityRelation, rightEntityRelation);
+                model.Relation relation = new model.Relation(leftEntityRelation, rightEntityRelation);
 
                 relations.add(relation);
             }
@@ -215,188 +207,5 @@ public class ParserTest {
                     return namesEq || it.getAlias().equals(tag);
                 })
                 .findFirst();
-    }
-
-    static class Entity {
-        private final String name;
-        private final String alias;
-        private final List<Property> properties;
-        /*private final List<Relation> relations;*/
-
-        public Entity(String name, String alias, List<Property> properties/*, List<Relation> relations*/) {
-            Objects.requireNonNull(name, "name");
-
-            this.name = name;
-            this.alias = alias;
-            this.properties = properties;
-            /*this.relations = relations;*/
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getAlias() {
-            return alias;
-        }
-
-        @Override
-        public String toString() {
-            return "Entity{" +
-                    "name=" + name +
-                    ", alias=" + alias +
-                    ", properties=" + properties +
-                    /*", relations=" + relations +*/
-                    '}';
-        }
-    }
-
-    static class PropertyBuilder {
-        private String name;
-        private String type;
-        private boolean isMandatory;
-        private boolean isGenerated;
-        private boolean isForeignKey;
-
-        public PropertyBuilder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public PropertyBuilder type(String type) {
-            this.type = type;
-            return this;
-        }
-
-        public PropertyBuilder isMandatory(boolean isMandatory) {
-            this.isMandatory = isMandatory;
-            return this;
-        }
-
-        public PropertyBuilder isGenerated(boolean isGenerated) {
-            this.isGenerated = isGenerated;
-            return this;
-        }
-
-        public PropertyBuilder isForeignKey(boolean isForeignKey) {
-            this.isForeignKey = isForeignKey;
-            return this;
-        }
-
-        public Property build() {
-            return new Property(name, type, isMandatory, isGenerated, isForeignKey);
-        }
-    }
-
-    static class Property {
-        // private String line;
-        private final String name;
-        private final String type;
-        private final boolean isMandatory;
-        private final boolean isGenerated;
-        private final boolean isPrimaryKey;
-        private final boolean isForeignKey;
-
-        public Property(/*String line,*/ String name, String type, boolean isMandatory, boolean isGenerated, boolean isForeignKey) {
-            // Objects.requireNonNull(line, "line");
-            Objects.requireNonNull(name, "name");
-            Objects.requireNonNull(type, "type");
-
-            // this.line = line;
-            this.name = name;
-            this.type = type;
-            this.isMandatory = isMandatory;
-            this.isGenerated = isGenerated;
-            this.isPrimaryKey = isMandatory && isGenerated;
-            this.isForeignKey = isForeignKey;
-        }
-
-        @Override
-        public String toString() {
-            return "Property{" +
-                    // "line=" + line +
-                    "name=" + name +
-                    // ", name=" + name +
-                    ", type=" + type +
-                    ", isMandatory=" + isMandatory +
-                    ", isGenerated=" + isGenerated +
-                    ", isPrimaryKey=" + isPrimaryKey +
-                    ", isForeignKey=" + isForeignKey +
-                    '}';
-        }
-    }
-
-    static class Relation {
-        private final EntityRelation leftEntity;
-        private final EntityRelation rightEntity;
-
-        public Relation(EntityRelation leftEntity, EntityRelation rightEntity) {
-            this.leftEntity = leftEntity;
-            this.rightEntity = rightEntity;
-        }
-
-        @Override
-        public String toString() {
-            return "Relation{" +
-                    "leftEntity=" + leftEntity +
-                    ", rightEntity=" + rightEntity +
-                    '}';
-        }
-    }
-
-    static class EntityRelation {
-        private final Entity entity;
-        private final Relations relation;
-
-        public EntityRelation(Entity entity, Relations relation) {
-            this.entity = entity;
-            this.relation = relation;
-        }
-
-        @Override
-        public String toString() {
-            return "EntityRelation{" +
-                    "entity=" + entity +
-                    ", relation=" + relation +
-                    '}';
-        }
-    }
-
-    enum Relations {
-        ZERO_OR_ONE("|o"),
-        ZERO_OR_ONE_REVERTED("o|"),
-        EXACTLY_ONE("||"),
-        ZERO_OR_MANY("}o"),
-        ZERO_OR_MANY_REVERTED("o{"),
-        ONE_OR_MANY("}|"),
-        ONE_OR_MANY_REVERTED("|{");
-
-        private final String sign;
-        private static final Map<String, Relations> RELATIONS_MAP = new HashMap<>();
-
-        static {
-            for (Relations value : values()) {
-                RELATIONS_MAP.put(value.sign, value);
-            }
-        }
-
-        Relations(String sign) {
-            this.sign = sign;
-        }
-
-        public String getSign() {
-            return sign;
-        }
-
-        public static Relations valueOfSign(String sign) {
-            return RELATIONS_MAP.get(sign);
-        }
-
-        @Override
-        public String toString() {
-            return "Relations{" +
-                    "name='" + name() + '\'' +
-                    '}';
-        }
     }
 }
