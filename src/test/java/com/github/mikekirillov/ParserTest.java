@@ -1,5 +1,5 @@
-import com.github.mikekirillov.PropertyBuilder;
-import com.github.mikekirillov.PumlSchemaTag;
+package com.github.mikekirillov;
+
 import com.github.mikekirillov.enums.RelationType;
 import com.github.mikekirillov.model.Relation;
 import com.github.mikekirillov.model.Entity;
