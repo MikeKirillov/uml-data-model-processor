@@ -1,7 +1,10 @@
-import enums.RelationType;
-import model.Entity;
-import model.EntityRelation;
-import model.Property;
+import com.github.mikekirillov.PropertyBuilder;
+import com.github.mikekirillov.PumlSchemaTag;
+import com.github.mikekirillov.enums.RelationType;
+import com.github.mikekirillov.model.Relation;
+import com.github.mikekirillov.model.Entity;
+import com.github.mikekirillov.model.EntityRelation;
+import com.github.mikekirillov.model.Property;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +42,7 @@ public class ParserTest {
         List<String> relationsStrings = new ArrayList<>();
         Map<String, List<String>> entitiesStringsAsMap = getEntitiesAsMap(cleanSpaces, relationsStrings);
         List<Entity> entities = processEntities(entitiesStringsAsMap);
-        List<model.Relation> relations = processRelations(relationsStrings, entities);
+        List<Relation> relations = processRelations(relationsStrings, entities);
 
         // System.out.println(relations); // TODO DELETE
         // System.out.println(entities.get(0)); // TODO DELETE
@@ -162,8 +165,8 @@ public class ParserTest {
     }
 
     // STEP_3. Process each relation line
-    private List<model.Relation> processRelations(List<String> relationsStrings, List<Entity> entities) {
-        List<model.Relation> relations = new ArrayList<>();
+    private List<Relation> processRelations(List<String> relationsStrings, List<Entity> entities) {
+        List<Relation> relations = new ArrayList<>();
 
         // just one of signs (".", "-") uses between relation arrow signs. min count is 1
         for (String string : relationsStrings) {
@@ -184,7 +187,7 @@ public class ParserTest {
                 RelationType rightRelationType = RelationType.valueOfSign(arrow.substring(arrow.length() - 2));
                 EntityRelation rightEntityRelation = new EntityRelation(rightEntity.get(), rightRelationType);
 
-                model.Relation relation = new model.Relation(leftEntityRelation, rightEntityRelation);
+                Relation relation = new Relation(leftEntityRelation, rightEntityRelation);
 
                 relations.add(relation);
             }

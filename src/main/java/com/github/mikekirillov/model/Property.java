@@ -1,4 +1,4 @@
-package model;
+package com.github.mikekirillov.model;
 
 import java.util.Objects;
 

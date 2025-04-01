@@ -1,6 +1,6 @@
-package model;
+package com.github.mikekirillov.model;
 
-import enums.RelationType;
+import com.github.mikekirillov.enums.RelationType;
 
 public class EntityRelation {
     private final Entity entity;

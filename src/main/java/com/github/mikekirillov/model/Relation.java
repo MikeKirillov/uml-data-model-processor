@@ -1,4 +1,4 @@
-package model;
+package com.github.mikekirillov.model;
 
 public class Relation {
     private final EntityRelation leftEntity;

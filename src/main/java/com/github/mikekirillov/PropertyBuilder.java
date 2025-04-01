@@ -1,4 +1,6 @@
-import model.Property;
+package com.github.mikekirillov;
+
+import com.github.mikekirillov.model.Property;
 
 public class PropertyBuilder {
     private String name;

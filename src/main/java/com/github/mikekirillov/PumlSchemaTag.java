@@ -1,3 +1,5 @@
+package com.github.mikekirillov;
+
 public class PumlSchemaTag {
     public static final String TAG_START = "@startuml";
     public static final String TAG_END = "@enduml";

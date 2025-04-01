@@ -1,4 +1,4 @@
-package enums;
+package com.github.mikekirillov.enums;
 
 import java.util.HashMap;
 import java.util.Map;
