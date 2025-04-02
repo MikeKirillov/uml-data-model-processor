@@ -34,19 +34,13 @@ public class ParserTest {
                 .map(String::trim)
                 .collect(Collectors.toList());
 
-        assertEquals(PumlSchemaTag.TAG_START, cleanSpaces.get(0));
-        assertEquals(PumlSchemaTag.TAG_END, cleanSpaces.get(cleanSpaces.size() - 1));
-
-        // cleanSpaces.forEach(System.out::println); // TODO DELETE
+        assertEquals(PumlSchemaTag.START, cleanSpaces.get(0));
+        assertEquals(PumlSchemaTag.END, cleanSpaces.get(cleanSpaces.size() - 1));
 
         List<String> relationsStrings = new ArrayList<>();
         Map<String, List<String>> entitiesStringsAsMap = getEntitiesAsMap(cleanSpaces, relationsStrings);
         List<Entity> entities = processEntities(entitiesStringsAsMap);
         List<Relation> relations = processRelations(relationsStrings, entities);
-
-        // System.out.println(relations); // TODO DELETE
-        // System.out.println(entities.get(0)); // TODO DELETE
-        // entities.forEach(System.out::println); // TODO DELETE
     }
 
     // STEP_1. Extracting every entity lines as map
@@ -60,9 +54,9 @@ public class ParserTest {
             String line = iterator.next();
 
             // get entity/class name
-            if (line.toLowerCase().contains(PumlSchemaTag.TAG_OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PumlSchemaTag.TAG_OBJECT_TYPE_CLASS)) {
+            if (line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS)) {
                 // between quotes ("...") when alias is given. if no quotes then PUML throws exception
-                if (line.toLowerCase().contains(PumlSchemaTag.TAG_AS)) {
+                if (line.toLowerCase().contains(PumlSchemaTag.AS)) {
                     int first = line.indexOf("\"") + 1;
                     int second = line.lastIndexOf("\"");
                     entityNameAsLastKey = line.substring(first, second);
@@ -77,7 +71,7 @@ public class ParserTest {
 
             if (entityNameAsLastKey != null) {
                 // check for line = "}", then it was last line of an entity
-                if (line.equals(PumlSchemaTag.TAG_CURLY_BRACKET_CLOSED)) {
+                if (line.equals(PumlSchemaTag.CURLY_BRACKET_CLOSED)) {
                     entityInnerLines.add(line);
                     entitiesMap.put(entityNameAsLastKey, entityInnerLines);
                     entityNameAsLastKey = null;
@@ -93,8 +87,7 @@ public class ParserTest {
             }
         }
 
-        assertEquals(3, entitiesMap.size()); // OK
-        // entitiesMap.forEach((k, v) -> System.out.println(k + ": " + v)); // TODO DELETE
+        assertEquals(3, entitiesMap.size());
 
         return entitiesMap;
     }
@@ -111,13 +104,13 @@ public class ParserTest {
                 // check if entity has alias
                 String lowCaseLine = line.toLowerCase();
 
-                if (lowCaseLine.contains(PumlSchemaTag.TAG_AS)) {
-                    int first = lowCaseLine.lastIndexOf(PumlSchemaTag.TAG_AS) + PumlSchemaTag.TAG_AS.length();
+                if (lowCaseLine.contains(PumlSchemaTag.AS)) {
+                    int first = lowCaseLine.lastIndexOf(PumlSchemaTag.AS) + PumlSchemaTag.AS.length();
                     String alias = line.substring(first);
                 /*TODO! check is missing:
                    alias and its mentions at relations are not equals (see PUML situations with creating empty entity) */
-                    if (alias.contains(PumlSchemaTag.TAG_CURLY_BRACKET_OPENED)) {
-                        entityAlias = alias.substring(0, alias.indexOf(PumlSchemaTag.TAG_CURLY_BRACKET_OPENED)).trim();
+                    if (alias.contains(PumlSchemaTag.CURLY_BRACKET_OPENED)) {
+                        entityAlias = alias.substring(0, alias.indexOf(PumlSchemaTag.CURLY_BRACKET_OPENED)).trim();
                     } else {
                         entityAlias = alias;
                     }
@@ -125,41 +118,35 @@ public class ParserTest {
 
                 // check for other lines except entity name and curly brackets
                 // and parse properties
-                if (!line.contains(PumlSchemaTag.TAG_AS) && !line.contains(PumlSchemaTag.TAG_CURLY_BRACKET_OPENED) && !line.contains(PumlSchemaTag.TAG_CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
+                if (!line.contains(PumlSchemaTag.AS) && !line.contains(PumlSchemaTag.CURLY_BRACKET_OPENED) && !line.contains(PumlSchemaTag.CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
                     PropertyBuilder propertyBuilder = new PropertyBuilder();
-                    propertyBuilder.isMandatory(line.startsWith(PumlSchemaTag.TAG_MANDATORY));
+                    propertyBuilder.isMandatory(line.startsWith(PumlSchemaTag.MANDATORY));
                     propertyBuilder.isGenerated(false);
-                    propertyBuilder.isForeignKey(line.contains(PumlSchemaTag.TAG_FK));
+                    propertyBuilder.isForeignKey(line.contains(PumlSchemaTag.FOREIGN_KEY));
 
-                    if (line.contains(PumlSchemaTag.TAG_GENERATED)) {
+                    if (line.contains(PumlSchemaTag.GENERATED)) {
                         propertyBuilder.isMandatory(true);
                         propertyBuilder.isMandatory(true);
                     }
 
                     List<String> propertyList = Arrays.asList(line.split(" "));
                     var newList = propertyList.stream()
-                            .filter(it -> !it.equals(PumlSchemaTag.TAG_MANDATORY))
+                            .filter(it -> !it.equals(PumlSchemaTag.MANDATORY))
                             .filter(it -> !it.equals(":"))
                             .toList();
 
                     propertyBuilder.name(newList.get(0));
                     propertyBuilder.type(newList.get(1));
 
-                    // System.out.println("newList " + newList); // TODO DELETE
-
                     Property property = propertyBuilder.build();
-
                     properties.add(property);
-
-                    // System.out.println(propertyList); // TODO DELETE
-                    // System.out.println(property); // TODO DELETE
                 }
             }
 
             entities.add(new Entity(entityName, entityAlias, properties));
         });
 
-        assertEquals(3, entities.size()); // OK
+        assertEquals(3, entities.size());
 
         return entities;
     }
