@@ -42,52 +42,90 @@ class PumlAnalyzerTest {
 
         entitiesAndRelations(lines, entities, relations);
 
-        System.out.println("entities".toUpperCase() + ": " + entities);
-        System.out.println("relations".toUpperCase() + ": " + relations);
+        // System.out.println("entities".toUpperCase() + ": " + entities);
+        // System.out.println("relations".toUpperCase() + ": " + relations);
+
+        assertEquals(3, entities.size());
+        assertEquals("gender", entities.get(0).getName());
+        assertEquals(2, entities.get(0).getProperties().size());
+        assertEquals("state", entities.get(1).getName());
+        assertEquals(2, entities.get(1).getProperties().size());
+        assertEquals("client", entities.get(2).getName());
+        assertEquals(8, entities.get(2).getProperties().size());
     }
 
     private void entitiesAndRelations(List<String> lines, List<Entity> entities, List<Relation> relations) {
+        Entity entity = null;
+        List<Property> properties = new ArrayList<>();
+
         for (String line : lines) {
-            Entity entity = null;
 
-            // process entity
-            if (line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS)) {
-                entity = new Entity();
-                List<String> strings = Arrays.stream(line.split(" "))
-                        .map(String::toLowerCase)
-                        .map(string -> string.replace("\"", "").replace("'", "").replace("{", ""))
-                        .filter(string -> !string.isBlank())
-                        .toList();
+            if (!line.toLowerCase().contains(PumlSchemaTag.START) && !line.toLowerCase().contains(PumlSchemaTag.END) && !StringUtils.containsOnly(line, "-")) {
 
-                entity.setName(strings.get(1));
+                // process entity
+                if (line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS)) {
+                    entity = new Entity();
+                    List<String> strings = Arrays.stream(line.split(" "))
+                            .map(String::toLowerCase)
+                            .map(string -> string.replace("\"", "").replace("'", "").replace("{", ""))
+                            .filter(string -> !string.isBlank())
+                            .toList();
 
-                if (strings.contains(PumlSchemaTag.AS_NO_SPACES)) {
-                    int as = strings.indexOf(PumlSchemaTag.AS_NO_SPACES);
-                    entity.setAlias(strings.get(as + 1));
+                    entity.setName(strings.get(1));
+
+                    if (strings.contains(PumlSchemaTag.AS_NO_SPACES)) {
+                        int as = strings.indexOf(PumlSchemaTag.AS_NO_SPACES);
+                        entity.setAlias(strings.get(as + 1));
+                    }
                 }
-            }
 
-            // process properties
-            List<Property> properties = new ArrayList<>();
+                // process properties
+                if (!line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) && !line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS)) {
+                    List<String> array = Arrays.stream(line.split(" "))
+                            .filter(it -> !it.isBlank() && !it.contains(":"))
+                            .toList();
 
-            if (!line.contains(PumlSchemaTag.CURLY_BRACKET_CLOSED)) {
-                List<String> array = Arrays.stream(line.split(" "))
-                        .filter(it -> !it.isBlank())
-                        .toList();
+                    PropertyBuilder propertyBuilder = new PropertyBuilder();
+                    if (!array.get(0).equals(PumlSchemaTag.CURLY_BRACKET_CLOSED)) {
+                        if (array.get(0).contains(PumlSchemaTag.MANDATORY)) {
+                            propertyBuilder.isMandatory(true);
+                            propertyBuilder.name(array.get(1));
+                            propertyBuilder.type(array.get(2));
+                        } else {
+                            propertyBuilder.name(array.get(0));
+                            propertyBuilder.type(array.get(1));
+                        }
 
-                System.out.println(array);
-            }
+                        if (array.stream().anyMatch(it -> it.toLowerCase().contains(PumlSchemaTag.GENERATED))) {
+                            propertyBuilder.isGenerated(true);
+                        }
 
-            if (Objects.nonNull(entity)) {
-                entity.setProperties(properties);
-                entities.add(entity);
+                        if (array.stream().anyMatch(it -> it.toUpperCase().contains(PumlSchemaTag.FOREIGN_KEY))) {
+                            propertyBuilder.isForeignKey(true);
+                        }
+
+                        properties.add(propertyBuilder.build());
+                    }
+
+                    if (Objects.nonNull(entity)) {
+                        if (!properties.isEmpty()) {
+                            entity.setProperties(properties);
+                        }
+
+                        if (StringUtils.containsOnly(line, PumlSchemaTag.CURLY_BRACKET_CLOSED)) {
+                            entities.add(entity);
+                            entity = null;
+                            properties = new ArrayList<>();
+                        }
+                    }
+                }
+
             }
 
             // process relations
             // TODO...
         }
     }
-
 
 
 }

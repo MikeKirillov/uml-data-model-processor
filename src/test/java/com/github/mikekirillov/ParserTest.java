@@ -121,11 +121,9 @@ public class ParserTest {
                 if (!line.contains(PumlSchemaTag.AS) && !line.contains(PumlSchemaTag.CURLY_BRACKET_OPENED) && !line.contains(PumlSchemaTag.CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
                     PropertyBuilder propertyBuilder = new PropertyBuilder();
                     propertyBuilder.isMandatory(line.startsWith(PumlSchemaTag.MANDATORY));
-                    propertyBuilder.isGenerated(false);
                     propertyBuilder.isForeignKey(line.contains(PumlSchemaTag.FOREIGN_KEY));
 
                     if (line.contains(PumlSchemaTag.GENERATED)) {
-                        propertyBuilder.isMandatory(true);
                         propertyBuilder.isMandatory(true);
                     }
 
