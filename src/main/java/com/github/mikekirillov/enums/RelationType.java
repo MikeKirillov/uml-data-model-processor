@@ -16,7 +16,7 @@ public enum RelationType {
 
     private final String type;
     private static final Map<String, RelationType> RELATIONS_MAP = new HashMap<>();
-    public static final List<RelationType> RELATIONS = new ArrayList<>();
+    private static final List<RelationType> RELATIONS = new ArrayList<>();
 
     static {
         for (RelationType value : values()) {
@@ -35,6 +35,10 @@ public enum RelationType {
 
     public static RelationType valueOfType(String type) {
         return RELATIONS_MAP.get(type);
+    }
+
+    public static List<RelationType> getRelations() {
+        return RELATIONS;
     }
 
     @Override

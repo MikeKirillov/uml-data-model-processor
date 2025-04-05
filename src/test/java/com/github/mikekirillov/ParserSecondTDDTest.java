@@ -79,7 +79,7 @@ class ParserSecondTDDTest {
                 }
 
                 // process properties
-                if (!line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) && !line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS) && RelationType.RELATIONS.stream().noneMatch(it -> line.contains(it.getType()))) {
+                if (!line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) && !line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS) && RelationType.getRelations().stream().noneMatch(it -> line.contains(it.getType()))) {
                     List<String> array = Arrays.stream(line.split(" "))
                             .filter(it -> !it.isBlank() && !it.contains(":"))
                             .toList();
@@ -120,7 +120,7 @@ class ParserSecondTDDTest {
                 }
 
                 // process relations
-                if (RelationType.RELATIONS.stream().anyMatch(it -> line.contains(it.getType()))) {
+                if (RelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()))) {
                     List<String> array = Arrays.stream(line.split(" "))
                             .filter(it -> !it.isBlank())
                             .toList();

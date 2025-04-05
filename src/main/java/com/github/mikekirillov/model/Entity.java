@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Objects;
 
 public class Entity {
-    private /*final*/ String name;
-    private /*final*/ String alias;
-    private /*final*/ List<Property> properties;
-    /*private final List<Relation> relations;*/
+    private String name;
+    private String alias;
+    private List<Property> properties;
 
-    public Entity() {}
+    public Entity() {
+    }
 
-    public Entity(String name, String alias, List<Property> properties/*, List<Relation> relations*/) {
+    public Entity(String name, String alias, List<Property> properties) {
         Objects.requireNonNull(name, "name");
 
         this.name = name;
@@ -50,7 +50,6 @@ public class Entity {
                 "name=" + name +
                 ", alias=" + alias +
                 ", properties=" + properties +
-                /*", relations=" + relations +*/
                 '}';
     }
 }
