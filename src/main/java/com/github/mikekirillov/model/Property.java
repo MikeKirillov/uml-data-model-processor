@@ -22,6 +22,30 @@ public class Property {
         this.isForeignKey = isForeignKey;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public boolean isMandatory() {
+        return isMandatory;
+    }
+
+    public boolean isGenerated() {
+        return isGenerated;
+    }
+
+    public boolean isPrimaryKey() {
+        return isPrimaryKey;
+    }
+
+    public boolean isForeignKey() {
+        return isForeignKey;
+    }
+
     @Override
     public String toString() {
         return "Property{" +

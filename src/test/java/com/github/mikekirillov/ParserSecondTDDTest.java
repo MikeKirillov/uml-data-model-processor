@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,6 +39,7 @@ class ParserSecondTDDTest {
         List<Entity> entities = new ArrayList<>();
         List<Relation> relations = new ArrayList<>();
 
+        // processing entities, properties and relations
         entitiesAndRelations(lines, entities, relations);
 
         // System.out.println("entities".toUpperCase() + ": " + entities); // TODO DELETE
@@ -51,6 +53,76 @@ class ParserSecondTDDTest {
         assertEquals("client", entities.get(2).getName());
         assertEquals(8, entities.get(2).getProperties().size());
         assertEquals(2, relations.size());
+
+        // generating schema.sql file
+        String schemaSql = generateSchema(entities);
+
+        System.out.println(schemaSql);
+    }
+
+    private String generateSchema(List<Entity> entities) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        Entity entity = entities.get(0); // works for 0 and 1 but not complex entities like 2 with FKs
+
+        stringBuilder.append("CREATE TABLE IF NOT EXISTS ");
+        stringBuilder.append(entity.getName()).append("(");
+        stringBuilder.append("\n");
+
+        List<Property> properties = entity.getProperties();
+        StringBuilder secondSb = new StringBuilder();
+
+        for (int i = 0; i < properties.size(); i++) {
+            Property property = properties.get(i);
+
+            stringBuilder.append(property.getName());
+            stringBuilder.append(" ");
+            stringBuilder.append(property.getType());
+            stringBuilder.append(" ");
+
+            if (property.isMandatory()) {
+                stringBuilder.append("NOT NULL");
+                stringBuilder.append(" ");
+            } else {
+                stringBuilder.append("NULL");
+                stringBuilder.append(" ");
+            }
+
+            if (property.isPrimaryKey()) {
+                stringBuilder.append("AUTO_INCREMENT");
+                stringBuilder.append(" ");
+                stringBuilder.append("PRIMARY KEY");
+            }
+
+            if (i != properties.size() - 1) {
+                stringBuilder.append(",");
+                // TODO think of if property is last, but not last line in SB cuz of FKs
+            }
+
+            stringBuilder.append("\n");
+
+            if (property.isForeignKey()) {
+                secondSb.append("FOREIGN KEY");
+                secondSb.append("(");
+                secondSb.append(property.getName());
+                secondSb.append(")");
+                secondSb.append(" ");
+                secondSb.append("REFERENCES");
+                secondSb.append(" ");
+
+                // TODO search of entity name and its property
+
+                secondSb.append(",");
+                secondSb.append("\n");
+            }
+        }
+
+        stringBuilder.append(secondSb);
+        stringBuilder.append(");");
+
+        System.out.println("stringBuilder.capacity: " + stringBuilder.capacity()); // TODO DELETE
+
+        return stringBuilder.toString();
     }
 
     private void entitiesAndRelations(List<String> lines, List<Entity> entities, List<Relation> relations) {
