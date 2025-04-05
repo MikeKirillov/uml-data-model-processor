@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ParserTest {
+public class ParserFirstTDDTest {
     private static final String RESOURCES_PATH = "src/test/resources/";
     private static final String TXT_FILE_PATH = "data-base-model.txt";
     private static final String PU_FILE_PATH = "data-base-model.pu";
@@ -155,7 +155,9 @@ public class ParserTest {
 
         // just one of signs (".", "-") uses between relation arrow signs. min count is 1
         for (String string : relationsStrings) {
-            List<String> split = Arrays.asList(string.split(" "));
+            List<String> split = Arrays.stream(string.split(" "))
+                    .filter(it -> !it.isBlank())
+                    .toList();
             String left = split.get(0);
             String right = split.get(split.size() - 1);
             String arrow = split.get(1);
@@ -166,10 +168,10 @@ public class ParserTest {
             assertTrue(leftEntity.isPresent() && rightEntity.isPresent());
 
             if (leftEntity.isPresent() && rightEntity.isPresent()) {
-                RelationType leftRelationType = RelationType.valueOfSign(arrow.substring(0, 2));
+                RelationType leftRelationType = RelationType.valueOfType(arrow.substring(0, 2));
                 EntityRelation leftEntityRelation = new EntityRelation(leftEntity.get(), leftRelationType);
 
-                RelationType rightRelationType = RelationType.valueOfSign(arrow.substring(arrow.length() - 2));
+                RelationType rightRelationType = RelationType.valueOfType(arrow.substring(arrow.length() - 2));
                 EntityRelation rightEntityRelation = new EntityRelation(rightEntity.get(), rightRelationType);
 
                 Relation relation = new Relation(leftEntityRelation, rightEntityRelation);

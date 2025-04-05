@@ -1,6 +1,8 @@
 package com.github.mikekirillov.enums;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum RelationType {
@@ -14,10 +16,12 @@ public enum RelationType {
 
     private final String type;
     private static final Map<String, RelationType> RELATIONS_MAP = new HashMap<>();
+    public static final List<RelationType> RELATIONS = new ArrayList<>();
 
     static {
         for (RelationType value : values()) {
             RELATIONS_MAP.put(value.type, value);
+            RELATIONS.add(value);
         }
     }
 
@@ -29,7 +33,7 @@ public enum RelationType {
         return type;
     }
 
-    public static RelationType valueOfSign(String type) {
+    public static RelationType valueOfType(String type) {
         return RELATIONS_MAP.get(type);
     }
 

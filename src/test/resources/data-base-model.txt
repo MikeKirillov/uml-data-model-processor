@@ -23,6 +23,6 @@ entity  client {
     * registration_date : DATETIME
 }
 
-client }|..|| g
+client   }|..|| g
 st ||--|{ client
 @enduml

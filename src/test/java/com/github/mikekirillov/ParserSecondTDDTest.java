@@ -12,13 +12,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.github.mikekirillov.PumlSchemaTag.AS_NO_SPACES;
 import static org.junit.jupiter.api.Assertions.*;
 
-class PumlAnalyzerTest {
+class ParserSecondTDDTest {
     private static final String RESOURCES_PATH = "src/test/resources/";
     private static final String TXT_FILE_PATH = "data-base-model.txt";
     private static final String PU_FILE_PATH = "data-base-model.pu";
@@ -42,8 +40,8 @@ class PumlAnalyzerTest {
 
         entitiesAndRelations(lines, entities, relations);
 
-        // System.out.println("entities".toUpperCase() + ": " + entities);
-        // System.out.println("relations".toUpperCase() + ": " + relations);
+        // System.out.println("entities".toUpperCase() + ": " + entities); // TODO DELETE
+        // System.out.println("relations".toUpperCase() + ": " + relations); // TODO DELETE
 
         assertEquals(3, entities.size());
         assertEquals("gender", entities.get(0).getName());
@@ -52,6 +50,7 @@ class PumlAnalyzerTest {
         assertEquals(2, entities.get(1).getProperties().size());
         assertEquals("client", entities.get(2).getName());
         assertEquals(8, entities.get(2).getProperties().size());
+        assertEquals(2, relations.size());
     }
 
     private void entitiesAndRelations(List<String> lines, List<Entity> entities, List<Relation> relations) {
@@ -80,7 +79,7 @@ class PumlAnalyzerTest {
                 }
 
                 // process properties
-                if (!line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) && !line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS)) {
+                if (!line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) && !line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS) && RelationType.RELATIONS.stream().noneMatch(it -> line.contains(it.getType()))) {
                     List<String> array = Arrays.stream(line.split(" "))
                             .filter(it -> !it.isBlank() && !it.contains(":"))
                             .toList();
@@ -120,12 +119,43 @@ class PumlAnalyzerTest {
                     }
                 }
 
-            }
+                // process relations
+                if (RelationType.RELATIONS.stream().anyMatch(it -> line.contains(it.getType()))) {
+                    List<String> array = Arrays.stream(line.split(" "))
+                            .filter(it -> !it.isBlank())
+                            .toList();
 
-            // process relations
-            // TODO...
+                    String left = array.get(0);
+                    String right = array.get(array.size() - 1);
+                    String relationArrow = array.get(1);
+
+                    if (!entities.isEmpty()) {
+                        Optional<Entity> leftEntity = findEntity(entities, left);
+                        Optional<Entity> rightEntity = findEntity(entities, right);
+
+                        assertTrue(leftEntity.isPresent());
+                        assertTrue(rightEntity.isPresent());
+
+                        if (leftEntity.isPresent() && rightEntity.isPresent()) {
+                            RelationType leftRelationType = RelationType.valueOfType(relationArrow.substring(0, 2));
+                            EntityRelation leftEntityRelation = new EntityRelation(leftEntity.get(), leftRelationType);
+
+                            RelationType rightRelationType = RelationType.valueOfType(relationArrow.substring(relationArrow.length() - 2));
+                            EntityRelation rightEntityRelation = new EntityRelation(rightEntity.get(), rightRelationType);
+
+                            Relation relation = new Relation(leftEntityRelation, rightEntityRelation);
+
+                            relations.add(relation);
+                        }
+                    }
+                }
+            }
         }
     }
 
-
+    private Optional<Entity> findEntity(List<Entity> entities, String tag) {
+        return entities.stream()
+                .filter(entity -> entity.getName().equals(tag) || entity.getAlias().equals(tag))
+                .findFirst();
+    }
 }
