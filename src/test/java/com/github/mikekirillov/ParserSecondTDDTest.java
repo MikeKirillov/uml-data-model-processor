@@ -63,45 +63,46 @@ class ParserSecondTDDTest {
     private String generateSchema(List<Entity> entities) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        Entity entity = entities.get(0); // works for 0 and 1 but not complex entities like 2 with FKs
+        Entity entity = entities.get(2);
 
         stringBuilder.append("CREATE TABLE IF NOT EXISTS ");
         stringBuilder.append(entity.getName()).append("(");
-        stringBuilder.append("\n");
 
         List<Property> properties = entity.getProperties();
-        StringBuilder secondSb = new StringBuilder();
+        StringBuilder secondSb = null;
 
         for (int i = 0; i < properties.size(); i++) {
             Property property = properties.get(i);
 
+            stringBuilder.append("\n");
             stringBuilder.append(property.getName());
             stringBuilder.append(" ");
             stringBuilder.append(property.getType());
-            stringBuilder.append(" ");
 
             if (property.isMandatory()) {
+                stringBuilder.append(" ");
                 stringBuilder.append("NOT NULL");
-                stringBuilder.append(" ");
             } else {
-                stringBuilder.append("NULL");
                 stringBuilder.append(" ");
+                stringBuilder.append("NULL");
             }
 
             if (property.isPrimaryKey()) {
+                stringBuilder.append(" ");
                 stringBuilder.append("AUTO_INCREMENT");
                 stringBuilder.append(" ");
                 stringBuilder.append("PRIMARY KEY");
             }
 
-            if (i != properties.size() - 1) {
-                stringBuilder.append(",");
-                // TODO think of if property is last, but not last line in SB cuz of FKs
-            }
-
-            stringBuilder.append("\n");
+            stringBuilder.append(",");
 
             if (property.isForeignKey()) {
+
+                if (Objects.isNull(secondSb)) {
+                    secondSb = new StringBuilder();
+                }
+
+                secondSb.append("\n");
                 secondSb.append("FOREIGN KEY");
                 secondSb.append("(");
                 secondSb.append(property.getName());
@@ -113,11 +114,20 @@ class ParserSecondTDDTest {
                 // TODO search of entity name and its property
 
                 secondSb.append(",");
-                secondSb.append("\n");
             }
         }
 
-        stringBuilder.append(secondSb);
+        if (Objects.nonNull(secondSb)) {
+            stringBuilder.append(secondSb);
+            stringBuilder.append("\n");
+        } else {
+            stringBuilder.append("\n");
+        }
+
+        System.out.println(stringBuilder.lastIndexOf("\n"));
+        int indexOfNewLine = stringBuilder.lastIndexOf("\n");
+        stringBuilder.replace(indexOfNewLine - 1, indexOfNewLine, "");
+
         stringBuilder.append(");");
 
         System.out.println("stringBuilder.capacity: " + stringBuilder.capacity()); // TODO DELETE
