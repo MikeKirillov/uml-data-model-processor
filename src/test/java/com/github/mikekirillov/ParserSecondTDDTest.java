@@ -1,5 +1,7 @@
 package com.github.mikekirillov;
 
+import com.github.mikekirillov.constants.PumlSchemaTag;
+import com.github.mikekirillov.constants.SqlSchemaTag;
 import com.github.mikekirillov.enums.RelationType;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.EntityRelation;
@@ -12,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,9 +43,6 @@ class ParserSecondTDDTest {
         // processing entities, properties and relations
         entitiesAndRelations(lines, entities, relations);
 
-        // System.out.println("entities".toUpperCase() + ": " + entities); // TODO DELETE
-        // System.out.println("relations".toUpperCase() + ": " + relations); // TODO DELETE
-
         assertEquals(3, entities.size());
         assertEquals("gender", entities.get(0).getName());
         assertEquals(2, entities.get(0).getProperties().size());
@@ -58,81 +56,6 @@ class ParserSecondTDDTest {
         String schemaSql = generateSchema(entities);
 
         System.out.println(schemaSql);
-    }
-
-    private String generateSchema(List<Entity> entities) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        Entity entity = entities.get(2);
-
-        stringBuilder.append("CREATE TABLE IF NOT EXISTS ");
-        stringBuilder.append(entity.getName()).append("(");
-
-        List<Property> properties = entity.getProperties();
-        StringBuilder secondSb = null;
-
-        for (int i = 0; i < properties.size(); i++) {
-            Property property = properties.get(i);
-
-            stringBuilder.append("\n");
-            stringBuilder.append(property.getName());
-            stringBuilder.append(" ");
-            stringBuilder.append(property.getType());
-
-            if (property.isMandatory()) {
-                stringBuilder.append(" ");
-                stringBuilder.append("NOT NULL");
-            } else {
-                stringBuilder.append(" ");
-                stringBuilder.append("NULL");
-            }
-
-            if (property.isPrimaryKey()) {
-                stringBuilder.append(" ");
-                stringBuilder.append("AUTO_INCREMENT");
-                stringBuilder.append(" ");
-                stringBuilder.append("PRIMARY KEY");
-            }
-
-            stringBuilder.append(",");
-
-            if (property.isForeignKey()) {
-
-                if (Objects.isNull(secondSb)) {
-                    secondSb = new StringBuilder();
-                }
-
-                secondSb.append("\n");
-                secondSb.append("FOREIGN KEY");
-                secondSb.append("(");
-                secondSb.append(property.getName());
-                secondSb.append(")");
-                secondSb.append(" ");
-                secondSb.append("REFERENCES");
-                secondSb.append(" ");
-
-                // TODO search of entity name and its property
-
-                secondSb.append(",");
-            }
-        }
-
-        if (Objects.nonNull(secondSb)) {
-            stringBuilder.append(secondSb);
-            stringBuilder.append("\n");
-        } else {
-            stringBuilder.append("\n");
-        }
-
-        System.out.println(stringBuilder.lastIndexOf("\n"));
-        int indexOfNewLine = stringBuilder.lastIndexOf("\n");
-        stringBuilder.replace(indexOfNewLine - 1, indexOfNewLine, "");
-
-        stringBuilder.append(");");
-
-        System.out.println("stringBuilder.capacity: " + stringBuilder.capacity()); // TODO DELETE
-
-        return stringBuilder.toString();
     }
 
     private void entitiesAndRelations(List<String> lines, List<Entity> entities, List<Relation> relations) {
@@ -220,13 +143,11 @@ class ParserSecondTDDTest {
 
                         if (leftEntity.isPresent() && rightEntity.isPresent()) {
                             RelationType leftRelationType = RelationType.valueOfType(relationArrow.substring(0, 2));
-                            EntityRelation leftEntityRelation = new EntityRelation(leftEntity.get(), leftRelationType);
-
                             RelationType rightRelationType = RelationType.valueOfType(relationArrow.substring(relationArrow.length() - 2));
-                            EntityRelation rightEntityRelation = new EntityRelation(rightEntity.get(), rightRelationType);
-
-                            Relation relation = new Relation(leftEntityRelation, rightEntityRelation);
-
+                            Relation relation = new Relation(
+                                    new EntityRelation(leftEntity.get(), leftRelationType),
+                                    new EntityRelation(rightEntity.get(), rightRelationType)
+                            );
                             relations.add(relation);
                         }
                     }
@@ -239,5 +160,96 @@ class ParserSecondTDDTest {
         return entities.stream()
                 .filter(entity -> entity.getName().equals(tag) || entity.getAlias().equals(tag))
                 .findFirst();
+    }
+
+    private String generateSchema(List<Entity> entities) {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Entity entity : entities) {
+            stringBuilder.append(SqlSchemaTag.CREATE_TABLE_IF_NOT_EXISTS);
+            stringBuilder.append(SqlSchemaTag.SPACE);
+            stringBuilder.append(entity.getName());
+            stringBuilder.append(SqlSchemaTag.BRACKET_OPENED);
+
+            List<Property> properties = entity.getProperties();
+            StringBuilder secondSb = null;
+
+            for (Property property : properties) {
+                stringBuilder.append(SqlSchemaTag.NEW_LINE);
+                stringBuilder.append(property.getName());
+                stringBuilder.append(SqlSchemaTag.SPACE);
+                stringBuilder.append(property.getType());
+
+                if (property.isMandatory()) {
+                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(SqlSchemaTag.NOT_NULL);
+                } else {
+                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(SqlSchemaTag.NULL);
+                }
+
+                if (property.isPrimaryKey()) {
+                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(SqlSchemaTag.AUTO_INCREMENT);
+                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(SqlSchemaTag.PRIMARY_KEY);
+                }
+
+                stringBuilder.append(SqlSchemaTag.COMMA);
+
+                if (property.isForeignKey()) {
+                    Entity referencedEntity = getReferencedEntity(entities, property);
+                    Property referencedProperty = getReferencedProperty(referencedEntity, property);
+
+                    if (Objects.isNull(secondSb)) {
+                        secondSb = new StringBuilder();
+                    }
+
+                    secondSb.append(SqlSchemaTag.NEW_LINE);
+                    secondSb.append(SqlSchemaTag.FOREIGN_KEY);
+                    secondSb.append(SqlSchemaTag.BRACKET_OPENED);
+                    secondSb.append(property.getName());
+                    secondSb.append(SqlSchemaTag.BRACKET_CLOSED);
+                    secondSb.append(SqlSchemaTag.SPACE);
+                    secondSb.append(SqlSchemaTag.REFERENCES);
+                    secondSb.append(SqlSchemaTag.SPACE);
+                    secondSb.append(referencedEntity.getName());
+                    secondSb.append(SqlSchemaTag.BRACKET_OPENED);
+                    secondSb.append(referencedProperty.getName());
+                    secondSb.append(SqlSchemaTag.BRACKET_CLOSED);
+                    secondSb.append(SqlSchemaTag.COMMA);
+                }
+            }
+
+            if (Objects.nonNull(secondSb)) {
+                stringBuilder.append(secondSb);
+                stringBuilder.append(SqlSchemaTag.NEW_LINE);
+            } else {
+                stringBuilder.append(SqlSchemaTag.NEW_LINE);
+            }
+
+            int indexOfNewLine = stringBuilder.lastIndexOf(SqlSchemaTag.NEW_LINE);
+            stringBuilder.replace(indexOfNewLine - 1, indexOfNewLine, "");
+
+            stringBuilder.append(SqlSchemaTag.BRACKET_CLOSED);
+            stringBuilder.append(SqlSchemaTag.SEMICOLON);
+            stringBuilder.append(SqlSchemaTag.NEW_LINE);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private Entity getReferencedEntity(List<Entity> entities, Property property) {
+        return entities.stream()
+                .filter(e -> property.getName().contains(e.getName()))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private Property getReferencedProperty(Entity entity, Property property) {
+        return entity.getProperties().stream()
+                .filter(p -> property.getName().contains(p.getName()))
+                .findFirst()
+                .orElseThrow();
     }
 }

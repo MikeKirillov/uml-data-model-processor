@@ -1,4 +1,4 @@
-package com.github.mikekirillov;
+package com.github.mikekirillov.constants;
 
 public class PumlSchemaTag {
     public static final String START = "@startuml";

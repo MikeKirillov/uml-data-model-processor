@@ -1,5 +1,6 @@
 package com.github.mikekirillov;
 
+import com.github.mikekirillov.constants.PumlSchemaTag;
 import com.github.mikekirillov.enums.RelationType;
 import com.github.mikekirillov.model.Relation;
 import com.github.mikekirillov.model.Entity;
