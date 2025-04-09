@@ -1,6 +1,6 @@
 package com.github.mikekirillov;
 
-import com.github.mikekirillov.constants.PumlSchemaTag;
+import com.github.mikekirillov.constants.PlantUmlSchemaTag;
 import com.github.mikekirillov.enums.RelationType;
 import com.github.mikekirillov.model.Relation;
 import com.github.mikekirillov.model.Entity;
@@ -35,8 +35,8 @@ public class ParserFirstTDDTest {
                 .map(String::trim)
                 .collect(Collectors.toList());
 
-        assertEquals(PumlSchemaTag.START, cleanSpaces.get(0));
-        assertEquals(PumlSchemaTag.END, cleanSpaces.get(cleanSpaces.size() - 1));
+        assertEquals(PlantUmlSchemaTag.START, cleanSpaces.get(0));
+        assertEquals(PlantUmlSchemaTag.END, cleanSpaces.get(cleanSpaces.size() - 1));
 
         List<String> relationsStrings = new ArrayList<>();
         Map<String, List<String>> entitiesStringsAsMap = getEntitiesAsMap(cleanSpaces, relationsStrings);
@@ -55,9 +55,9 @@ public class ParserFirstTDDTest {
             String line = iterator.next();
 
             // get entity/class name
-            if (line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PumlSchemaTag.OBJECT_TYPE_CLASS)) {
+            if (line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS)) {
                 // between quotes ("...") when alias is given. if no quotes then PUML throws exception
-                if (line.toLowerCase().contains(PumlSchemaTag.AS)) {
+                if (line.toLowerCase().contains(PlantUmlSchemaTag.AS)) {
                     int first = line.indexOf("\"") + 1;
                     int second = line.lastIndexOf("\"");
                     entityNameAsLastKey = line.substring(first, second);
@@ -72,7 +72,7 @@ public class ParserFirstTDDTest {
 
             if (entityNameAsLastKey != null) {
                 // check for line = "}", then it was last line of an entity
-                if (line.equals(PumlSchemaTag.CURLY_BRACKET_CLOSED)) {
+                if (line.equals(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED)) {
                     entityInnerLines.add(line);
                     entitiesMap.put(entityNameAsLastKey, entityInnerLines);
                     entityNameAsLastKey = null;
@@ -105,13 +105,13 @@ public class ParserFirstTDDTest {
                 // check if entity has alias
                 String lowCaseLine = line.toLowerCase();
 
-                if (lowCaseLine.contains(PumlSchemaTag.AS)) {
-                    int first = lowCaseLine.lastIndexOf(PumlSchemaTag.AS) + PumlSchemaTag.AS.length();
+                if (lowCaseLine.contains(PlantUmlSchemaTag.AS)) {
+                    int first = lowCaseLine.lastIndexOf(PlantUmlSchemaTag.AS) + PlantUmlSchemaTag.AS.length();
                     String alias = line.substring(first);
                 /*TODO! check is missing:
                    alias and its mentions at relations are not equals (see PUML situations with creating empty entity) */
-                    if (alias.contains(PumlSchemaTag.CURLY_BRACKET_OPENED)) {
-                        entityAlias = alias.substring(0, alias.indexOf(PumlSchemaTag.CURLY_BRACKET_OPENED)).trim();
+                    if (alias.contains(PlantUmlSchemaTag.CURLY_BRACKET_OPENED)) {
+                        entityAlias = alias.substring(0, alias.indexOf(PlantUmlSchemaTag.CURLY_BRACKET_OPENED)).trim();
                     } else {
                         entityAlias = alias;
                     }
@@ -119,18 +119,18 @@ public class ParserFirstTDDTest {
 
                 // check for other lines except entity name and curly brackets
                 // and parse properties
-                if (!line.contains(PumlSchemaTag.AS) && !line.contains(PumlSchemaTag.CURLY_BRACKET_OPENED) && !line.contains(PumlSchemaTag.CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
+                if (!line.contains(PlantUmlSchemaTag.AS) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_OPENED) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
                     PropertyBuilder propertyBuilder = new PropertyBuilder();
-                    propertyBuilder.isMandatory(line.startsWith(PumlSchemaTag.MANDATORY));
-                    propertyBuilder.isForeignKey(line.contains(PumlSchemaTag.FOREIGN_KEY));
+                    propertyBuilder.isMandatory(line.startsWith(PlantUmlSchemaTag.MANDATORY));
+                    propertyBuilder.isForeignKey(line.contains(PlantUmlSchemaTag.FOREIGN_KEY));
 
-                    if (line.contains(PumlSchemaTag.GENERATED)) {
+                    if (line.contains(PlantUmlSchemaTag.GENERATED)) {
                         propertyBuilder.isMandatory(true);
                     }
 
                     List<String> propertyList = Arrays.asList(line.split(" "));
                     var newList = propertyList.stream()
-                            .filter(it -> !it.equals(PumlSchemaTag.MANDATORY))
+                            .filter(it -> !it.equals(PlantUmlSchemaTag.MANDATORY))
                             .filter(it -> !it.equals(":"))
                             .toList();
 

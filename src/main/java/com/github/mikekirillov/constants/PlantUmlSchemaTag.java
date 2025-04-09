@@ -1,6 +1,6 @@
 package com.github.mikekirillov.constants;
 
-public class PumlSchemaTag {
+public class PlantUmlSchemaTag {
     public static final String START = "@startuml";
     public static final String END = "@enduml";
     public static final String OBJECT_TYPE_ENTITY = "entity";
