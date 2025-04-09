@@ -22,8 +22,8 @@ public class PlantUmlAnalyzer {
         PlantUmlRelationsParser relationsParser = new PlantUmlRelationsParser(entities);
         List<Relation> relations = relationsParser.parseLinesFrom(lines);
 
-        SqlSchemaProcessor schemaProcessor = new SqlSchemaProcessor();
-        String sqlSchema = schemaProcessor.generateSchema(entities);
+        SqlSchemaProcessor schemaProcessor = new SqlSchemaProcessor(entities);
+        String sqlSchema = schemaProcessor.generateSchema();
 
         System.out.println(sqlSchema);
     }
