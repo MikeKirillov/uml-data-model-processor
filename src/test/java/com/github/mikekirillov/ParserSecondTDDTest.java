@@ -16,13 +16,11 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.mikekirillov.utils.TestUtils.RESOURCES_PATH;
+import static com.github.mikekirillov.utils.TestUtils.TXT_FILE_PATH;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParserSecondTDDTest {
-    private static final String RESOURCES_PATH = "src/test/resources/";
-    private static final String TXT_FILE_PATH = "data-base-model.txt";
-    private static final String PU_FILE_PATH = "data-base-model.pu";
-    private static final String PUML_FILE_PATH = "data-base-model.puml";
 
     @Test
     public void shouldReadLines() throws IOException {

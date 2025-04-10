@@ -9,22 +9,30 @@ import java.nio.file.Path;
 import java.util.List;
 
 public class PlantUmlAnalyzer {
+    private final PlantUmlParser<Entity> entitiesParser;
+    private final SqlSchemaProcessor processor;
 
-    public void analyze(String pack, String file) throws IOException {
+    public PlantUmlAnalyzer(PlantUmlParser<Entity> entitiesParser,
+                            SqlSchemaProcessor processor) {
+        this.entitiesParser = entitiesParser;
+        this.processor = processor;
+    }
+
+    public String analyze(String pack, String file) throws IOException {
         Path path = Path.of(pack, file);
         List<String> lines = Files.readAllLines(path).stream()
                 .map(String::trim)
                 .toList();
 
-        PlantUmlEntitiesParser entitiesParser = new PlantUmlEntitiesParser();
         List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
-        PlantUmlRelationsParser relationsParser = new PlantUmlRelationsParser(entities);
-        List<Relation> relations = relationsParser.parseLinesFrom(lines);
+        // not required for MVP
+        /* TODO think about split parser for entities only (just for sql script)
+             and parser for entities and relations (for sql script and Java entity-classes generation)
+        */
+        /*PlantUmlParser<Relation> relationsParser = new PlantUmlRelationsParser(entities);
+        List<Relation> relations = relationsParser.parseLinesFrom(lines);*/
 
-        SqlSchemaProcessor schemaProcessor = new SqlSchemaProcessor(entities);
-        String sqlSchema = schemaProcessor.generateSchema();
-
-        System.out.println(sqlSchema);
+        return processor.generateSchema(entities);
     }
 }

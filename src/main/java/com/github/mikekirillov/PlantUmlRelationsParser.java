@@ -38,8 +38,8 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
             String relationArrow = array.get(1);
 
             if (!entities.isEmpty()) {
-                Optional<Entity> leftEntity = findEntity(entities, left);
-                Optional<Entity> rightEntity = findEntity(entities, right);
+                Optional<Entity> leftEntity = findEntity(left);
+                Optional<Entity> rightEntity = findEntity(right);
 
                 if (leftEntity.isPresent() && rightEntity.isPresent()) {
                     UmlRelationType leftRelationType = UmlRelationType.valueOfType(relationArrow.substring(0, 2));
@@ -54,7 +54,7 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
         }
     }
 
-    private Optional<Entity> findEntity(List<Entity> entities, String tag) {
+    private Optional<Entity> findEntity(String tag) {
         return entities.stream()
                 .filter(entity -> entity.getName().equals(tag) || entity.getAlias().equals(tag))
                 .findFirst();
