@@ -1,12 +1,12 @@
 package com.github.mikekirillov.model;
 
-import com.github.mikekirillov.enums.RelationType;
+import com.github.mikekirillov.enums.UmlRelationType;
 
 public class EntityRelation {
     private final Entity entity;
-    private final RelationType relationType;
+    private final UmlRelationType relationType;
 
-    public EntityRelation(Entity entity, RelationType relationType) {
+    public EntityRelation(Entity entity, UmlRelationType relationType) {
         this.entity = entity;
         this.relationType = relationType;
     }

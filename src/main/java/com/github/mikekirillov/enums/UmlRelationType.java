@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public enum RelationType {
+public enum UmlRelationType {
     ZERO_OR_ONE("|o"),
     ZERO_OR_ONE_REVERTED("o|"),
     EXACTLY_ONE("||"),
@@ -15,17 +15,17 @@ public enum RelationType {
     ONE_OR_MANY_REVERTED("|{");
 
     private final String type;
-    private static final Map<String, RelationType> RELATIONS_MAP = new HashMap<>();
-    private static final List<RelationType> RELATIONS = new ArrayList<>();
+    private static final Map<String, UmlRelationType> RELATIONS_MAP = new HashMap<>();
+    private static final List<UmlRelationType> RELATIONS = new ArrayList<>();
 
     static {
-        for (RelationType value : values()) {
+        for (UmlRelationType value : values()) {
             RELATIONS_MAP.put(value.type, value);
             RELATIONS.add(value);
         }
     }
 
-    RelationType(String type) {
+    UmlRelationType(String type) {
         this.type = type;
     }
 
@@ -33,11 +33,11 @@ public enum RelationType {
         return type;
     }
 
-    public static RelationType valueOfType(String type) {
+    public static UmlRelationType valueOfType(String type) {
         return RELATIONS_MAP.get(type);
     }
 
-    public static List<RelationType> getRelations() {
+    public static List<UmlRelationType> getRelations() {
         return RELATIONS;
     }
 

@@ -2,7 +2,7 @@ package com.github.mikekirillov;
 
 import com.github.mikekirillov.constants.PlantUmlSchemaTag;
 import com.github.mikekirillov.constants.SqlSchemaTag;
-import com.github.mikekirillov.enums.RelationType;
+import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.EntityRelation;
 import com.github.mikekirillov.model.Property;
@@ -77,14 +77,14 @@ class ParserSecondTDDTest {
 
                     entity.setName(strings.get(1));
 
-                    if (strings.contains(PlantUmlSchemaTag.AS_NO_SPACES)) {
-                        int as = strings.indexOf(PlantUmlSchemaTag.AS_NO_SPACES);
+                    if (strings.contains(PlantUmlSchemaTag.AS)) {
+                        int as = strings.indexOf(PlantUmlSchemaTag.AS);
                         entity.setAlias(strings.get(as + 1));
                     }
                 }
 
                 // process properties
-                if (!line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY) && !line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS) && RelationType.getRelations().stream().noneMatch(it -> line.contains(it.getType()))) {
+                if (!line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY) && !line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS) && UmlRelationType.getRelations().stream().noneMatch(it -> line.contains(it.getType()))) {
                     List<String> array = Arrays.stream(line.split(" "))
                             .filter(it -> !it.isBlank() && !it.contains(":"))
                             .toList();
@@ -125,7 +125,7 @@ class ParserSecondTDDTest {
                 }
 
                 // process relations
-                if (RelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()))) {
+                if (UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()))) {
                     List<String> array = Arrays.stream(line.split(" "))
                             .filter(it -> !it.isBlank())
                             .toList();
@@ -142,8 +142,8 @@ class ParserSecondTDDTest {
                         assertTrue(rightEntity.isPresent());
 
                         if (leftEntity.isPresent() && rightEntity.isPresent()) {
-                            RelationType leftRelationType = RelationType.valueOfType(relationArrow.substring(0, 2));
-                            RelationType rightRelationType = RelationType.valueOfType(relationArrow.substring(relationArrow.length() - 2));
+                            UmlRelationType leftRelationType = UmlRelationType.valueOfType(relationArrow.substring(0, 2));
+                            UmlRelationType rightRelationType = UmlRelationType.valueOfType(relationArrow.substring(relationArrow.length() - 2));
                             Relation relation = new Relation(
                                     new EntityRelation(leftEntity.get(), leftRelationType),
                                     new EntityRelation(rightEntity.get(), rightRelationType)

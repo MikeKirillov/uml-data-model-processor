@@ -1,7 +1,7 @@
 package com.github.mikekirillov;
 
 import com.github.mikekirillov.constants.PlantUmlSchemaTag;
-import com.github.mikekirillov.enums.RelationType;
+import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Relation;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.EntityRelation;
@@ -57,7 +57,7 @@ public class ParserFirstTDDTest {
             // get entity/class name
             if (line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY) || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS)) {
                 // between quotes ("...") when alias is given. if no quotes then PUML throws exception
-                if (line.toLowerCase().contains(PlantUmlSchemaTag.AS)) {
+                if (line.toLowerCase().contains(PlantUmlSchemaTag.AS_BETWEEN_SPACES)) {
                     int first = line.indexOf("\"") + 1;
                     int second = line.lastIndexOf("\"");
                     entityNameAsLastKey = line.substring(first, second);
@@ -82,8 +82,8 @@ public class ParserFirstTDDTest {
                 }
             }
 
-            if (line.contains(RelationType.ZERO_OR_ONE.getType()) || line.contains(RelationType.EXACTLY_ONE.getType()) ||
-                    line.contains(RelationType.ZERO_OR_MANY.getType()) || line.contains(RelationType.ONE_OR_MANY.getType())) {
+            if (line.contains(UmlRelationType.ZERO_OR_ONE.getType()) || line.contains(UmlRelationType.EXACTLY_ONE.getType()) ||
+                    line.contains(UmlRelationType.ZERO_OR_MANY.getType()) || line.contains(UmlRelationType.ONE_OR_MANY.getType())) {
                 relationsStrings.add(line);
             }
         }
@@ -105,8 +105,8 @@ public class ParserFirstTDDTest {
                 // check if entity has alias
                 String lowCaseLine = line.toLowerCase();
 
-                if (lowCaseLine.contains(PlantUmlSchemaTag.AS)) {
-                    int first = lowCaseLine.lastIndexOf(PlantUmlSchemaTag.AS) + PlantUmlSchemaTag.AS.length();
+                if (lowCaseLine.contains(PlantUmlSchemaTag.AS_BETWEEN_SPACES)) {
+                    int first = lowCaseLine.lastIndexOf(PlantUmlSchemaTag.AS_BETWEEN_SPACES) + PlantUmlSchemaTag.AS_BETWEEN_SPACES.length();
                     String alias = line.substring(first);
                 /*TODO! check is missing:
                    alias and its mentions at relations are not equals (see PUML situations with creating empty entity) */
@@ -119,7 +119,7 @@ public class ParserFirstTDDTest {
 
                 // check for other lines except entity name and curly brackets
                 // and parse properties
-                if (!line.contains(PlantUmlSchemaTag.AS) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_OPENED) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
+                if (!line.contains(PlantUmlSchemaTag.AS_BETWEEN_SPACES) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_OPENED) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
                     PropertyBuilder propertyBuilder = new PropertyBuilder();
                     propertyBuilder.isMandatory(line.startsWith(PlantUmlSchemaTag.MANDATORY));
                     propertyBuilder.isForeignKey(line.contains(PlantUmlSchemaTag.FOREIGN_KEY));
@@ -169,10 +169,10 @@ public class ParserFirstTDDTest {
             assertTrue(leftEntity.isPresent() && rightEntity.isPresent());
 
             if (leftEntity.isPresent() && rightEntity.isPresent()) {
-                RelationType leftRelationType = RelationType.valueOfType(arrow.substring(0, 2));
+                UmlRelationType leftRelationType = UmlRelationType.valueOfType(arrow.substring(0, 2));
                 EntityRelation leftEntityRelation = new EntityRelation(leftEntity.get(), leftRelationType);
 
-                RelationType rightRelationType = RelationType.valueOfType(arrow.substring(arrow.length() - 2));
+                UmlRelationType rightRelationType = UmlRelationType.valueOfType(arrow.substring(arrow.length() - 2));
                 EntityRelation rightEntityRelation = new EntityRelation(rightEntity.get(), rightRelationType);
 
                 Relation relation = new Relation(leftEntityRelation, rightEntityRelation);

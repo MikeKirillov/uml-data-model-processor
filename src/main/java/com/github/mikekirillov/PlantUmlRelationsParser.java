@@ -1,6 +1,6 @@
 package com.github.mikekirillov;
 
-import com.github.mikekirillov.enums.RelationType;
+import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.EntityRelation;
 import com.github.mikekirillov.model.Relation;
@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
-    private final static Predicate<String> LINE_CONTAINS_RELATION_TYPE = line -> RelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
+    private final static Predicate<String> LINE_CONTAINS_RELATION_TYPE = line -> UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
 
     private final List<Entity> entities;
 
@@ -42,8 +42,8 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
                 Optional<Entity> rightEntity = findEntity(entities, right);
 
                 if (leftEntity.isPresent() && rightEntity.isPresent()) {
-                    RelationType leftRelationType = RelationType.valueOfType(relationArrow.substring(0, 2));
-                    RelationType rightRelationType = RelationType.valueOfType(relationArrow.substring(relationArrow.length() - 2));
+                    UmlRelationType leftRelationType = UmlRelationType.valueOfType(relationArrow.substring(0, 2));
+                    UmlRelationType rightRelationType = UmlRelationType.valueOfType(relationArrow.substring(relationArrow.length() - 2));
                     Relation relation = new Relation(
                             new EntityRelation(leftEntity.get(), leftRelationType),
                             new EntityRelation(rightEntity.get(), rightRelationType)

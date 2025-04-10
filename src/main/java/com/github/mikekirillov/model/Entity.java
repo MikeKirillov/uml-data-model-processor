@@ -17,7 +17,6 @@ public class Entity {
         this.name = name;
         this.alias = alias;
         this.properties = properties;
-        /*this.relations = relations;*/
     }
 
     public String getName() {

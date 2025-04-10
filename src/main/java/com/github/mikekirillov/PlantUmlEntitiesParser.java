@@ -1,7 +1,7 @@
 package com.github.mikekirillov;
 
 import com.github.mikekirillov.constants.PlantUmlSchemaTag;
-import com.github.mikekirillov.enums.RelationType;
+import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.Property;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +17,7 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
             || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS);
     private final static Predicate<String> LINE_HAS_ENTITY_OR_CLASS_OR_RELATION_TYPE = line -> line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY)
             || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS)
-            || RelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
+            || UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
 
     @Override
     public List<Entity> parseLinesFrom(List<String> lines) {
@@ -30,7 +30,7 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
                 processEntity(entity, line);
 
                 if (LINE_HAS_ENTITY_OR_CLASS_OR_RELATION_TYPE.negate().test(line)) {
-                    processProperties(line, properties);
+                    processProperty(line, properties);
 
                     if (!properties.isEmpty()) {
                         entity.setProperties(properties);
@@ -58,14 +58,14 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
 
             entity.setName(strings.get(1));
 
-            if (strings.contains(PlantUmlSchemaTag.AS_NO_SPACES)) {
-                int as = strings.indexOf(PlantUmlSchemaTag.AS_NO_SPACES);
+            if (strings.contains(PlantUmlSchemaTag.AS)) {
+                int as = strings.indexOf(PlantUmlSchemaTag.AS);
                 entity.setAlias(strings.get(as + 1));
             }
         }
     }
 
-    private void processProperties(String line, List<Property> properties) {
+    private void processProperty(String line, List<Property> properties) {
         List<String> array = Arrays.stream(line.split(" "))
                 .filter(it -> !it.isBlank() && !it.contains(":"))
                 .toList();
