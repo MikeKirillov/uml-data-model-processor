@@ -11,6 +11,14 @@ public class EntityRelation {
         this.relationType = relationType;
     }
 
+    public Entity getEntity() {
+        return entity;
+    }
+
+    public UmlRelationType getRelationType() {
+        return relationType;
+    }
+
     @Override
     public String toString() {
         return "EntityRelation{" +

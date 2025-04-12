@@ -43,17 +43,13 @@ class PlantUmlAnalyzerTest {
 
     @Test
     public void shouldReturnSqlSchema() throws IOException {
-        PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
-        SqlSchemaProcessor processor = new SqlSchemaProcessor();
-        analyzer = new PlantUmlAnalyzer(entitiesParser, processor);
+        analyzer = new PlantUmlAnalyzer(
+                new PlantUmlEntitiesParser(),
+                new SqlSchemaProcessor()
+        );
 
         String sqlSchema = analyzer.analyze(RESOURCES_PATH, TXT_FILE_PATH);
 
         assertNotNull(sqlSchema);
-    }
-
-    @Test
-    public void shouldThrowNoSuchElementException() {
-        // TODO
     }
 }

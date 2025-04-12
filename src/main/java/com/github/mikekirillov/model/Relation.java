@@ -9,6 +9,14 @@ public class Relation {
         this.rightEntity = rightEntity;
     }
 
+    public EntityRelation getLeftEntity() {
+        return leftEntity;
+    }
+
+    public EntityRelation getRightEntity() {
+        return rightEntity;
+    }
+
     @Override
     public String toString() {
         return "Relation{" +

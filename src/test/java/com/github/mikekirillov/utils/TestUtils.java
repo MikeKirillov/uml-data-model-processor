@@ -25,7 +25,26 @@ public class TestUtils {
                 "--",
                 "* name : VARCHAR(128)",
                 "}",
-                "client   }|..|| g",
+                "@enduml"
+        );
+    }
+
+    public static List<String> returnUmlLinesWithFk() {
+        return List.of(
+                "@startuml",
+                "entity \"gender\" AS g {",
+                "* id : INT <<generated>>",
+                "--",
+                "* name    : VARCHAR(10)",
+                "}",
+                "",
+                "class \"state\" as st{",
+                "* id : INT <<generated>>",
+                "--",
+                "* name : VARCHAR(128)",
+                "gender_id : INT",
+                "}",
+                "st   }|..|| g",
                 "@enduml"
         );
     }
@@ -39,6 +58,48 @@ public class TestUtils {
                 new Entity("state", "st", List.of(
                         new Property("id", "INT", true, true, false),
                         new Property("name", "VARCHAR(128)", true, false, false)
+                ))
+        );
+    }
+
+    public static List<Entity> returnEntitiesWIthFk() {
+        return List.of(
+                new Entity("gender", "g", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(10)", true, false, false)
+                )),
+                new Entity("state", "st", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(128)", true, false, false),
+                        new Property("gender_id", "VARCHAR(128)", true, false, true)
+                ))
+        );
+    }
+
+    public static List<Entity> returnEntitiesDamagedFkEntityName() {
+        return List.of(
+                new Entity("gender", "g", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(10)", true, false, false)
+                )),
+                new Entity("state", "st", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(128)", true, false, false),
+                        new Property("random_id", "VARCHAR(128)", true, false, true)
+                ))
+        );
+    }
+
+    public static List<Entity> returnEntitiesDamagedFkEntityId() {
+        return List.of(
+                new Entity("gender", "g", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(10)", true, false, false)
+                )),
+                new Entity("state", "st", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(128)", true, false, false),
+                        new Property("gender_xx", "VARCHAR(128)", true, false, true)
                 ))
         );
     }
