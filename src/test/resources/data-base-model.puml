@@ -1,0 +1,83 @@
+@startuml
+entity "gender"{
+    * id : INT <<generated>>
+    --
+    * name : VARCHAR(10)
+}
+
+entity "training_type"{
+    * id : INT <<generated>>
+    --
+    * name : VARCHAR(64)
+}
+
+entity "location"{
+    * id : INT <<generated>>
+    --
+    * name : VARCHAR(64)
+}
+
+entity "state"{
+    * id : INT <<generated>>
+    --
+    * name : VARCHAR(128)
+}
+
+entity "client"{
+    * id : INT <<generated>>
+    --
+    * last_name : VARCHAR(128)
+    * first_name : VARCHAR(128)
+    middle_name : VARCHAR(128)
+    full_name : VARCHAR(128)
+    gender_id : INT <<FK>>
+    * phone_number : VARCHAR(128)
+    * registration_date : DATETIME
+}
+
+entity "discipline"{
+    * id : INT <<generated>>
+    --
+    * name : VARCHAR(128)
+    * training_type_id : INT <<FK>>
+}
+
+entity "coach"{
+    * id : INT <<generated>>
+    --
+    * last_name : VARCHAR(128)
+    * first_name : VARCHAR(128)
+    middle_name : VARCHAR(128)
+    full_name : VARCHAR(128)
+    * discipline_id : INT <<FK>>
+    phone_number : VARCHAR(128)
+    registration_date : DATETIME
+    career_start_date : DATETIME
+}
+
+entity "training"{
+    * id : INT <<generated>>
+    --
+    * coach_id : INT <<FK>>
+    * location_id : INT <<FK>>
+    * date_from : TIMESTAMP
+    * date_to : TIMESTAMP
+    * state_id : INT <<FK>>
+}
+
+entity "training_client"{
+    * id : INT <<generated>>
+    --
+    * training_id : INT <<FK>>
+    * client_id : INT <<FK>>
+}
+
+client }|..|| gender
+discipline }|..|| training_type
+coach }|..|| discipline
+training }|..|| coach
+training }|..|| location
+training }|..|| state
+training_client }|..|| training
+training_client }|..|| client
+@enduml
