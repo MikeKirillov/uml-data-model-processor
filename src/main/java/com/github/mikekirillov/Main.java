@@ -9,7 +9,7 @@ public class Main {
     private static final String RESOURCES_PATH_IN = "src/test/resources/";
     private static final String TXT_FILE_PATH_IN = "data-base-model.txt";
     private static final String RESOURCES_PATH_OUT = "src/main/resources/generated/";
-    private static final String TXT_FILE_PATH_OUT = "schema.txt";
+    private static final String TXT_FILE_PATH_OUT = "schema.sql";
 
     public static void main(String[] args) throws IOException {
         PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
