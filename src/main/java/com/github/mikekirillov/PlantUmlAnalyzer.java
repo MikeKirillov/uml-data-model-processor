@@ -10,16 +10,13 @@ import java.util.List;
 
 public class PlantUmlAnalyzer {
     private final PlantUmlParser<Entity> entitiesParser;
-    private final SqlSchemaProcessor processor;
 
-    public PlantUmlAnalyzer(PlantUmlParser<Entity> entitiesParser,
-                            SqlSchemaProcessor processor) {
+    public PlantUmlAnalyzer(PlantUmlParser<Entity> entitiesParser) {
         this.entitiesParser = entitiesParser;
-        this.processor = processor;
     }
 
-    public String analyze(String pack, String file) throws IOException {
-        Path path = Path.of(pack, file);
+    public List<Entity> analyze(String filePath, String fileName) throws IOException {
+        Path path = Path.of(filePath, fileName);
         List<String> lines = Files.readAllLines(path).stream()
                 .map(String::trim)
                 .toList();
@@ -33,6 +30,6 @@ public class PlantUmlAnalyzer {
         /*PlantUmlParser<Relation> relationsParser = new PlantUmlRelationsParser(entities);
         List<Relation> relations = relationsParser.parseLinesFrom(lines);*/
 
-        return processor.generateSchema(entities);
+        return entities;
     }
 }

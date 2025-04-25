@@ -39,6 +39,5 @@ class PlantUmlEntitiesParserTest {
         assertEquals("state", entities.get(1).getName());
         assertEquals("st", entities.get(1).getAlias());
         assertEquals(2, entities.get(1).getProperties().size());
-
     }
 }
