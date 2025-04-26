@@ -17,15 +17,15 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.github.mikekirillov.utils.TestUtils.RESOURCES_PATH;
-import static com.github.mikekirillov.utils.TestUtils.TXT_FILE_PATH;
+import static com.github.mikekirillov.utils.TestUtils.RESOURCES_PATH_IN;
+import static com.github.mikekirillov.utils.TestUtils.TXT_FILE_PATH_IN;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParserSecondTDDTest {
 
     @Test
     public void shouldReadLines() throws IOException {
-        Path path = Path.of(RESOURCES_PATH, TXT_FILE_PATH);
+        Path path = Path.of(RESOURCES_PATH_IN, TXT_FILE_PATH_IN);
 
         // TODO! think about importing basic validation by PUML tools
 
