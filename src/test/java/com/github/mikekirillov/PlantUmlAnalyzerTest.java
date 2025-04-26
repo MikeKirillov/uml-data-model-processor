@@ -31,13 +31,12 @@ class PlantUmlAnalyzerTest {
     public void shouldVerifyAllMethodsCalls() throws IOException {
         List<String> lines = returnUmlLines();
         List<Entity> entities = returnEntities();
-
         MockedStatic<Files> filesMockedStatic = Mockito.mockStatic(Files.class);
 
         when(Files.readAllLines(any())).thenReturn(lines);
         given(entitiesParser.parseLinesFrom(any())).willReturn(entities);
 
-        List<Entity> analyzed = analyzer.analyze(RESOURCES_PATH, TXT_FILE_PATH);
+        List<Entity> analyzed = analyzer.analyze(RESOURCES_PATH_IN, TXT_FILE_PATH_IN);
 
         verify(entitiesParser).parseLinesFrom(lines);
         assertEquals(2, analyzed.size());

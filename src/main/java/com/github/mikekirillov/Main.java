@@ -23,5 +23,5 @@ public class Main {
 
         SqlSchemaFileWriter writer = new SqlSchemaFileWriter(sqlSchema, RESOURCES_PATH_OUT, TXT_FILE_PATH_OUT);
         writer.write();
-    }
+    } // TODO TEST when it would be separate logic class
 }

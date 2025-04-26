@@ -6,11 +6,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 public class SqlSchemaFileWriter {
-    private Logger log = Logger.getLogger(this.getClass().getName()); // TODO is it required or better remake it
-
     private final String sqlSchema;
     private final String filePath;
     private final String fileName;
@@ -32,10 +29,7 @@ public class SqlSchemaFileWriter {
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             writer.write(sqlSchema, 0, sqlSchema.length());
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-
-        log.info("File " + fileName + " were created at " + filePath);
-        // TODO TEST!!!
     }
 }

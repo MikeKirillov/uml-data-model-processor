@@ -6,10 +6,12 @@ import com.github.mikekirillov.model.Property;
 import java.util.List;
 
 public class TestUtils {
-    public static final String RESOURCES_PATH = "src/test/resources/";
-    public static final String TXT_FILE_PATH = "data-base-model.txt";
-    public static final String PU_FILE_PATH = "data-base-model.pu";
-    public static final String PUML_FILE_PATH = "data-base-model.puml";
+    public static final String RESOURCES_PATH_IN = "src/test/resources/";
+    public static final String TXT_FILE_PATH_IN = "data-base-model.txt";
+    public static final String PU_FILE_PATH_IN = "data-base-model.pu";
+    public static final String PUML_FILE_PATH_IN = "data-base-model.puml";
+    public static final String RESOURCES_PATH_OUT = "src/test/resources/generated/";
+    public static final String TXT_FILE_PATH_OUT = "schema.sql";
 
     public static List<String> returnUmlLines() {
         return List.of(
@@ -102,5 +104,12 @@ public class TestUtils {
                         new Property("gender_xx", "VARCHAR(128)", true, false, true)
                 ))
         );
+    }
+
+    public static String returnSqlSchema() {
+        return "CREATE TABLE IF NOT EXISTS gender(\n" +
+                "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
+                "name VARCHAR(10) NOT NULL\n" +
+                ");";
     }
 }
