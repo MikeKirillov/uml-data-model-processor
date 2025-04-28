@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class Main {
-    private static final String RESOURCES_PATH_IN = "src/test/resources/";
+    private static final String RESOURCES_PATH_IN = "puml-data-model-to-sql-core/src/test/resources/";
     private static final String TXT_FILE_PATH_IN = "data-base-model.txt";
     private static final String RESOURCES_PATH_OUT = "src/main/resources/generated/";
     private static final String TXT_FILE_PATH_OUT = "schema.sql";
