@@ -8,7 +8,7 @@ import java.util.List;
 public class Main {
     private static final String RESOURCES_PATH_IN = "puml-data-model-to-sql-core/src/test/resources/";
     private static final String TXT_FILE_PATH_IN = "data-base-model.txt";
-    private static final String RESOURCES_PATH_OUT = "src/main/resources/generated/";
+    private static final String RESOURCES_PATH_OUT = "puml-data-model-to-sql-core/src/main/resources/generated/";
     private static final String TXT_FILE_PATH_OUT = "schema.sql";
 
     public static void main(String[] args) throws IOException {
