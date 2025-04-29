@@ -15,8 +15,8 @@ public class PlantUmlAnalyzer {
         this.entitiesParser = entitiesParser;
     }
 
-    public List<Entity> analyze(String filePath, String fileName) throws IOException {
-        Path path = Path.of(filePath, fileName);
+    public List<Entity> analyze(String filePath) throws IOException {
+        Path path = Path.of(filePath);
         List<String> lines = Files.readAllLines(path).stream()
                 .map(String::trim)
                 .toList();
