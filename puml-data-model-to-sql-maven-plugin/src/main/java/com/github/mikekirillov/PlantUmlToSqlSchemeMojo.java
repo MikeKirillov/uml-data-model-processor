@@ -45,12 +45,12 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
-        SqlSchemaProcessor processor = new SqlSchemaProcessor();
         PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer(entitiesParser);
 
         try {
             List<Entity> entities = analyzer.analyze(inputFilePath);
-            String sqlSchema = processor.generateSchema(entities);
+            SqlSchemaProcessor processor = new SqlSchemaProcessor(entities);
+            String sqlSchema = processor.generateSchema();
 
             getLog().info("Generated schema:\n" + sqlSchema);
 

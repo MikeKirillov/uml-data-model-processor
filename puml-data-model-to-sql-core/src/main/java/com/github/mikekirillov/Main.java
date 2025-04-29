@@ -13,11 +13,11 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
-        SqlSchemaProcessor processor = new SqlSchemaProcessor();
         PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer(entitiesParser);
 
         List<Entity> entities = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
-        String sqlSchema = processor.generateSchema(entities);
+        SqlSchemaProcessor processor = new SqlSchemaProcessor(entities);
+        String sqlSchema = processor.generateSchema();
 
         System.out.println(sqlSchema);
 
