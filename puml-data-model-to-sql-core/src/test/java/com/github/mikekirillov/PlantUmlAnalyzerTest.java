@@ -36,7 +36,7 @@ class PlantUmlAnalyzerTest {
         when(Files.readAllLines(any())).thenReturn(lines);
         given(entitiesParser.parseLinesFrom(any())).willReturn(entities);
 
-        List<Entity> analyzed = analyzer.analyze(RESOURCES_PATH_IN, TXT_FILE_PATH_IN);
+        List<Entity> analyzed = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
 
         verify(entitiesParser).parseLinesFrom(lines);
         assertEquals(2, analyzed.size());

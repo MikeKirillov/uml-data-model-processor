@@ -16,7 +16,7 @@ public class Main {
         SqlSchemaProcessor processor = new SqlSchemaProcessor();
         PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer(entitiesParser);
 
-        List<Entity> entities = analyzer.analyze(RESOURCES_PATH_IN, TXT_FILE_PATH_IN);
+        List<Entity> entities = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
         String sqlSchema = processor.generateSchema(entities);
 
         System.out.println(sqlSchema);
