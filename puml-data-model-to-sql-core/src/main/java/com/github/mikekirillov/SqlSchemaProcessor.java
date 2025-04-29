@@ -7,10 +7,13 @@ import com.github.mikekirillov.model.Property;
 import java.util.List;
 
 public class SqlSchemaProcessor {
-    private List<Entity> entities;
+    private final List<Entity> entities;
 
-    public String generateSchema(List<Entity> entities) {
+    public SqlSchemaProcessor(List<Entity> entities) {
         this.entities = entities;
+    }
+
+    public String generateSchema() {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (Entity entity : entities) {

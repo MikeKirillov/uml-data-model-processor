@@ -13,15 +13,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class SqlSchemaProcessorTest {
     private SqlSchemaProcessor processor;
 
-    @BeforeEach
-    void init() {
-        processor = new SqlSchemaProcessor();
-    }
-
     @Test
     public void shouldReturnSqlSchemaString() {
         List<Entity> entities = returnEntities();
-        String sqlSchema = processor.generateSchema(entities);
+        processor = new SqlSchemaProcessor(entities);
+        String sqlSchema = processor.generateSchema();
 
         assertNotNull(sqlSchema);
     }
@@ -29,14 +25,16 @@ class SqlSchemaProcessorTest {
     @Test
     public void shouldThrowExceptionByDamagedPropertyFkEntityName() {
         List<Entity> entities = returnEntitiesDamagedFkEntityName();
+        processor = new SqlSchemaProcessor(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.generateSchema(entities));
+        assertThrows(NoSuchElementException.class, () -> processor.generateSchema());
     }
 
     @Test
     public void shouldThrowExceptionByDamagedPropertyFkEntityId() {
         List<Entity> entities = returnEntitiesDamagedFkEntityId();
+        processor = new SqlSchemaProcessor(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.generateSchema(entities));
+        assertThrows(NoSuchElementException.class, () -> processor.generateSchema());
     }
 }
