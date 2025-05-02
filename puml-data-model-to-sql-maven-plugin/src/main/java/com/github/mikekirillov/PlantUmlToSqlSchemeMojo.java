@@ -54,7 +54,7 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
 
             getLog().info("Generated schema:\n" + sqlSchema);
 
-            SqlSchemaFileWriter writer = new SqlSchemaFileWriter(sqlSchema, outputFilePath, outputFileName);
+            SqlSchemaFileWriter writer = new SqlSchemaFileWriter(sqlSchema, outputFilePath, outputFileName + "." + outputFileExtension);
             writer.write();
 
             getLog().info(getCompleteMsg());
