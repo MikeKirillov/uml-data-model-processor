@@ -12,16 +12,22 @@ public class Main {
     private static final String TXT_FILE_PATH_OUT = "schema.sql";
 
     public static void main(String[] args) throws IOException {
+        // 1. input model analysis
         PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
         PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer(entitiesParser);
-
         List<Entity> entities = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
+
+        // 2. generating SQL Data Definition Language (DDL) model
         SqlSchemaProcessor processor = new SqlSchemaProcessor(entities);
         String sqlSchema = processor.generateSchema();
 
         System.out.println(sqlSchema);
 
+        // 3. creating and writing DDL script as separate document
         SqlSchemaFileWriter writer = new SqlSchemaFileWriter(sqlSchema, RESOURCES_PATH_OUT, TXT_FILE_PATH_OUT);
         writer.write();
-    } // TODO TEST when it would be separate logic class
+
+        // 4. generating POJO - data model Java classes
+        // TODO
+    }
 }
