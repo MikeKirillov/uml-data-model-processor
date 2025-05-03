@@ -33,7 +33,7 @@ full call:
 
 ## Creating tables
 
-Spring creates tables only with manually created `.../src/main/resources/schema.sql` file or scheme generated
+Spring creates tables only with manually created `.../src/main/resources/schema.sql` file or DDL scheme generated
 with plugin and put scheme at `.../target/classes/` location. So only single value of outputFilePath available.
 
 Test commit with working plugin configuration
