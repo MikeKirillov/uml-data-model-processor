@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.mikekirillov.utils.TestUtils.returnEntitiesWIthFk;
 
@@ -52,7 +54,7 @@ public class ModelClassGeneratorTDDTest {
             // generating fields
             for (Property property : entity.getProperties()) {
                 String propertyType = getPropertyType(property.getType());
-                String propertyName = property.getName(); // TODO change snake case to camel case
+                String propertyName = camelToSnake(property.getName());
 
                 if (property.isPrimaryKey()) {
                     writer.write("\t@Id\n");
@@ -111,5 +113,17 @@ public class ModelClassGeneratorTDDTest {
             case "boolean" -> "boolean";
             default -> "String";
         };
+    }
+
+    private String camelToSnake(String camel) {
+        if (camel.contains("_")) {
+            String snake = Stream.of(camel.split("_"))
+                    .map(StringUtils::capitalize)
+                    .collect(Collectors.joining());
+
+            return StringUtils.uncapitalize(snake);
+        }
+        
+        return camel;
     }
 }
