@@ -73,7 +73,7 @@ public class TestUtils {
                 new Entity("state", "st", List.of(
                         new Property("id", "INT", true, true, false),
                         new Property("name", "VARCHAR(128)", true, false, false),
-                        new Property("gender_id", "VARCHAR(128)", true, false, true)
+                        new Property("gender_id", "INT", true, false, true)
                 ))
         );
     }
