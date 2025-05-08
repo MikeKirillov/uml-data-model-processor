@@ -47,6 +47,7 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
                 Map<String, String> properties = new HashMap<>();
 
                 // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
+                // TODO make configuration checks for unit generation sent by plugin
 
                 writeFields(writer, entity, properties);
                 writeEmptyConstructor(writer, entityName);
