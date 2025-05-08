@@ -3,6 +3,8 @@ package com.github.mikekirillov.tdd;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.Property;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
@@ -15,18 +17,47 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.mikekirillov.utils.TestUtils.POJO_GENERATOR_DIR;
 import static com.github.mikekirillov.utils.TestUtils.returnEntitiesWIthFk;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ModelClassGeneratorTDDTest {
+    private List<Entity> entities;
+    private File parentDir;
+
+    @BeforeEach
+    void init() {
+        entities = returnEntitiesWIthFk();
+        Path path = Path.of(POJO_GENERATOR_DIR);
+        parentDir = new File(path.toUri());
+    }
+
+    @AfterEach
+    void out() {
+        for (String fileName : Objects.requireNonNull(parentDir.list())) {
+            Path path = Path.of(POJO_GENERATOR_DIR + fileName);
+            File fileToDelete = new File(path.toUri());
+
+            fileToDelete.delete();
+            fileToDelete.getParentFile().delete();
+        }
+    }
 
     @Test
     public void shouldGeneratePOJOs() {
-        List<Entity> entities = returnEntitiesWIthFk();
-
-        System.out.println(entities);
-        System.out.println(entities.size());
-
         processEntities(entities);
+
+        assertTrue(parentDir.exists());
+        assertEquals(entities.size(), Objects.requireNonNull(parentDir.list()).length);
+        assertTrue(
+                Objects.requireNonNull(parentDir.list())[0].toLowerCase()
+                        .contains(entities.get(0).getName().toLowerCase())
+        );
+        assertTrue(
+                Objects.requireNonNull(parentDir.list())[1].toLowerCase()
+                        .contains(entities.get(1).getName().toLowerCase())
+        );
     }
 
     private void processEntities(List<Entity> entities) {
@@ -37,7 +68,7 @@ public class ModelClassGeneratorTDDTest {
 
     private void generatePojo(Entity entity) {
         String entityName = StringUtils.capitalize(entity.getName());
-        Path path = Path.of("src/test/java/com/github/mikekirillov/tdd/model/", entityName + ".java");
+        Path path = Path.of(POJO_GENERATOR_DIR, entityName + ".java");
         File file = new File(path.toUri());
 
         if (!file.getParentFile().exists()) {
@@ -84,21 +115,38 @@ public class ModelClassGeneratorTDDTest {
                         }
                     });
 
-            // generating all fields constructor
             if (!properties.isEmpty()) {
-                StringBuilder typeNames = new StringBuilder();
+                // generating all fields constructor
+                StringBuilder constructorParameters = new StringBuilder();
                 StringBuilder declaring = new StringBuilder();
 
                 properties.forEach((name, type) -> {
-                    typeNames.append(type).append(" ").append(name).append(", ");
+                    constructorParameters.append(type).append(" ").append(name).append(", ");
                     declaring.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
                 });
 
-                String typeNameString = typeNames.substring(0, typeNames.length() - 2);
+                String typeNameString = constructorParameters.substring(0, constructorParameters.length() - 2);
 
                 writer.write("\n\tpublic " + entityName + "(" + typeNameString + ") {\n");
                 writer.write(declaring.toString());
                 writer.write("\t}\n");
+
+                // generating getters and setters
+                properties.forEach((name, type) -> {
+                    String getterName = "get" + StringUtils.capitalize(name);
+                    String setterName = "set" + StringUtils.capitalize(name);
+
+                    try {
+                        writer.write("\n\tpublic " + type + " " + getterName + "() {\n");
+                        writer.write("\t\treturn " + name + ";\n");
+                        writer.write("\t}\n");
+                        writer.write("\n\tpublic void " + setterName + "(" + type + " " + name + ") {\n");
+                        writer.write("\t\tthis." + name + " = " + name + ";\n");
+                        writer.write("\t}\n");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
             }
 
             writer.write("}\n");
@@ -123,7 +171,7 @@ public class ModelClassGeneratorTDDTest {
 
             return StringUtils.uncapitalize(snake);
         }
-        
+
         return camel;
     }
 }
