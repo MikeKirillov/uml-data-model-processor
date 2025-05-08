@@ -39,8 +39,8 @@ public class ModelClassGeneratorTDDTest {
             Path path = Path.of(POJO_GENERATOR_DIR + fileName);
             File fileToDelete = new File(path.toUri());
 
-            fileToDelete.delete();
-            fileToDelete.getParentFile().delete();
+            // fileToDelete.delete();
+            // fileToDelete.getParentFile().delete();
         }
     }
 
@@ -76,13 +76,25 @@ public class ModelClassGeneratorTDDTest {
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            // generating package
             writer.write("package com.github.mikekirillov.tdd.model;\n\n");
-            writer.write("import org.springframework.data.annotation.Id;\n\n");
-            writer.write("public class " + entityName + " {\n");
 
-            Map<String, String> properties = new HashMap<>();
+            // generating imports
+            List<Property> propertyList = entity.getProperties();
+            if (propertyList.stream().anyMatch(property -> property.getType().equals("DATETIME"))) {
+                writer.write("import java.sql.Date;\n");
+            }
+            if (propertyList.stream().anyMatch(property -> property.getType().equals("TIMESTAMP"))) {
+                writer.write("import java.util.Date;\n");
+            }
+
+            writer.write("import org.springframework.data.annotation.Id;\n");
+
+            // generating class declaring
+            writer.write("\npublic class " + entityName + " {\n");
 
             // generating fields
+            Map<String, String> properties = new HashMap<>();
             for (Property property : entity.getProperties()) {
                 String propertyType = getPropertyType(property.getType());
                 String propertyName = camelToSnake(property.getName());
@@ -159,6 +171,7 @@ public class ModelClassGeneratorTDDTest {
         return switch (type.toLowerCase()) {
             case "int", "integer" -> "int";
             case "boolean" -> "boolean";
+            case "datetime", "timestamp" -> "Date";
             default -> "String";
         };
     }
