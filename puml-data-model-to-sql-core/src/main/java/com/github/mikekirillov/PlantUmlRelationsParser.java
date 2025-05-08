@@ -9,7 +9,8 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
-    private final static Predicate<String> LINE_CONTAINS_RELATION_TYPE = line -> UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
+    private final static Predicate<String> LINE_CONTAINS_RELATION_TYPE = line ->
+            UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
 
     private final List<Entity> entities;
 

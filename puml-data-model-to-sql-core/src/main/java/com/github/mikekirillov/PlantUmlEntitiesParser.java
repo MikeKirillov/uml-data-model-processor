@@ -4,18 +4,22 @@ import com.github.mikekirillov.constants.PlantUmlSchemaTag;
 import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.Property;
+import com.github.mikekirillov.model.PropertyBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 import java.util.function.Predicate;
 
 public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
-    private final static Predicate<String> LINE_IS_START_OR_END = line -> line.toLowerCase().contains(PlantUmlSchemaTag.START)
+    private final static Predicate<String> LINE_IS_START_OR_END = line ->
+            line.toLowerCase().contains(PlantUmlSchemaTag.START)
             || line.toLowerCase().contains(PlantUmlSchemaTag.END)
             || StringUtils.containsOnly(line, "-");
-    private final static Predicate<String> LINE_IS_ENTITY_OR_CLASS = line -> line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY)
+    private final static Predicate<String> LINE_IS_ENTITY_OR_CLASS = line ->
+            line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY)
             || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS);
-    private final static Predicate<String> LINE_HAS_ENTITY_OR_CLASS_OR_RELATION_TYPE = line -> line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY)
+    private final static Predicate<String> LINE_HAS_ENTITY_OR_CLASS_OR_RELATION_TYPE = line ->
+            line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY)
             || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS)
             || UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
 

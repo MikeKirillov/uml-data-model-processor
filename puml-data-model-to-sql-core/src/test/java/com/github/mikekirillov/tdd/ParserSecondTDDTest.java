@@ -1,6 +1,6 @@
 package com.github.mikekirillov.tdd;
 
-import com.github.mikekirillov.PropertyBuilder;
+import com.github.mikekirillov.model.PropertyBuilder;
 import com.github.mikekirillov.constants.PlantUmlSchemaTag;
 import com.github.mikekirillov.constants.SqlSchemaTag;
 import com.github.mikekirillov.enums.UmlRelationType;

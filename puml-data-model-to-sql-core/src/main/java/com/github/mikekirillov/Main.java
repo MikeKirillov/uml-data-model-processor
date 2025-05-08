@@ -10,6 +10,7 @@ public class Main {
     private static final String TXT_FILE_PATH_IN = "data-base-model.txt";
     private static final String RESOURCES_PATH_OUT = "puml-data-model-to-sql-core/src/main/resources/generated/";
     private static final String TXT_FILE_PATH_OUT = "schema.sql";
+    private static final String POJO_GENERATOR_OUT_DIR = "puml-data-model-to-sql-core/src/main/resources/generated/model";
 
     public static void main(String[] args) throws IOException {
         // 1. input model analysis
@@ -28,6 +29,7 @@ public class Main {
         writer.write();
 
         // 4. generating POJO - data model Java classes
-        // TODO
+        ModelPojoWriter modelPojoWriter = new JdbcModePojoWriter(POJO_GENERATOR_OUT_DIR);
+        modelPojoWriter.processEntities(entities);
     }
 }
