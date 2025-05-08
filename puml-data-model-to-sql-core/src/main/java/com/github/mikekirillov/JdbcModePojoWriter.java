@@ -166,7 +166,7 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
         return switch (type.toLowerCase()) {
             case "int", "integer" -> "int";
             case "boolean" -> "boolean";
-            case "datetime" -> "Date";
+            case "datetime", "timestamp" -> "Date";
             default -> "String";
         };
     }
