@@ -107,6 +107,20 @@ public class TestUtils {
         );
     }
 
+    public static List<Entity> returnEntitiesWIthFkSnake() {
+        return List.of(
+                new Entity("gender_es", "g", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(10)", true, false, false)
+                )),
+                new Entity("state", "st", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(128)", true, false, false),
+                        new Property("gender_es_id", "INT", true, false, true)
+                ))
+        );
+    }
+
     public static String returnSqlSchema() {
         return "CREATE TABLE IF NOT EXISTS gender(\n" +
                 "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +

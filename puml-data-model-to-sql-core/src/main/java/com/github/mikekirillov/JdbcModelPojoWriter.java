@@ -100,9 +100,10 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     private void writeFields(Writer writer, Entity entity, Map<String, String> properties) throws IOException {
         for (Property property : entity.getProperties()) {
-            String name = camelToSnake(property.getName());
+            String name = snakeToCamel(property.getName());
             String type = convertType(property.getType());
 
+            // TODO for Spring Data JDBC config param check
             if (property.isPrimaryKey()) {
                 writer.write("\t@Id\n");
             }
@@ -187,7 +188,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         };
     }
 
-    private String camelToSnake(String camel) {
+    private String snakeToCamel(String camel) {
         if (camel.contains("_")) {
             String snake = Stream.of(camel.split("_"))
                     .map(StringUtils::capitalize)
