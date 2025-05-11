@@ -101,6 +101,7 @@ public class ModelClassGeneratorTDDTest {
                 writeIdConstructor(writer, entity, entityName);
                 writeAllArgsConstructor(writer, properties, entityName);
                 writeGettersSetters(writer, properties);
+                writeToStringMethod(writer, properties, entityName);
             } else {
                 writeNoArgsConstructor(writer, entityName);
             }
@@ -230,6 +231,29 @@ public class ModelClassGeneratorTDDTest {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    private void writeToStringMethod(Writer writer, Map<String, String> properties, String entityName) throws IOException {
+        writer.write("\n\t@Override");
+        writer.write("\n\tpublic String toString() {");
+        writer.write("\n\t\treturn \"" + entityName + "{\" +");
+
+        Optional<String> firstKey = properties.keySet().stream().findFirst();
+
+        properties.forEach((key, values) -> {
+            try {
+                if (firstKey.isPresent() && key.equals(firstKey.get())) {
+                    writer.write("\n\t\t\t\"" + key + "='\" + " + key + " + '\\'' +");
+                } else {
+                    writer.write("\n\t\t\t\", " + key + "='\" + " + key + " + '\\'' +");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        writer.write("\n\t\t'}';");
+        writer.write("\n\t}\n");
     }
 
     private void writeClosingFile(Writer writer) throws IOException {

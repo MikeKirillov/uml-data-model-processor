@@ -15,4 +15,18 @@ public class Client {
 	private Date registrationDate;
 
 	public Client() {}
+
+	@Override
+	public String toString() {
+		return "Client{" +
+			"lastName='" + lastName + '\'' +
+			", firstName='" + firstName + '\'' +
+			", gender='" + gender + '\'' +
+			", registrationDate='" + registrationDate + '\'' +
+			", fullName='" + fullName + '\'' +
+			", middleName='" + middleName + '\'' +
+			", id='" + id + '\'' +
+			", state='" + state + '\'' +
+		'}';
+	}
 }

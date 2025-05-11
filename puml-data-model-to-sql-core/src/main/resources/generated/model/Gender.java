@@ -8,4 +8,12 @@ public class Gender {
 	private String name;
 
 	public Gender() {}
+
+	@Override
+	public String toString() {
+		return "Gender{" +
+			"name='" + name + '\'' +
+			", id='" + id + '\'' +
+		'}';
+	}
 }

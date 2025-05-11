@@ -8,10 +8,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,6 +21,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final boolean requiresAllArgsConstructor;
     private final boolean requiresGetters;
     private final boolean requiresSetters;
+    private final boolean requiresToStringMethod;
 
     private List<Entity> foreignKeyEntities = null;
 
@@ -34,7 +32,8 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                                boolean requiresIdArgConstructor,
                                boolean requiresAllArgsConstructor,
                                boolean requiresGetters,
-                               boolean requiresSetters) {
+                               boolean requiresSetters,
+                               boolean requiresToStringMethod) {
         this.outputModelPath = outputModelPath;
         this.foreignKeyParamsAsObjectReference = foreignKeyParamsAsObjectReference;
         this.requiresSpringDataJdbcAnnotations = requiresSpringDataJdbcAnnotations;
@@ -43,6 +42,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         this.requiresAllArgsConstructor = requiresAllArgsConstructor;
         this.requiresGetters = requiresGetters;
         this.requiresSetters = requiresSetters;
+        this.requiresToStringMethod = requiresToStringMethod;
     }
 
     @Override
@@ -101,6 +101,9 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 }
                 if (requiresGetters || requiresSetters) {
                     writeGettersSetters(writer, properties);
+                }
+                if (requiresToStringMethod) {
+                    writeToStringMethod(writer, properties, entityName);
                 }
             } else {
                 if (requiresNoArgsConstructor) {
@@ -227,6 +230,29 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    private void writeToStringMethod(Writer writer, Map<String, String> properties, String entityName) throws IOException {
+        writer.write("\n\t@Override");
+        writer.write("\n\tpublic String toString() {");
+        writer.write("\n\t\treturn \"" + entityName + "{\" +");
+
+        Optional<String> firstKey = properties.keySet().stream().findFirst();
+
+        properties.forEach((key, values) -> {
+            try {
+                if (firstKey.isPresent() && key.equals(firstKey.get())) {
+                    writer.write("\n\t\t\t\"" + key + "='\" + " + key + " + '\\'' +");
+                } else {
+                    writer.write("\n\t\t\t\", " + key + "='\" + " + key + " + '\\'' +");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        writer.write("\n\t\t'}';");
+        writer.write("\n\t}\n");
     }
 
     private void writeClosingFile(Writer writer) throws IOException {
