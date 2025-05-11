@@ -163,7 +163,6 @@ public class ModelClassGeneratorTDDTest {
                         .filter(itName -> propertyName.contains(itName.toLowerCase()))
                         .findFirst()
                         .orElseThrow();
-
                 name = snakeToCamel(foundOne, false);
                 type = snakeToCamel(foundOne, true);
 
