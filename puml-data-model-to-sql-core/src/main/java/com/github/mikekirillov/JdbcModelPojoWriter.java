@@ -11,32 +11,68 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final String outputModelPath;
-    private boolean requiredSpringDataJdbcAnnotations;
-    private boolean requiredGetters;
-    private boolean requiredSetters;
-    private boolean requiredNoArgsConstructor;
-    private boolean requiredIdArgConstructor;
-    private boolean requiredAllArgsConstructor;
+    private final boolean foreignKeyParamsAsObjectReference;
+    private final boolean requiresSpringDataJdbcAnnotations;
+    private final boolean requiresNoArgsConstructor;
+    private final boolean requiresIdArgConstructor;
+    private final boolean requiresAllArgsConstructor;
+    private final boolean requiresGetters;
+    private final boolean requiresSetters;
 
-    public JdbcModelPojoWriter(String outputModelPath) {
+    private List<Entity> foreignKeyEntities = null;
+
+    public JdbcModelPojoWriter(String outputModelPath,
+                               boolean foreignKeyParamsAsObjectReference,
+                               boolean requiresSpringDataJdbcAnnotations,
+                               boolean requiresNoArgsConstructor,
+                               boolean requiresIdArgConstructor,
+                               boolean requiresAllArgsConstructor,
+                               boolean requiresGetters,
+                               boolean requiresSetters) {
         this.outputModelPath = outputModelPath;
+        this.foreignKeyParamsAsObjectReference = foreignKeyParamsAsObjectReference;
+        this.requiresSpringDataJdbcAnnotations = requiresSpringDataJdbcAnnotations;
+        this.requiresNoArgsConstructor = requiresNoArgsConstructor;
+        this.requiresIdArgConstructor = requiresIdArgConstructor;
+        this.requiresAllArgsConstructor = requiresAllArgsConstructor;
+        this.requiresGetters = requiresGetters;
+        this.requiresSetters = requiresSetters;
     }
 
     @Override
     public void processEntities(List<Entity> entities) {
-        for (Entity entity : entities) {
-            write(entity);
+        if (foreignKeyParamsAsObjectReference) {
+            foreignKeyEntities = entities.stream()
+                    .filter(entity -> entity.getProperties().stream().noneMatch(Property::isForeignKey))
+                    .toList();
+
+            for (Entity entity : foreignKeyEntities) {
+                write(entity);
+            }
+
+            List<Entity> hasFks = entities.stream()
+                    .filter(entity -> entity.getProperties().stream().anyMatch(Property::isForeignKey))
+                    .toList();
+
+            for (Entity entity : hasFks) {
+                write(entity);
+            }
+        } else {
+            for (Entity entity : entities) {
+                write(entity);
+            }
         }
     }
 
     @Override
     public void write(Entity entity) {
-        String entityName = StringUtils.capitalize(entity.getName());
+        String entityName = snakeToCamel(entity.getName(), true);
         Path path = Path.of(outputModelPath, entityName + ".java");
         File file = new File(path.toUri());
 
@@ -52,15 +88,24 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
 
-                // TODO make configuration checks for unit generation sent by plugin
-
                 writeFields(writer, entity, properties);
-                writeNoArgsConstructor(writer, entityName);
-                writeIdConstructor(writer, entity, entityName);
-                writeAllArgsConstructor(writer, properties, entityName);
-                writeGettersSetters(writer, properties);
+
+                if (requiresNoArgsConstructor) {
+                    writeNoArgsConstructor(writer, entityName);
+                }
+                if (requiresIdArgConstructor) {
+                    writeIdConstructor(writer, entity, entityName);
+                }
+                if (requiresAllArgsConstructor) {
+                    writeAllArgsConstructor(writer, properties, entityName);
+                }
+                if (requiresGetters || requiresSetters) {
+                    writeGettersSetters(writer, properties);
+                }
             } else {
-                writeNoArgsConstructor(writer, entityName);
+                if (requiresNoArgsConstructor) {
+                    writeNoArgsConstructor(writer, entityName);
+                }
             }
 
             writeClosingFile(writer);
@@ -76,8 +121,9 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
     private void writeImports(Writer writer, Entity entity) throws IOException {
         List<Property> propertyList = entity.getProperties();
 
-        // TODO for Spring Data JDBC config param check
-        writer.write("import org.springframework.data.annotation.Id;\n");
+        if (requiresSpringDataJdbcAnnotations) {
+            writer.write("import org.springframework.data.annotation.Id;\n");
+        }
 
         if (!propertyList.isEmpty()) {
             if (propertyList.stream().anyMatch(property -> property.getType().equals("DATETIME"))) {
@@ -89,8 +135,6 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
             }
 
             // TODO REMEMBER that scheme could contain both of date types
-
-            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
         }
     }
 
@@ -100,18 +144,28 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     private void writeFields(Writer writer, Entity entity, Map<String, String> properties) throws IOException {
         for (Property property : entity.getProperties()) {
-            String name = snakeToCamel(property.getName());
-            String type = convertType(property.getType());
+            String name, type;
 
-            // TODO for Spring Data JDBC config param check
-            if (property.isPrimaryKey()) {
+            if (requiresSpringDataJdbcAnnotations && property.isPrimaryKey()) {
                 writer.write("\t@Id\n");
+            }
+
+            if (property.isForeignKey() && Objects.nonNull(foreignKeyEntities)) {
+                String propertyName = property.getName().toLowerCase();
+                String foundOne = foreignKeyEntities.stream()
+                        .map(Entity::getName)
+                        .filter(itName -> propertyName.contains(itName.toLowerCase()))
+                        .findFirst()
+                        .orElseThrow();
+                name = snakeToCamel(foundOne, false);
+                type = snakeToCamel(foundOne, true);
+            } else {
+                name = snakeToCamel(property.getName(), false);
+                type = convertType(property.getType());
             }
 
             writer.write("\tprivate " + type + " " + name + ";\n");
             properties.put(name, type);
-
-            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
         }
     }
 
@@ -151,8 +205,6 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         writer.write("\n\tpublic " + entityName + "(" + typeNameString + ") {\n");
         writer.write(declaring.toString());
         writer.write("\t}\n");
-
-        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
     }
 
     private void writeGettersSetters(Writer writer, Map<String, String> properties) throws IOException {
@@ -161,18 +213,20 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
             String setterName = "set" + StringUtils.capitalize(name);
 
             try {
-                writer.write("\n\tpublic " + type + " " + getterName + "() {\n");
-                writer.write("\t\treturn " + name + ";\n");
-                writer.write("\t}\n");
-                writer.write("\n\tpublic void " + setterName + "(" + type + " " + name + ") {\n");
-                writer.write("\t\tthis." + name + " = " + name + ";\n");
-                writer.write("\t}\n");
+                if (requiresGetters) {
+                    writer.write("\n\tpublic " + type + " " + getterName + "() {\n");
+                    writer.write("\t\treturn " + name + ";\n");
+                    writer.write("\t}\n");
+                }
+                if (requiresSetters) {
+                    writer.write("\n\tpublic void " + setterName + "(" + type + " " + name + ") {\n");
+                    writer.write("\t\tthis." + name + " = " + name + ";\n");
+                    writer.write("\t}\n");
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-
-        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
     }
 
     private void writeClosingFile(Writer writer) throws IOException {
@@ -188,15 +242,13 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         };
     }
 
-    private String snakeToCamel(String camel) {
+    private String snakeToCamel(String camel, boolean capitalize) {
         if (camel.contains("_")) {
-            String snake = Stream.of(camel.split("_"))
+            camel = Stream.of(camel.split("_"))
                     .map(StringUtils::capitalize)
                     .collect(Collectors.joining());
-
-            return StringUtils.uncapitalize(snake);
         }
 
-        return camel;
+        return capitalize ? StringUtils.capitalize(camel) : StringUtils.uncapitalize(camel);
     }
 }
