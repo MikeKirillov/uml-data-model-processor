@@ -14,11 +14,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class JdbcModePojoWriter implements ModelPojoWriter {
-    private final String filePath;
+public class JdbcModelPojoWriter implements ModelPojoWriter {
+    private final String outputModelPath;
+    private boolean requiredSpringDataJdbcAnnotations;
+    private boolean requiredGetters;
+    private boolean requiredSetters;
+    private boolean requiredNoArgsConstructor;
+    private boolean requiredIdArgConstructor;
+    private boolean requiredAllArgsConstructor;
 
-    public JdbcModePojoWriter(String filePath) {
-        this.filePath = filePath;
+    public JdbcModelPojoWriter(String outputModelPath) {
+        this.outputModelPath = outputModelPath;
     }
 
     @Override
@@ -31,7 +37,7 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
     @Override
     public void write(Entity entity) {
         String entityName = StringUtils.capitalize(entity.getName());
-        Path path = Path.of(filePath, entityName + ".java");
+        Path path = Path.of(outputModelPath, entityName + ".java");
         File file = new File(path.toUri());
 
         if (!file.getParentFile().exists()) {
@@ -46,7 +52,6 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
 
-                // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
                 // TODO make configuration checks for unit generation sent by plugin
 
                 writeFields(writer, entity, properties);
@@ -71,6 +76,9 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
     private void writeImports(Writer writer, Entity entity) throws IOException {
         List<Property> propertyList = entity.getProperties();
 
+        // TODO for Spring Data JDBC config param check
+        writer.write("import org.springframework.data.annotation.Id;\n");
+
         if (!propertyList.isEmpty()) {
             if (propertyList.stream().anyMatch(property -> property.getType().equals("DATETIME"))) {
                 writer.write("import java.sql.Date;\n");
@@ -79,9 +87,11 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
             if (propertyList.stream().anyMatch(property -> property.getType().equals("TIMESTAMP"))) {
                 writer.write("import java.util.Date;\n");
             }
-        } // TODO REMEMBER that scheme could contain both of date types
 
-        writer.write("import org.springframework.data.annotation.Id;\n");
+            // TODO REMEMBER that scheme could contain both of date types
+
+            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
+        }
     }
 
     private void writeClassDeclaration(Writer writer, String entityName) throws IOException {
@@ -99,6 +109,8 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
 
             writer.write("\tprivate " + type + " " + name + ";\n");
             properties.put(name, type);
+
+            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
         }
     }
 
@@ -138,6 +150,8 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
         writer.write("\n\tpublic " + entityName + "(" + typeNameString + ") {\n");
         writer.write(declaring.toString());
         writer.write("\t}\n");
+
+        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
     }
 
     private void writeGettersSetters(Writer writer, Map<String, String> properties) throws IOException {
@@ -156,6 +170,8 @@ public class JdbcModePojoWriter implements ModelPojoWriter {
                 throw new RuntimeException(e);
             }
         });
+
+        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
     }
 
     private void writeClosingFile(Writer writer) throws IOException {

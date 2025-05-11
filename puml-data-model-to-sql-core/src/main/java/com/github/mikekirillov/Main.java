@@ -29,7 +29,7 @@ public class Main {
         writer.write();
 
         // 4. generating POJO - data model Java classes
-        ModelPojoWriter modelPojoWriter = new JdbcModePojoWriter(POJO_GENERATOR_OUT_DIR);
+        ModelPojoWriter modelPojoWriter = new JdbcModelPojoWriter(POJO_GENERATOR_OUT_DIR);
         modelPojoWriter.processEntities(entities);
     }
 }

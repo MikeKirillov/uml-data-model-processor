@@ -70,26 +70,26 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
     }
 
     private void processProperty(String line, List<Property> properties) {
-        List<String> array = Arrays.stream(line.split(" "))
+        List<String> strings = Arrays.stream(line.split(" "))
                 .filter(it -> !it.isBlank() && !it.contains(":"))
                 .toList();
 
         PropertyBuilder propertyBuilder = new PropertyBuilder();
-        if (!array.get(0).equals(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED)) {
-            if (array.get(0).contains(PlantUmlSchemaTag.MANDATORY)) {
+        if (!strings.get(0).equals(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED)) {
+            if (strings.get(0).contains(PlantUmlSchemaTag.MANDATORY)) {
                 propertyBuilder.isMandatory(true);
-                propertyBuilder.name(array.get(1));
-                propertyBuilder.type(array.get(2));
+                propertyBuilder.name(strings.get(1));
+                propertyBuilder.type(strings.get(2));
             } else {
-                propertyBuilder.name(array.get(0));
-                propertyBuilder.type(array.get(1));
+                propertyBuilder.name(strings.get(0));
+                propertyBuilder.type(strings.get(1));
             }
 
-            if (array.stream().anyMatch(it -> it.toLowerCase().contains(PlantUmlSchemaTag.GENERATED))) {
+            if (strings.stream().anyMatch(it -> it.toLowerCase().contains(PlantUmlSchemaTag.GENERATED))) {
                 propertyBuilder.isGenerated(true);
             }
 
-            if (array.stream().anyMatch(it -> it.toUpperCase().contains(PlantUmlSchemaTag.FOREIGN_KEY))) {
+            if (strings.stream().anyMatch(it -> it.toUpperCase().contains(PlantUmlSchemaTag.FOREIGN_KEY))) {
                 propertyBuilder.isForeignKey(true);
             }
 
