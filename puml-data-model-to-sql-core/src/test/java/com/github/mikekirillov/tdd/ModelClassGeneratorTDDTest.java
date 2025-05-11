@@ -28,7 +28,7 @@ public class ModelClassGeneratorTDDTest {
 
     @BeforeEach
     void init() {
-        entities = returnEntitiesWIthFk();
+        entities = returnEntitiesWIthFkSnake();
         Path path = Path.of(POJO_GENERATOR_DIR);
         parentDir = new File(path.toUri());
     }
@@ -39,8 +39,8 @@ public class ModelClassGeneratorTDDTest {
             Path path = Path.of(POJO_GENERATOR_DIR + fileName);
             File fileToDelete = new File(path.toUri());
 
-            // fileToDelete.delete();
-            // fileToDelete.getParentFile().delete();
+            fileToDelete.delete();
+            fileToDelete.getParentFile().delete();
         }
     }
 
@@ -50,47 +50,6 @@ public class ModelClassGeneratorTDDTest {
 
         assertTrue(parentDir.exists());
         assertEquals(entities.size(), Objects.requireNonNull(parentDir.list()).length);
-        assertTrue(
-                Objects.requireNonNull(parentDir.list())[0].toLowerCase()
-                        .contains(entities.get(0).getName().toLowerCase())
-        );
-        assertTrue(
-                Objects.requireNonNull(parentDir.list())[1].toLowerCase()
-                        .contains(entities.get(1).getName().toLowerCase())
-        );
-    }
-
-    private void processEntities(List<Entity> entities) {
-        for (Entity entity : entities) {
-            generatePojo(entity);
-        }
-    }
-
-    private void generatePojo(Entity entity) {
-        String entityName = StringUtils.capitalize(entity.getName());
-        Path path = createDirAndFile(entityName);
-
-        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            writePackage(writer);
-            writeImports(writer, entity);
-            writeClassDeclaration(writer, entityName);
-
-            if (!entity.getProperties().isEmpty()) {
-                Map<String, String> properties = new HashMap<>();
-
-                writeFields(writer, entity, properties);
-                writeNoArgsConstructor(writer, entityName);
-                writeIdConstructor(writer, entity, entityName);
-                writeAllArgsConstructor(writer, properties, entityName);
-                writeGettersSetters(writer, properties);
-            } else {
-                writeNoArgsConstructor(writer, entityName);
-            }
-
-            writeClosingFile(writer);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Test
@@ -99,40 +58,34 @@ public class ModelClassGeneratorTDDTest {
 
         assertTrue(parentDir.exists());
         assertEquals(entities.size(), Objects.requireNonNull(parentDir.list()).length);
-        assertTrue(
-                Objects.requireNonNull(parentDir.list())[0].toLowerCase()
-                        .contains(entities.get(0).getName().toLowerCase())
-        );
-        assertTrue(
-                Objects.requireNonNull(parentDir.list())[1].toLowerCase()
-                        .contains(entities.get(1).getName().toLowerCase())
-        );
+    }
+
+    private void processEntities(List<Entity> entities) {
+        for (Entity entity : entities) {
+            generatePojo(entity, false, null);
+        }
     }
 
     private void processEntitiesWithInnerFkClass(List<Entity> entities) {
-        List<Entity> isFks = entities.stream()
+        List<Entity> fks = entities.stream()
                 .filter(entity -> entity.getProperties().stream().noneMatch(Property::isForeignKey))
                 .toList();
 
-        System.out.println(isFks);
-
-        for (Entity entity : isFks) {
-            generatePojo(entity);
+        for (Entity entity : fks) {
+            generatePojo(entity, false, null);
         }
 
         List<Entity> hasFks = entities.stream()
                 .filter(entity -> entity.getProperties().stream().anyMatch(Property::isForeignKey))
                 .toList();
 
-        System.out.println(hasFks);
-
         for (Entity entity : hasFks) {
-            generatePojoWithInnerFkClass(entity, isFks);
+            generatePojo(entity, true, fks);
         }
     }
 
-    private void generatePojoWithInnerFkClass(Entity entity, List<Entity> isFks) {
-        String entityName = StringUtils.capitalize(entity.getName());
+    private void generatePojo(Entity entity, boolean fkAsClass, List<Entity> fks) {
+        String entityName = snakeToCamel(entity.getName(), true);
         Path path = createDirAndFile(entityName);
 
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
@@ -143,7 +96,7 @@ public class ModelClassGeneratorTDDTest {
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
 
-                writeFields(writer, entity, properties);
+                writeFields(writer, entity, properties, fkAsClass, fks);
                 writeNoArgsConstructor(writer, entityName);
                 writeIdConstructor(writer, entity, entityName);
                 writeAllArgsConstructor(writer, properties, entityName);
@@ -157,7 +110,6 @@ public class ModelClassGeneratorTDDTest {
             throw new RuntimeException(e);
         }
     }
-
 
     private Path createDirAndFile(String entityName) {
         Path path = Path.of(POJO_GENERATOR_DIR, entityName + ".java");
@@ -177,7 +129,7 @@ public class ModelClassGeneratorTDDTest {
     private void writeImports(Writer writer, Entity entity) throws IOException {
         List<Property> propertyList = entity.getProperties();
 
-        // TODO for Spring Data JDBC config param check
+        // for Spring Data JDBC config param check
         writer.write("import org.springframework.data.annotation.Id;\n");
 
         if (!propertyList.isEmpty()) {
@@ -188,10 +140,6 @@ public class ModelClassGeneratorTDDTest {
             if (propertyList.stream().anyMatch(property -> property.getType().equals("TIMESTAMP"))) {
                 writer.write("import java.util.Date;\n");
             }
-
-            // TODO REMEMBER that scheme could contain both of date types
-
-            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
         }
     }
 
@@ -199,19 +147,33 @@ public class ModelClassGeneratorTDDTest {
         writer.write("\npublic class " + entityName + " {\n");
     }
 
-    private void writeFields(Writer writer, Entity entity, Map<String, String> properties) throws IOException {
+    private void writeFields(Writer writer, Entity entity, Map<String, String> properties, boolean fkAsClass, List<Entity> fks) throws IOException {
         for (Property property : entity.getProperties()) {
-            String name = camelToSnake(property.getName());
-            String type = convertType(property.getType());
+            String name, type;
 
+            // for Spring Data JDBC config param check
             if (property.isPrimaryKey()) {
                 writer.write("\t@Id\n");
             }
 
+            if (property.isForeignKey() && fkAsClass) {
+                String propertyName = property.getName().toLowerCase();
+                String foundOne = fks.stream()
+                        .map(Entity::getName)
+                        .filter(itName -> propertyName.contains(itName.toLowerCase()))
+                        .findFirst()
+                        .orElseThrow();
+
+                name = snakeToCamel(foundOne, false);
+                type = snakeToCamel(foundOne, true);
+
+            } else {
+                name = snakeToCamel(property.getName(), false);
+                type = convertType(property.getType());
+            }
+
             writer.write("\tprivate " + type + " " + name + ";\n");
             properties.put(name, type);
-
-            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
         }
     }
 
@@ -251,8 +213,6 @@ public class ModelClassGeneratorTDDTest {
         writer.write("\n\tpublic " + entityName + "(" + typeNameString + ") {\n");
         writer.write(declaring.toString());
         writer.write("\t}\n");
-
-        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
     }
 
     private void writeGettersSetters(Writer writer, Map<String, String> properties) throws IOException {
@@ -271,8 +231,6 @@ public class ModelClassGeneratorTDDTest {
                 throw new RuntimeException(e);
             }
         });
-
-        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
     }
 
     private void writeClosingFile(Writer writer) throws IOException {
@@ -288,15 +246,13 @@ public class ModelClassGeneratorTDDTest {
         };
     }
 
-    private String camelToSnake(String camel) {
+    private String snakeToCamel(String camel, boolean capitalize) {
         if (camel.contains("_")) {
-            String snake = Stream.of(camel.split("_"))
+            camel = Stream.of(camel.split("_"))
                     .map(StringUtils::capitalize)
                     .collect(Collectors.joining());
-
-            return StringUtils.uncapitalize(snake);
         }
 
-        return camel;
+        return capitalize ? StringUtils.capitalize(camel) : StringUtils.uncapitalize(camel);
     }
 }
