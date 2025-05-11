@@ -55,12 +55,12 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 // TODO make configuration checks for unit generation sent by plugin
 
                 writeFields(writer, entity, properties);
-                writeEmptyConstructor(writer, entityName);
+                writeNoArgsConstructor(writer, entityName);
                 writeIdConstructor(writer, entity, entityName);
                 writeAllArgsConstructor(writer, properties, entityName);
                 writeGettersSetters(writer, properties);
             } else {
-                writeEmptyConstructor(writer, entityName);
+                writeNoArgsConstructor(writer, entityName);
             }
 
             writeClosingFile(writer);
@@ -114,7 +114,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         }
     }
 
-    private void writeEmptyConstructor(Writer writer, String entityName) throws IOException {
+    private void writeNoArgsConstructor(Writer writer, String entityName) throws IOException {
         writer.write("\n\tpublic " + entityName + "() {}\n");
     }
 
