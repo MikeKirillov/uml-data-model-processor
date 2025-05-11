@@ -8,4 +8,12 @@ public class State {
 	private String name;
 
 	public State() {}
+
+	@Override
+	public String toString() {
+		return "State{" +
+			"name='" + name + '\'' +
+			", id='" + id + '\'' +
+		'}';
+	}
 }
