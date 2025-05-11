@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,8 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.mikekirillov.utils.TestUtils.POJO_GENERATOR_DIR;
-import static com.github.mikekirillov.utils.TestUtils.returnEntitiesWIthFk;
+import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -68,101 +68,26 @@ public class ModelClassGeneratorTDDTest {
 
     private void generatePojo(Entity entity) {
         String entityName = StringUtils.capitalize(entity.getName());
-        Path path = Path.of(POJO_GENERATOR_DIR, entityName + ".java");
-        File file = new File(path.toUri());
-
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
+        Path path = createDirAndFile(entityName);
 
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            // generating package
-            writer.write("package com.github.mikekirillov.tdd.model;\n\n");
+            writePackage(writer);
+            writeImports(writer, entity);
+            writeClassDeclaration(writer, entityName);
 
-            // generating imports
-            List<Property> propertyList = entity.getProperties();
-            if (propertyList.stream().anyMatch(property -> property.getType().equals("DATETIME"))) {
-                writer.write("import java.sql.Date;\n");
-            }
-            if (propertyList.stream().anyMatch(property -> property.getType().equals("TIMESTAMP"))) {
-                writer.write("import java.util.Date;\n");
-            }
+            if (!entity.getProperties().isEmpty()) {
+                Map<String, String> properties = new HashMap<>();
 
-            // for Spring Data JDBC config param check
-            writer.write("import org.springframework.data.annotation.Id;\n");
-
-            // generating class declaring
-            writer.write("\npublic class " + entityName + " {\n");
-
-            // generating fields
-            Map<String, String> properties = new HashMap<>();
-            for (Property property : entity.getProperties()) {
-                String propertyType = getPropertyType(property.getType());
-                String propertyName = camelToSnake(property.getName());
-
-                if (property.isPrimaryKey()) {
-                    writer.write("\t@Id\n");
-                }
-
-                writer.write("\tprivate " + propertyType + " " + propertyName + ";\n");
-                properties.put(propertyName, propertyType);
+                writeFields(writer, entity, properties);
+                writeNoArgsConstructor(writer, entityName);
+                writeIdConstructor(writer, entity, entityName);
+                writeAllArgsConstructor(writer, properties, entityName);
+                writeGettersSetters(writer, properties);
+            } else {
+                writeNoArgsConstructor(writer, entityName);
             }
 
-            // generating empty constructor
-            writer.write("\n\tpublic " + entityName + "() {}\n");
-
-            // generating id constructor
-            entity.getProperties().stream()
-                    .filter(Property::isPrimaryKey)
-                    .findFirst()
-                    .ifPresent(primaryKey -> {
-                        String name = primaryKey.getName();
-                        String type = getPropertyType(primaryKey.getType());
-
-                        try {
-                            writer.write("\n\tpublic " + entityName + "(" + type + " " + name + ") {\n");
-                            writer.write("\t\tthis." + name + " = " + name + ";\n");
-                            writer.write("\t}\n");
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-
-            if (!properties.isEmpty()) {
-                // generating all fields constructor
-                StringBuilder constructorParameters = new StringBuilder();
-                StringBuilder declaring = new StringBuilder();
-
-                properties.forEach((name, type) -> {
-                    constructorParameters.append(type).append(" ").append(name).append(", ");
-                    declaring.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
-                });
-
-                String typeNameString = constructorParameters.substring(0, constructorParameters.length() - 2);
-
-                writer.write("\n\tpublic " + entityName + "(" + typeNameString + ") {\n");
-                writer.write(declaring.toString());
-                writer.write("\t}\n");
-
-                // generating getters and setters
-                properties.forEach((name, type) -> {
-                    String getterName = "get" + StringUtils.capitalize(name);
-                    String setterName = "set" + StringUtils.capitalize(name);
-
-                    try {
-                        writer.write("\n\tpublic " + type + " " + getterName + "() {\n");
-                        writer.write("\t\treturn " + name + ";\n");
-                        writer.write("\t}\n");
-                        writer.write("\n\tpublic void " + setterName + "(" + type + " " + name + ") {\n");
-                        writer.write("\t\tthis." + name + " = " + name + ";\n");
-                        writer.write("\t}\n");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
-
-            writer.write("}\n");
+            writeClosingFile(writer);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -189,6 +114,8 @@ public class ModelClassGeneratorTDDTest {
                 .filter(entity -> entity.getProperties().stream().noneMatch(Property::isForeignKey))
                 .toList();
 
+        System.out.println(isFks);
+
         for (Entity entity : isFks) {
             generatePojo(entity);
         }
@@ -197,6 +124,8 @@ public class ModelClassGeneratorTDDTest {
                 .filter(entity -> entity.getProperties().stream().anyMatch(Property::isForeignKey))
                 .toList();
 
+        System.out.println(hasFks);
+
         for (Entity entity : hasFks) {
             generatePojoWithInnerFkClass(entity, isFks);
         }
@@ -204,6 +133,33 @@ public class ModelClassGeneratorTDDTest {
 
     private void generatePojoWithInnerFkClass(Entity entity, List<Entity> isFks) {
         String entityName = StringUtils.capitalize(entity.getName());
+        Path path = createDirAndFile(entityName);
+
+        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            writePackage(writer);
+            writeImports(writer, entity);
+            writeClassDeclaration(writer, entityName);
+
+            if (!entity.getProperties().isEmpty()) {
+                Map<String, String> properties = new HashMap<>();
+
+                writeFields(writer, entity, properties);
+                writeNoArgsConstructor(writer, entityName);
+                writeIdConstructor(writer, entity, entityName);
+                writeAllArgsConstructor(writer, properties, entityName);
+                writeGettersSetters(writer, properties);
+            } else {
+                writeNoArgsConstructor(writer, entityName);
+            }
+
+            writeClosingFile(writer);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private Path createDirAndFile(String entityName) {
         Path path = Path.of(POJO_GENERATOR_DIR, entityName + ".java");
         File file = new File(path.toUri());
 
@@ -211,100 +167,119 @@ public class ModelClassGeneratorTDDTest {
             file.getParentFile().mkdirs();
         }
 
-        try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            // generating package
-            writer.write("package com.github.mikekirillov.tdd.model;\n\n");
+        return path;
+    }
 
-            // generating imports
-            List<Property> propertyList = entity.getProperties();
+    private void writePackage(Writer writer) throws IOException {
+        writer.write("package com.github.mikekirillov.tdd.model;\n\n");
+    }
+
+    private void writeImports(Writer writer, Entity entity) throws IOException {
+        List<Property> propertyList = entity.getProperties();
+
+        // TODO for Spring Data JDBC config param check
+        writer.write("import org.springframework.data.annotation.Id;\n");
+
+        if (!propertyList.isEmpty()) {
             if (propertyList.stream().anyMatch(property -> property.getType().equals("DATETIME"))) {
                 writer.write("import java.sql.Date;\n");
             }
+
             if (propertyList.stream().anyMatch(property -> property.getType().equals("TIMESTAMP"))) {
                 writer.write("import java.util.Date;\n");
             }
 
-            // for Spring Data JDBC config param check
-            writer.write("import org.springframework.data.annotation.Id;\n");
+            // TODO REMEMBER that scheme could contain both of date types
 
-            // generating class declaring
-            writer.write("\npublic class " + entityName + " {\n");
+            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
+        }
+    }
 
-            // generating fields
-            Map<String, String> properties = new HashMap<>();
-            for (Property property : entity.getProperties()) {
-                String propertyType = getPropertyType(property.getType());
-                String propertyName = camelToSnake(property.getName());
+    private void writeClassDeclaration(Writer writer, String entityName) throws IOException {
+        writer.write("\npublic class " + entityName + " {\n");
+    }
 
-                if (property.isPrimaryKey()) {
-                    writer.write("\t@Id\n");
-                }
+    private void writeFields(Writer writer, Entity entity, Map<String, String> properties) throws IOException {
+        for (Property property : entity.getProperties()) {
+            String name = camelToSnake(property.getName());
+            String type = convertType(property.getType());
 
-                writer.write("\tprivate " + propertyType + " " + propertyName + ";\n");
-                properties.put(propertyName, propertyType);
+            if (property.isPrimaryKey()) {
+                writer.write("\t@Id\n");
             }
 
-            // generating empty constructor
-            writer.write("\n\tpublic " + entityName + "() {}\n");
+            writer.write("\tprivate " + type + " " + name + ";\n");
+            properties.put(name, type);
 
-            // generating id constructor
-            entity.getProperties().stream()
-                    .filter(Property::isPrimaryKey)
-                    .findFirst()
-                    .ifPresent(primaryKey -> {
-                        String name = primaryKey.getName();
-                        String type = getPropertyType(primaryKey.getType());
+            // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
+        }
+    }
 
-                        try {
-                            writer.write("\n\tpublic " + entityName + "(" + type + " " + name + ") {\n");
-                            writer.write("\t\tthis." + name + " = " + name + ";\n");
-                            writer.write("\t}\n");
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+    private void writeNoArgsConstructor(Writer writer, String entityName) throws IOException {
+        writer.write("\n\tpublic " + entityName + "() {}\n");
+    }
 
-            if (!properties.isEmpty()) {
-                // generating all fields constructor
-                StringBuilder constructorParameters = new StringBuilder();
-                StringBuilder declaring = new StringBuilder();
-
-                properties.forEach((name, type) -> {
-                    constructorParameters.append(type).append(" ").append(name).append(", ");
-                    declaring.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
-                });
-
-                String typeNameString = constructorParameters.substring(0, constructorParameters.length() - 2);
-
-                writer.write("\n\tpublic " + entityName + "(" + typeNameString + ") {\n");
-                writer.write(declaring.toString());
-                writer.write("\t}\n");
-
-                // generating getters and setters
-                properties.forEach((name, type) -> {
-                    String getterName = "get" + StringUtils.capitalize(name);
-                    String setterName = "set" + StringUtils.capitalize(name);
+    private void writeIdConstructor(Writer writer, Entity entity, String entityName) throws IOException {
+        entity.getProperties().stream()
+                .filter(Property::isPrimaryKey)
+                .findFirst()
+                .ifPresent(primaryKey -> {
+                    String name = primaryKey.getName();
+                    String type = convertType(primaryKey.getType());
 
                     try {
-                        writer.write("\n\tpublic " + type + " " + getterName + "() {\n");
-                        writer.write("\t\treturn " + name + ";\n");
-                        writer.write("\t}\n");
-                        writer.write("\n\tpublic void " + setterName + "(" + type + " " + name + ") {\n");
+                        writer.write("\n\tpublic " + entityName + "(" + type + " " + name + ") {\n");
                         writer.write("\t\tthis." + name + " = " + name + ";\n");
                         writer.write("\t}\n");
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 });
-            }
-
-            writer.write("}\n");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
-    private String getPropertyType(String type) {
+    private void writeAllArgsConstructor(Writer writer, Map<String, String> properties, String entityName) throws IOException {
+        StringBuilder constructorParameters = new StringBuilder();
+        StringBuilder declaring = new StringBuilder();
+
+        properties.forEach((name, type) -> {
+            constructorParameters.append(type).append(" ").append(name).append(", ");
+            declaring.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
+        });
+
+        String typeNameString = constructorParameters.substring(0, constructorParameters.length() - 2);
+
+        writer.write("\n\tpublic " + entityName + "(" + typeNameString + ") {\n");
+        writer.write(declaring.toString());
+        writer.write("\t}\n");
+
+        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
+    }
+
+    private void writeGettersSetters(Writer writer, Map<String, String> properties) throws IOException {
+        properties.forEach((name, type) -> {
+            String getterName = "get" + StringUtils.capitalize(name);
+            String setterName = "set" + StringUtils.capitalize(name);
+
+            try {
+                writer.write("\n\tpublic " + type + " " + getterName + "() {\n");
+                writer.write("\t\treturn " + name + ";\n");
+                writer.write("\t}\n");
+                writer.write("\n\tpublic void " + setterName + "(" + type + " " + name + ") {\n");
+                writer.write("\t\tthis." + name + " = " + name + ";\n");
+                writer.write("\t}\n");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        // TODO FK property could be used as is (from uml scheme) or as link to other generated POJO
+    }
+
+    private void writeClosingFile(Writer writer) throws IOException {
+        writer.write("}\n");
+    }
+
+    private String convertType(String type) {
         return switch (type.toLowerCase()) {
             case "int", "integer" -> "int";
             case "boolean" -> "boolean";
