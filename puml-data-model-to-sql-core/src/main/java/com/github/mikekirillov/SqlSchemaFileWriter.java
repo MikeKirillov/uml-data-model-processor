@@ -9,17 +9,17 @@ import java.nio.file.Path;
 
 public class SqlSchemaFileWriter {
     private final String sqlSchema;
-    private final String filePath;
-    private final String fileName;
+    private final String outputFilePath;
+    private final String outputFile;
 
-    public SqlSchemaFileWriter(String sqlSchema, String filePath, String fileName) {
+    public SqlSchemaFileWriter(String sqlSchema, String outputFilePath, String outputFile) {
         this.sqlSchema = sqlSchema;
-        this.filePath = filePath;
-        this.fileName = fileName;
+        this.outputFilePath = outputFilePath;
+        this.outputFile = outputFile;
     }
 
     public void write() {
-        Path path = Path.of(filePath, fileName);
+        Path path = Path.of(outputFilePath, outputFile);
         File file = new File(path.toUri());
 
         if (!file.getParentFile().exists()) {
