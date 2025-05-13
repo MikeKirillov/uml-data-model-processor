@@ -28,7 +28,7 @@ public class ModelClassGeneratorTDDTest {
 
     @BeforeEach
     void init() {
-        entities = returnEntitiesWIthFkSnake();
+        entities = returnEntitiesWithFkSnake();
         Path path = Path.of(POJO_GENERATOR_DIR);
         parentDir = new File(path.toUri());
     }

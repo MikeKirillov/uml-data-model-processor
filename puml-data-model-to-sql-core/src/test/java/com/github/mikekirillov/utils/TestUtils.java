@@ -12,7 +12,7 @@ public class TestUtils {
     public static final String PUML_FILE_PATH_IN = "data-base-model.puml";
     public static final String RESOURCES_PATH_OUT = "src/test/resources/generated/";
     public static final String TXT_FILE_PATH_OUT = "schema.sql";
-    public static final String POJO_GENERATOR_DIR = "src/test/java/com/github/mikekirillov/tdd/model/";
+    public static final String POJO_GENERATOR_DIR = "src/test/resources/model/";
 
     public static List<String> returnUmlLines() {
         return List.of(
@@ -65,7 +65,7 @@ public class TestUtils {
         );
     }
 
-    public static List<Entity> returnEntitiesWIthFk() {
+    public static List<Entity> returnEntitiesWithFk() {
         return List.of(
                 new Entity("gender", "g", List.of(
                         new Property("id", "INT", true, true, false),
@@ -107,7 +107,7 @@ public class TestUtils {
         );
     }
 
-    public static List<Entity> returnEntitiesWIthFkSnake() {
+    public static List<Entity> returnEntitiesWithFkSnake() {
         return List.of(
                 new Entity("gender_es", "g", List.of(
                         new Property("id", "INT", true, true, false),
