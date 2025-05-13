@@ -26,7 +26,7 @@ class PlantUmlRelationsParserTest {
 
     @Test
     public void shouldReturnRelations() {
-        List<Entity> entities = returnEntitiesWIthFk();
+        List<Entity> entities = returnEntitiesWithFk();
         parser = new PlantUmlRelationsParser(entities);
 
         List<String> lines = returnUmlLinesWithFk();

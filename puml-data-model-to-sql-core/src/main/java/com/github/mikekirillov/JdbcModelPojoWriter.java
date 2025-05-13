@@ -9,8 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
+import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
+import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 
 public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final String outputModelPath;
@@ -70,8 +71,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         }
     }
 
-    @Override
-    public void write(Entity entity) {
+    private void write(Entity entity) {
         String entityName = snakeToCamel(entity.getName(), true);
         Path path = Path.of(outputModelPath, entityName + ".java");
         File file = new File(path.toUri());
@@ -257,24 +257,5 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     private void writeClosingFile(Writer writer) throws IOException {
         writer.write("}\n");
-    }
-
-    private String convertType(String type) {
-        return switch (type.toLowerCase()) {
-            case "int", "integer" -> "int";
-            case "boolean" -> "boolean";
-            case "datetime", "timestamp" -> "Date";
-            default -> "String";
-        };
-    }
-
-    private String snakeToCamel(String camel, boolean capitalize) {
-        if (camel.contains("_")) {
-            camel = Stream.of(camel.split("_"))
-                    .map(StringUtils::capitalize)
-                    .collect(Collectors.joining());
-        }
-
-        return capitalize ? StringUtils.capitalize(camel) : StringUtils.uncapitalize(camel);
     }
 }
