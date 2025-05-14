@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
@@ -20,9 +19,10 @@ class JdbcModelPojoWriterTest {
 
     @Test
     public void shouldWriteEasyPojo() throws IOException {
+        boolean fkAsClass = false;
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
-                false,
+                fkAsClass,
                 false,
                 false,
                 false,
@@ -33,14 +33,15 @@ class JdbcModelPojoWriterTest {
         );
         List<Entity> entities = returnEntitiesWithFk();
         writer.processEntities(entities);
-        assertEntities(entities, null);
+        assertEntities(entities, fkAsClass);
     }
 
     @Test
     public void shouldWritePojoWithSnakeProperty() throws IOException {
+        boolean fkAsClass = true;
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
-                true,
+                fkAsClass,
                 false,
                 false,
                 false,
@@ -51,17 +52,10 @@ class JdbcModelPojoWriterTest {
         );
         List<Entity> entities = returnEntitiesWithFkSnake();
         writer.processEntities(entities);
-        List<Entity> foreignKeyEntities = entities.stream()
-                .filter(entity -> entity.getProperties().stream().noneMatch(Property::isForeignKey))
-                .toList();
-        assertEntities(foreignKeyEntities, null);
-        List<Entity> hasFks = entities.stream()
-                .filter(entity -> entity.getProperties().stream().anyMatch(Property::isForeignKey))
-                .toList();
-        assertEntities(hasFks, foreignKeyEntities);
+        assertEntities(entities, fkAsClass);
     }
 
-    private void assertEntities(List<Entity> entities, List<Entity> foreignKeyEntities) throws IOException {
+    private void assertEntities(List<Entity> entities, boolean fkAsClass) throws IOException {
         for (Entity entity : entities) {
             String capitalizedEntityName = snakeToCamel(entity.getName(), true);
             File createdFile = createJavaFile(capitalizedEntityName);
@@ -74,18 +68,17 @@ class JdbcModelPojoWriterTest {
             assertEquals("public class " + capitalizedEntityName + " {", lines.get(1));
 
             List<Property> properties = entity.getProperties();
-            assertProperties(properties, foreignKeyEntities, lines);
-
+            assertProperties(properties, entities, lines, fkAsClass);
             assertEquals("}", lines.get(linesSize - 1));
             deleteJavaFile(createdFile);
         }
     }
 
-    private void assertProperties(List<Property> properties, List<Entity> foreignKeyEntities, List<String> lines) {
+    private void assertProperties(List<Property> properties, List<Entity> entities, List<String> lines, boolean fkAsClass) {
         for (int i = 0; i < properties.size(); i++) {
             Property property = properties.get(i);
-            if (property.isForeignKey() && Objects.nonNull(foreignKeyEntities)) {
-                var foundOne = foreignKeyEntities.stream()
+            if (fkAsClass && property.isForeignKey()) {
+                var foundOne = entities.stream()
                         .map(Entity::getName)
                         .filter(itName -> property.getName().contains(itName.toLowerCase()))
                         .findFirst()

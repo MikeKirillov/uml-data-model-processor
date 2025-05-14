@@ -32,8 +32,8 @@ public class Main {
         ModelPojoWriter modelPojoWriter = new JdbcModelPojoWriter(
                 POJO_GENERATOR_OUT_DIR,
                 true,
-                true,
-                true,
+                false,
+                false,
                 false,
                 false,
                 false,

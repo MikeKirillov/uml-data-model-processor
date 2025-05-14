@@ -24,7 +24,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final boolean requiresSetters;
     private final boolean requiresToStringMethod;
 
-    private List<Entity> foreignKeyEntities = null;
+    private final List<Entity> processedEntities = new ArrayList<>();
 
     public JdbcModelPojoWriter(String outputModelPath,
                                boolean foreignKeyParamsAsObjectReference,
@@ -48,26 +48,8 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     @Override
     public void processEntities(List<Entity> entities) {
-        if (foreignKeyParamsAsObjectReference) {
-            foreignKeyEntities = entities.stream()
-                    .filter(entity -> entity.getProperties().stream().noneMatch(Property::isForeignKey))
-                    .toList();
-
-            for (Entity entity : foreignKeyEntities) {
-                write(entity);
-            }
-
-            List<Entity> hasFks = entities.stream()
-                    .filter(entity -> entity.getProperties().stream().anyMatch(Property::isForeignKey))
-                    .toList();
-
-            for (Entity entity : hasFks) {
-                write(entity);
-            }
-        } else {
-            for (Entity entity : entities) {
-                write(entity);
-            }
+        for (Entity entity : entities) {
+            write(entity);
         }
     }
 
@@ -84,12 +66,9 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
             writePackage(writer);
             writeImports(writer, entity);
             writeClassDeclaration(writer, entityName);
-
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
-
                 writeFields(writer, entity, properties);
-
                 if (requiresNoArgsConstructor) {
                     writeNoArgsConstructor(writer, entityName);
                 }
@@ -110,9 +89,10 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                     writeNoArgsConstructor(writer, entityName);
                 }
             }
-
             writeClosingFile(writer);
-        } catch (IOException e) {
+            processedEntities.add(entity);
+        } catch (IOException | UnsupportedOperationException e) {
+            file.delete();
             throw new RuntimeException(e);
         }
     }
@@ -153,9 +133,9 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 writer.write("\t@Id\n");
             }
 
-            if (property.isForeignKey() && Objects.nonNull(foreignKeyEntities)) {
+            if (foreignKeyParamsAsObjectReference && property.isForeignKey() && !processedEntities.isEmpty()) {
                 String propertyName = property.getName().toLowerCase();
-                String foundOne = foreignKeyEntities.stream()
+                String foundOne = processedEntities.stream()
                         .map(Entity::getName)
                         .filter(itName -> propertyName.contains(itName.toLowerCase()))
                         .findFirst()
@@ -251,7 +231,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
             }
         });
 
-        writer.write("\n\t\t'}';");
+        writer.write("\n\t\t\t'}';");
         writer.write("\n\t}\n");
     }
 
