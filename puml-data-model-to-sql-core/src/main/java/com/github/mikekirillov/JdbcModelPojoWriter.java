@@ -15,6 +15,7 @@ import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 
 public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final String outputModelPath;
+    private final List<Entity> entities;
     private final boolean foreignKeyParamsAsObjectReference;
     private final boolean requiresSpringDataJdbcAnnotations;
     private final boolean requiresNoArgsConstructor;
@@ -24,9 +25,8 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final boolean requiresSetters;
     private final boolean requiresToStringMethod;
 
-    private final List<Entity> processedEntities = new ArrayList<>();
-
     public JdbcModelPojoWriter(String outputModelPath,
+                               List<Entity> entities,
                                boolean foreignKeyParamsAsObjectReference,
                                boolean requiresSpringDataJdbcAnnotations,
                                boolean requiresNoArgsConstructor,
@@ -36,6 +36,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                                boolean requiresSetters,
                                boolean requiresToStringMethod) {
         this.outputModelPath = outputModelPath;
+        this.entities = entities;
         this.foreignKeyParamsAsObjectReference = foreignKeyParamsAsObjectReference;
         this.requiresSpringDataJdbcAnnotations = requiresSpringDataJdbcAnnotations;
         this.requiresNoArgsConstructor = requiresNoArgsConstructor;
@@ -47,13 +48,13 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
     }
 
     @Override
-    public void processEntities(List<Entity> entities) {
+    public void write() {
         for (Entity entity : entities) {
-            write(entity);
+            processEntity(entity);
         }
     }
 
-    private void write(Entity entity) {
+    private void processEntity(Entity entity) {
         String entityName = snakeToCamel(entity.getName(), true);
         Path path = Path.of(outputModelPath, entityName + ".java");
         File file = new File(path.toUri());
@@ -90,7 +91,6 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 }
             }
             writeClosingFile(writer);
-            processedEntities.add(entity);
         } catch (IOException | UnsupportedOperationException e) {
             file.delete();
             throw new RuntimeException(e);
@@ -133,9 +133,9 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 writer.write("\t@Id\n");
             }
 
-            if (foreignKeyParamsAsObjectReference && property.isForeignKey() && !processedEntities.isEmpty()) {
+            if (foreignKeyParamsAsObjectReference && property.isForeignKey()) {
                 String propertyName = property.getName().toLowerCase();
-                String foundOne = processedEntities.stream()
+                String foundOne = entities.stream()
                         .map(Entity::getName)
                         .filter(itName -> propertyName.contains(itName.toLowerCase()))
                         .findFirst()

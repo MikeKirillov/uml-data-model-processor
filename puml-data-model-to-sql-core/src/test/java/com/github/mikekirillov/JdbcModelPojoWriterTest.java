@@ -18,10 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class JdbcModelPojoWriterTest {
 
     @Test
-    public void shouldWriteEasyPojo() throws IOException {
+    public void shouldProcessEntityEasyPojo() throws IOException {
         boolean fkAsClass = false;
+        List<Entity> entities = returnEntitiesWithFk();
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
+                entities,
                 fkAsClass,
                 false,
                 false,
@@ -31,16 +33,17 @@ class JdbcModelPojoWriterTest {
                 false,
                 false
         );
-        List<Entity> entities = returnEntitiesWithFk();
-        writer.processEntities(entities);
+        writer.write();
         assertEntities(entities, fkAsClass);
     }
 
     @Test
-    public void shouldWritePojoWithSnakeProperty() throws IOException {
+    public void shouldProcessEntityPojoWithSnakeProperty() throws IOException {
         boolean fkAsClass = true;
+        List<Entity> entities = returnEntitiesWithFkSnake();
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
+                entities,
                 fkAsClass,
                 false,
                 false,
@@ -50,8 +53,7 @@ class JdbcModelPojoWriterTest {
                 false,
                 false
         );
-        List<Entity> entities = returnEntitiesWithFkSnake();
-        writer.processEntities(entities);
+        writer.write();
         assertEntities(entities, fkAsClass);
     }
 

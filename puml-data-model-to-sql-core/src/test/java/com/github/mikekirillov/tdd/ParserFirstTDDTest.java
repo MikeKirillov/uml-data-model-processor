@@ -180,7 +180,7 @@ public class ParserFirstTDDTest {
             }
         }
 
-        assertEquals(2, relations.size());
+        assertEquals(3, relations.size());
 
         return relations;
     }

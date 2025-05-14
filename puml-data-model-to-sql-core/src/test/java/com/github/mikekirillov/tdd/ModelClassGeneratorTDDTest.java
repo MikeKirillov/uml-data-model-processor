@@ -62,18 +62,17 @@ public class ModelClassGeneratorTDDTest {
 
     private void processEntities(List<Entity> entities) {
         for (Entity entity : entities) {
-            generatePojo(entity, false, new ArrayList<>());
+            generatePojo(entity, false, entities);
         }
     }
 
     private void processEntitiesWithInnerFkClass(List<Entity> entities) {
-        List<Entity> processedEntities = new ArrayList<>();
         for (Entity entity : entities) {
-            generatePojo(entity, true, processedEntities);
+            generatePojo(entity, true, entities);
         }
     }
 
-    private void generatePojo(Entity entity, boolean fkAsClass, List<Entity> processedEntities) {
+    private void generatePojo(Entity entity, boolean fkAsClass, List<Entity> entities) {
         String entityName = snakeToCamel(entity.getName(), true);
         Path path = createDirAndFile(entityName);
 
@@ -84,7 +83,7 @@ public class ModelClassGeneratorTDDTest {
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
 
-                writeFields(writer, entity, properties, fkAsClass, processedEntities);
+                writeFields(writer, entity, properties, fkAsClass, entities);
                 writeNoArgsConstructor(writer, entityName);
                 writeIdConstructor(writer, entity, entityName);
                 writeAllArgsConstructor(writer, properties, entityName);
@@ -94,7 +93,6 @@ public class ModelClassGeneratorTDDTest {
                 writeNoArgsConstructor(writer, entityName);
             }
             writeClosingFile(writer);
-            processedEntities.add(entity);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -136,7 +134,7 @@ public class ModelClassGeneratorTDDTest {
         writer.write("\npublic class " + entityName + " {\n");
     }
 
-    private void writeFields(Writer writer, Entity entity, Map<String, String> properties, boolean fkAsClass, List<Entity> processedEntities) throws IOException {
+    private void writeFields(Writer writer, Entity entity, Map<String, String> properties, boolean fkAsClass, List<Entity> entities) throws IOException {
         for (Property property : entity.getProperties()) {
             String name, type;
 
@@ -145,9 +143,9 @@ public class ModelClassGeneratorTDDTest {
                 writer.write("\t@Id\n");
             }
 
-            if (fkAsClass && property.isForeignKey() && !processedEntities.isEmpty()) {
+            if (fkAsClass && property.isForeignKey()) {
                 String propertyName = property.getName().toLowerCase();
-                String foundOne = processedEntities.stream()
+                String foundOne = entities.stream()
                         .map(Entity::getName)
                         .filter(itName -> propertyName.contains(itName.toLowerCase()))
                         .findFirst()
