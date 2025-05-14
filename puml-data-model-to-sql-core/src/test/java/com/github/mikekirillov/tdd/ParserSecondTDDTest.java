@@ -46,10 +46,10 @@ class ParserSecondTDDTest {
         assertEquals("gender", entities.get(0).getName());
         assertEquals(2, entities.get(0).getProperties().size());
         assertEquals("state", entities.get(1).getName());
-        assertEquals(2, entities.get(1).getProperties().size());
+        assertEquals(3, entities.get(1).getProperties().size());
         assertEquals("client", entities.get(2).getName());
-        assertEquals(8, entities.get(2).getProperties().size());
-        assertEquals(2, relations.size());
+        assertEquals(5, entities.get(2).getProperties().size());
+        assertEquals(3, relations.size());
 
         // generating schema.sql file
         String schemaSql = generateSchema(entities);

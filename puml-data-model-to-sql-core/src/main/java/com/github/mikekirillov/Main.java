@@ -31,6 +31,7 @@ public class Main {
         // 4. generating POJO - data model Java classes
         ModelPojoWriter modelPojoWriter = new JdbcModelPojoWriter(
                 POJO_GENERATOR_OUT_DIR,
+                entities,
                 true,
                 false,
                 false,
@@ -40,6 +41,6 @@ public class Main {
                 false,
                 true
         );
-        modelPojoWriter.processEntities(entities);
+        modelPojoWriter.write();
     }
 }
