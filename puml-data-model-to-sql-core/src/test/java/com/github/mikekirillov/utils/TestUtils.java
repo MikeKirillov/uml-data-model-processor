@@ -117,6 +117,11 @@ public class TestUtils {
                         new Property("id", "INT", true, true, false),
                         new Property("name", "VARCHAR(128)", true, false, false),
                         new Property("gender_es_id", "INT", true, false, true)
+                )),
+                new Entity("coach", "st", List.of(
+                        new Property("id", "INT", true, true, false),
+                        new Property("name", "VARCHAR(128)", true, false, false),
+                        new Property("state_id", "INT", true, false, true)
                 ))
         );
     }

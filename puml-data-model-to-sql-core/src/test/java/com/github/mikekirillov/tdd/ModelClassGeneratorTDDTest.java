@@ -15,9 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
+import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -62,29 +62,18 @@ public class ModelClassGeneratorTDDTest {
 
     private void processEntities(List<Entity> entities) {
         for (Entity entity : entities) {
-            generatePojo(entity, false, null);
+            generatePojo(entity, false, new ArrayList<>());
         }
     }
 
     private void processEntitiesWithInnerFkClass(List<Entity> entities) {
-        List<Entity> fks = entities.stream()
-                .filter(entity -> entity.getProperties().stream().noneMatch(Property::isForeignKey))
-                .toList();
-
-        for (Entity entity : fks) {
-            generatePojo(entity, false, null);
-        }
-
-        List<Entity> hasFks = entities.stream()
-                .filter(entity -> entity.getProperties().stream().anyMatch(Property::isForeignKey))
-                .toList();
-
-        for (Entity entity : hasFks) {
-            generatePojo(entity, true, fks);
+        List<Entity> processedEntities = new ArrayList<>();
+        for (Entity entity : entities) {
+            generatePojo(entity, true, processedEntities);
         }
     }
 
-    private void generatePojo(Entity entity, boolean fkAsClass, List<Entity> fks) {
+    private void generatePojo(Entity entity, boolean fkAsClass, List<Entity> processedEntities) {
         String entityName = snakeToCamel(entity.getName(), true);
         Path path = createDirAndFile(entityName);
 
@@ -92,11 +81,10 @@ public class ModelClassGeneratorTDDTest {
             writePackage(writer);
             writeImports(writer, entity);
             writeClassDeclaration(writer, entityName);
-
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
 
-                writeFields(writer, entity, properties, fkAsClass, fks);
+                writeFields(writer, entity, properties, fkAsClass, processedEntities);
                 writeNoArgsConstructor(writer, entityName);
                 writeIdConstructor(writer, entity, entityName);
                 writeAllArgsConstructor(writer, properties, entityName);
@@ -105,8 +93,8 @@ public class ModelClassGeneratorTDDTest {
             } else {
                 writeNoArgsConstructor(writer, entityName);
             }
-
             writeClosingFile(writer);
+            processedEntities.add(entity);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -148,7 +136,7 @@ public class ModelClassGeneratorTDDTest {
         writer.write("\npublic class " + entityName + " {\n");
     }
 
-    private void writeFields(Writer writer, Entity entity, Map<String, String> properties, boolean fkAsClass, List<Entity> fks) throws IOException {
+    private void writeFields(Writer writer, Entity entity, Map<String, String> properties, boolean fkAsClass, List<Entity> processedEntities) throws IOException {
         for (Property property : entity.getProperties()) {
             String name, type;
 
@@ -157,16 +145,15 @@ public class ModelClassGeneratorTDDTest {
                 writer.write("\t@Id\n");
             }
 
-            if (property.isForeignKey() && fkAsClass) {
+            if (fkAsClass && property.isForeignKey() && !processedEntities.isEmpty()) {
                 String propertyName = property.getName().toLowerCase();
-                String foundOne = fks.stream()
+                String foundOne = processedEntities.stream()
                         .map(Entity::getName)
                         .filter(itName -> propertyName.contains(itName.toLowerCase()))
                         .findFirst()
                         .orElseThrow();
                 name = snakeToCamel(foundOne, false);
                 type = snakeToCamel(foundOne, true);
-
             } else {
                 name = snakeToCamel(property.getName(), false);
                 type = convertType(property.getType());
@@ -258,24 +245,5 @@ public class ModelClassGeneratorTDDTest {
 
     private void writeClosingFile(Writer writer) throws IOException {
         writer.write("}\n");
-    }
-
-    private String convertType(String type) {
-        return switch (type.toLowerCase()) {
-            case "int", "integer" -> "int";
-            case "boolean" -> "boolean";
-            case "datetime", "timestamp" -> "Date";
-            default -> "String";
-        };
-    }
-
-    private String snakeToCamel(String camel, boolean capitalize) {
-        if (camel.contains("_")) {
-            camel = Stream.of(camel.split("_"))
-                    .map(StringUtils::capitalize)
-                    .collect(Collectors.joining());
-        }
-
-        return capitalize ? StringUtils.capitalize(camel) : StringUtils.uncapitalize(camel);
     }
 }
