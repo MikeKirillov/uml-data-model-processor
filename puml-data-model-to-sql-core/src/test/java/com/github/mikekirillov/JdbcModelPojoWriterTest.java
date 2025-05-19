@@ -19,13 +19,14 @@ class JdbcModelPojoWriterTest {
 
     @Test
     public void shouldProcessEntityEasyPojo() throws IOException {
-        boolean fkAsClass = false;
+        boolean requiresSpringDataJdbcAnnotations = false;
+        boolean allowForeignKeyAsEmbeddedEntity = false;
         List<Entity> entities = returnEntitiesWithFk();
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
                 entities,
-                fkAsClass,
-                false,
+                requiresSpringDataJdbcAnnotations,
+                allowForeignKeyAsEmbeddedEntity,
                 false,
                 false,
                 false,
@@ -35,18 +36,19 @@ class JdbcModelPojoWriterTest {
                 false
         );
         writer.write();
-        assertEntities(entities, fkAsClass);
+        assertEntities(entities, requiresSpringDataJdbcAnnotations, allowForeignKeyAsEmbeddedEntity);
     }
 
     @Test
     public void shouldProcessEntityPojoWithSnakeProperty() throws IOException {
-        boolean fkAsClass = true;
+        boolean requiresSpringDataJdbcAnnotations = true;
+        boolean allowForeignKeyAsEmbeddedEntity = true;
         List<Entity> entities = returnEntitiesWithFkSnake();
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
                 entities,
-                fkAsClass,
-                false,
+                requiresSpringDataJdbcAnnotations,
+                allowForeignKeyAsEmbeddedEntity,
                 false,
                 false,
                 false,
@@ -56,10 +58,12 @@ class JdbcModelPojoWriterTest {
                 false
         );
         writer.write();
-        assertEntities(entities, fkAsClass);
+        assertEntities(entities, requiresSpringDataJdbcAnnotations, allowForeignKeyAsEmbeddedEntity);
     }
 
-    private void assertEntities(List<Entity> entities, boolean fkAsClass) throws IOException {
+    private void assertEntities(List<Entity> entities,
+                                boolean requiresSpringDataJdbcAnnotations,
+                                boolean allowForeignKeyAsEmbeddedEntity) throws IOException {
         for (Entity entity : entities) {
             String capitalizedEntityName = snakeToCamel(entity.getName(), true);
             File createdFile = createJavaFile(capitalizedEntityName);
@@ -69,33 +73,57 @@ class JdbcModelPojoWriterTest {
             List<String> lines = readFile(createdFile.toPath());
             int linesSize = lines.size();
             assertEquals("package com.github.mikekirillov.tdd.model;", lines.get(0));
-            assertEquals("public class " + capitalizedEntityName + " {", lines.get(1));
+
+            if (allowForeignKeyAsEmbeddedEntity) {
+                assertEquals("public class " + capitalizedEntityName + " {", lines.get(5));
+            } else {
+                assertEquals("public class " + capitalizedEntityName + " {", lines.get(2));
+            }
 
             List<Property> properties = entity.getProperties();
-            assertProperties(properties, entities, lines, fkAsClass);
+            assertProperties(properties, entities, lines, requiresSpringDataJdbcAnnotations, allowForeignKeyAsEmbeddedEntity);
             assertEquals("}", lines.get(linesSize - 1));
             deleteJavaFile(createdFile);
         }
     }
 
-    private void assertProperties(List<Property> properties, List<Entity> entities, List<String> lines, boolean fkAsClass) {
+    private void assertProperties(List<Property> properties,
+                                  List<Entity> entities,
+                                  List<String> lines,
+                                  boolean requiresSpringDataJdbcAnnotations,
+                                  boolean allowForeignKeyAsEmbeddedEntity) {
         for (int i = 0; i < properties.size(); i++) {
             Property property = properties.get(i);
-            if (fkAsClass && property.isForeignKey()) {
+            if (requiresSpringDataJdbcAnnotations && property.isForeignKey()) {
                 var foundOne = entities.stream()
                         .map(Entity::getName)
                         .filter(itName -> property.getName().contains(itName.toLowerCase()))
                         .findFirst()
                         .orElseThrow();
-                assertEquals(
-                        "private " + snakeToCamel(foundOne, true) + " " + snakeToCamel(foundOne, false) + ";",
-                        lines.get(2 + i)
-                );
+                if (allowForeignKeyAsEmbeddedEntity) {
+                    System.out.println(foundOne);
+                    assertEquals(
+                            "private " + snakeToCamel(foundOne, true) + " " + snakeToCamel(foundOne, false) + ";",
+                            lines.get(8 + i)
+                    );
+                } else {
+                    assertEquals(
+                            "private " + snakeToCamel(foundOne, true) + " " + snakeToCamel(foundOne, false) + ";",
+                            lines.get(3 + i)
+                    );
+                }
             } else {
-                assertEquals(
-                        "private " + convertType(property.getType()) + " " + snakeToCamel(property.getName(), false) + ";",
-                        lines.get(2 + i)
-                );
+                if (allowForeignKeyAsEmbeddedEntity) {
+                    assertEquals(
+                            "private " + convertType(property.getType()) + " " + snakeToCamel(property.getName(), false) + ";",
+                            lines.get(7 + i)
+                    );
+                } else {
+                    assertEquals(
+                            "private " + convertType(property.getType()) + " " + snakeToCamel(property.getName(), false) + ";",
+                            lines.get(3 + i)
+                    );
+                }
             }
         }
     }

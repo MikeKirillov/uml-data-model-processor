@@ -16,9 +16,9 @@ import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final String outputModelPath;
     private final List<Entity> entities;
+    private final boolean requiresSpringDataJdbcAnnotations;
     private final boolean allowForeignKeyAsEmbeddedEntity;
     private final boolean allowForeignKeyAsEmbeddedEntityByAggregate;
-    private final boolean requiresSpringDataJdbcAnnotations;
     private final boolean requiresNoArgsConstructor;
     private final boolean requiresIdArgConstructor;
     private final boolean requiresAllArgsConstructor;
@@ -28,9 +28,9 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     public JdbcModelPojoWriter(String outputModelPath,
                                List<Entity> entities,
+                               boolean requiresSpringDataJdbcAnnotations,
                                boolean allowForeignKeyAsEmbeddedEntity,
                                boolean allowForeignKeyAsEmbeddedEntityByAggregate,
-                               boolean requiresSpringDataJdbcAnnotations,
                                boolean requiresNoArgsConstructor,
                                boolean requiresIdArgConstructor,
                                boolean requiresAllArgsConstructor,
@@ -146,7 +146,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 writer.write("\t@Id\n");
             }
 
-            if (allowForeignKeyAsEmbeddedEntity && property.isForeignKey()) {
+            if (requiresSpringDataJdbcAnnotations && allowForeignKeyAsEmbeddedEntity && property.isForeignKey()) {
                 String propertyName = property.getName().toLowerCase();
                 Entity foundOne = entities.stream()
                         .filter(it -> propertyName.contains(it.getName().toLowerCase()))
