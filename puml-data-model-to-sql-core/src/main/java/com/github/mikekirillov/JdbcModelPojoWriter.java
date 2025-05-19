@@ -110,7 +110,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         if (requiresSpringDataJdbcAnnotations) {
             writer.write("import org.springframework.data.annotation.Id;\n");
             writer.write("import org.springframework.data.relational.core.mapping.Table;\n");
-            if (allowForeignKeyAsEmbeddedEntity) {
+            if (allowForeignKeyAsEmbeddedEntity && entity.getProperties().stream().anyMatch(Property::isForeignKey)) {
                 if (allowForeignKeyAsEmbeddedEntityByAggregate) {
                     writer.write("import org.springframework.data.relational.core.mapping.Column;\n");
                     writer.write("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
@@ -166,7 +166,6 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                     writer.write("\t@MappedCollection(idColumn = \"" + pkName + "\")\n");
                     type = snakeToCamel(foundOne.getName(), true);
                 }
-
             } else {
                 name = snakeToCamel(property.getName(), false);
                 type = convertType(property.getType());

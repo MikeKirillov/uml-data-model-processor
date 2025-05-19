@@ -54,7 +54,7 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
 
             getLog().info("Generated schema:\n" + sqlSchema);
 
-            // TODO CONFIG SKIP of sql ddl-script-gen PR pojo-gen
+            // TODO CONFIG SKIP of sql ddl-script-gen OR pojo-gen
             SqlSchemaFileWriter writer = new SqlSchemaFileWriter(sqlSchema, outputFilePath, outputFileName + "." + outputFileExtension);
             writer.write();
 
