@@ -6,30 +6,32 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import java.sql.Date;
 
-@Table("client")
-public class Client {
+@Table("coach")
+public class Coach {
 	@Id
 	private int id;
 	private String lastName;
 	private String firstName;
 	private String middleName;
 	private String fullName;
-	@Column("gender_id")
-	private AggregateReference<Gender, String> gender;
+	@Column("discipline_id")
+	private AggregateReference<Discipline, String> discipline;
 	private String phoneNumber;
 	private Date registrationDate;
+	private Date careerStartDate;
 
 	@Override
 	public String toString() {
-		return "Client{" +
+		return "Coach{" +
 			"lastName='" + lastName + '\'' +
 			", firstName='" + firstName + '\'' +
 			", phoneNumber='" + phoneNumber + '\'' +
-			", gender='" + gender + '\'' +
+			", careerStartDate='" + careerStartDate + '\'' +
 			", registrationDate='" + registrationDate + '\'' +
 			", fullName='" + fullName + '\'' +
 			", middleName='" + middleName + '\'' +
 			", id='" + id + '\'' +
+			", discipline='" + discipline + '\'' +
 			'}';
 	}
 }
