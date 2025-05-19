@@ -31,6 +31,7 @@ class JdbcModelPojoWriterTest {
                 false,
                 false,
                 false,
+                false,
                 false
         );
         writer.write();
@@ -45,6 +46,7 @@ class JdbcModelPojoWriterTest {
                 POJO_GENERATOR_DIR,
                 entities,
                 fkAsClass,
+                false,
                 false,
                 false,
                 false,

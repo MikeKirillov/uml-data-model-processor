@@ -16,7 +16,8 @@ import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final String outputModelPath;
     private final List<Entity> entities;
-    private final boolean foreignKeyParamsAsObjectReference;
+    private final boolean allowForeignKeyAsEmbeddedEntity;
+    private final boolean allowForeignKeyAsEmbeddedEntityByAggregate;
     private final boolean requiresSpringDataJdbcAnnotations;
     private final boolean requiresNoArgsConstructor;
     private final boolean requiresIdArgConstructor;
@@ -27,7 +28,8 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     public JdbcModelPojoWriter(String outputModelPath,
                                List<Entity> entities,
-                               boolean foreignKeyParamsAsObjectReference,
+                               boolean allowForeignKeyAsEmbeddedEntity,
+                               boolean allowForeignKeyAsEmbeddedEntityByAggregate,
                                boolean requiresSpringDataJdbcAnnotations,
                                boolean requiresNoArgsConstructor,
                                boolean requiresIdArgConstructor,
@@ -37,7 +39,8 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                                boolean requiresToStringMethod) {
         this.outputModelPath = outputModelPath;
         this.entities = entities;
-        this.foreignKeyParamsAsObjectReference = foreignKeyParamsAsObjectReference;
+        this.allowForeignKeyAsEmbeddedEntity = allowForeignKeyAsEmbeddedEntity;
+        this.allowForeignKeyAsEmbeddedEntityByAggregate = allowForeignKeyAsEmbeddedEntityByAggregate;
         this.requiresSpringDataJdbcAnnotations = requiresSpringDataJdbcAnnotations;
         this.requiresNoArgsConstructor = requiresNoArgsConstructor;
         this.requiresIdArgConstructor = requiresIdArgConstructor;
@@ -66,7 +69,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             writePackage(writer);
             writeImports(writer, entity);
-            writeClassDeclaration(writer, entityName);
+            writeClassDeclaration(writer, entity, entityName);
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
                 writeFields(writer, entity, properties);
@@ -106,6 +109,15 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
         if (requiresSpringDataJdbcAnnotations) {
             writer.write("import org.springframework.data.annotation.Id;\n");
+            writer.write("import org.springframework.data.relational.core.mapping.Table;\n");
+            if (allowForeignKeyAsEmbeddedEntity) {
+                if (allowForeignKeyAsEmbeddedEntityByAggregate) {
+                    writer.write("import org.springframework.data.relational.core.mapping.Column;\n");
+                    writer.write("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
+                } else {
+                    writer.write("import org.springframework.data.relational.core.mapping.MappedCollection;\n");
+                }
+            }
         }
 
         if (!propertyList.isEmpty()) {
@@ -121,7 +133,8 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         }
     }
 
-    private void writeClassDeclaration(Writer writer, String entityName) throws IOException {
+    private void writeClassDeclaration(Writer writer, Entity entity, String entityName) throws IOException {
+        writer.write("\n@Table(\"" + entity.getName() + "\")");
         writer.write("\npublic class " + entityName + " {\n");
     }
 
@@ -133,15 +146,27 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 writer.write("\t@Id\n");
             }
 
-            if (foreignKeyParamsAsObjectReference && property.isForeignKey()) {
+            if (allowForeignKeyAsEmbeddedEntity && property.isForeignKey()) {
                 String propertyName = property.getName().toLowerCase();
-                String foundOne = entities.stream()
-                        .map(Entity::getName)
-                        .filter(itName -> propertyName.contains(itName.toLowerCase()))
+                Entity foundOne = entities.stream()
+                        .filter(it -> propertyName.contains(it.getName().toLowerCase()))
                         .findFirst()
                         .orElseThrow();
-                name = snakeToCamel(foundOne, false);
-                type = snakeToCamel(foundOne, true);
+                name = snakeToCamel(foundOne.getName(), false);
+
+                if (allowForeignKeyAsEmbeddedEntityByAggregate) {
+                    writer.write("\t@Column(\"" + property.getName() + "\")\n");
+                    type = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
+                } else {
+                    String pkName = foundOne.getProperties().stream()
+                            .filter(Property::isPrimaryKey)
+                            .map(Property::getName)
+                            .findFirst()
+                            .orElseThrow();
+                    writer.write("\t@MappedCollection(idColumn = \"" + pkName + "\")\n");
+                    type = snakeToCamel(foundOne.getName(), true);
+                }
+
             } else {
                 name = snakeToCamel(property.getName(), false);
                 type = convertType(property.getType());
