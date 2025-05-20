@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.github.mikekirillov.enums.UmlRelationType.EXACTLY_ONE;
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 
@@ -78,7 +79,9 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
             writeClassDeclaration(writer, entity, entityName);
             if (!entity.getProperties().isEmpty()) {
                 Map<String, String> properties = new HashMap<>();
+
                 writeFields(writer, entity, properties);
+
                 if (requiresNoArgsConstructor) {
                     writeNoArgsConstructor(writer, entityName);
                 }
@@ -146,7 +149,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     private void writeFields(Writer writer, Entity entity, Map<String, String> properties) throws IOException {
         for (Property property : entity.getProperties()) {
-            String name, type;
+            String fieldName, fieldType;
 
             if (requiresSpringDataJdbcAnnotations && property.isPrimaryKey()) {
                 writer.write("\t@Id\n");
@@ -158,11 +161,19 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                         .filter(it -> propertyName.contains(it.getName().toLowerCase()))
                         .findFirst()
                         .orElseThrow();
-                name = snakeToCamel(foundOne.getName(), false);
+                fieldName = snakeToCamel(foundOne.getName(), false);
 
                 if (allowForeignKeyAsEmbeddedEntityByAggregate) {
-                    writer.write("\t@Column(\"" + property.getName() + "\")\n");
-                    type = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
+                    // add not secondary entity reference field only: for training_client add client field, not training,
+                    // because training class will contain set of training_client entity
+                    String[] split = property.getName().split("_");
+
+                    if (filterRelationAsBridgeEntity(entity).isEmpty()
+                            || split.length == 2 && entity.getName().endsWith(split[0])) {
+                        writer.write("\t@Column(\"" + property.getName() + "\")\n");
+                        fieldType = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
+                        writeField(writer, properties, fieldType, fieldName);
+                    }
                 } else {
                     String pkName = foundOne.getProperties().stream()
                             .filter(Property::isPrimaryKey)
@@ -170,16 +181,20 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                             .findFirst()
                             .orElseThrow();
                     writer.write("\t@MappedCollection(idColumn = \"" + pkName + "\")\n");
-                    type = snakeToCamel(foundOne.getName(), true);
+                    fieldType = snakeToCamel(foundOne.getName(), true);
+                    writeField(writer, properties, fieldType, fieldName);
                 }
             } else {
-                name = snakeToCamel(property.getName(), false);
-                type = convertType(property.getType());
+                fieldName = snakeToCamel(property.getName(), false);
+                fieldType = convertType(property.getType());
+                writeField(writer, properties, fieldType, fieldName);
             }
-
-            writer.write("\tprivate " + type + " " + name + ";\n");
-            properties.put(name, type);
         }
+    }
+
+    private void writeField(Writer writer, Map<String, String> properties, String type, String name) throws IOException {
+        writer.write("\tprivate " + type + " " + name + ";\n");
+        properties.put(name, type);
     }
 
     private void writeNoArgsConstructor(Writer writer, String entityName) throws IOException {
@@ -271,14 +286,14 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     private List<Relation> getBridgeEntities(List<Relation> relations) {
         return relations.stream()
-                .filter(relation -> checkEntityAsBridge(relation.getRightEntity())
-                        && checkBridgeContainsOtherName(relation.getRightEntity(), relation.getLeftEntity())
-                        || checkEntityAsBridge(relation.getLeftEntity())
-                        && checkBridgeContainsOtherName(relation.getLeftEntity(), relation.getRightEntity()))
+                .filter(relation -> checkEntityIsBridge(relation.getRightEntity())
+                        && checkBridgeContainsOtherEntityName(relation.getRightEntity(), relation.getLeftEntity())
+                        || checkEntityIsBridge(relation.getLeftEntity())
+                        && checkBridgeContainsOtherEntityName(relation.getLeftEntity(), relation.getRightEntity()))
                 .toList();
     }
 
-    private boolean checkEntityAsBridge(EntityRelation entityRelation) {
+    private boolean checkEntityIsBridge(EntityRelation entityRelation) {
         String name = entityRelation.getEntity().getName();
         if (name.contains("_")) {
             String[] split = name.split("_");
@@ -286,8 +301,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 List<String> entNames = entities.stream()
                         .map(Entity::getName)
                         .toList();
-                return (entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY)
-                        || entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY_REVERTED))
+                return checkRelationIsOneOrMany(entityRelation)
                         && entNames.contains(split[0])
                         && entNames.contains(split[1]);
             }
@@ -296,7 +310,29 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         return false;
     }
 
-    private boolean checkBridgeContainsOtherName(EntityRelation bridgeEntity, EntityRelation otherEntity) {
-        return bridgeEntity.getEntity().getName().contains(otherEntity.getEntity().getName());
+    private boolean checkRelationIsOneOrMany(EntityRelation entityRelation) {
+        return entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY)
+                || entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY_REVERTED);
+    }
+
+    private boolean checkBridgeContainsOtherEntityName(EntityRelation bridgeEntity, EntityRelation otherEntity) {
+        return bridgeEntity.getEntity().getName().toLowerCase().contains(otherEntity.getEntity().getName().toLowerCase());
+    }
+
+    private List<Relation> filterRelationAsBridgeEntity(Entity entity) {
+        return relations.stream()
+                .filter(relation -> {
+                    var right = relation.getRightEntity();
+                    var left = relation.getLeftEntity();
+
+                    return checkRelationIsOneOrMany(right) && checkRelationEqualsEntity(right, entity)
+                            || checkRelationIsOneOrMany(left) && checkRelationEqualsEntity(left, entity);
+                })
+                .toList();
+    }
+
+    private boolean checkRelationEqualsEntity(EntityRelation relation, Entity entity) {
+        var relationName = relation.getEntity().getName();
+        return relationName.contains("_") && relationName.equalsIgnoreCase(entity.getName());
     }
 }
