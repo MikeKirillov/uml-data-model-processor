@@ -9,8 +9,6 @@ import org.springframework.data.jdbc.core.mapping.AggregateReference;
 public class TrainingClient {
 	@Id
 	private int id;
-	@Column("training_id")
-	private AggregateReference<Training, String> training;
 	@Column("client_id")
 	private AggregateReference<Client, String> client;
 
@@ -18,7 +16,6 @@ public class TrainingClient {
 	public String toString() {
 		return "TrainingClient{" +
 			"client='" + client + '\'' +
-			", training='" + training + '\'' +
 			", id='" + id + '\'' +
 			'}';
 	}
