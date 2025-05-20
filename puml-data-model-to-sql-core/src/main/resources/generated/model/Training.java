@@ -4,6 +4,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.MappedCollection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Date;
 
 @Table("training")
@@ -18,11 +21,14 @@ public class Training {
 	private Date dateTo;
 	@Column("state_id")
 	private AggregateReference<State, String> state;
+	@MappedCollection(idColumn = "training_id")
+	private Set<TrainingClient> trainingClients = new HashSet<>();
 
 	@Override
 	public String toString() {
 		return "Training{" +
-			"dateTo='" + dateTo + '\'' +
+			"trainingClients='" + trainingClients + '\'' +
+			", dateTo='" + dateTo + '\'' +
 			", location='" + location + '\'' +
 			", id='" + id + '\'' +
 			", state='" + state + '\'' +
