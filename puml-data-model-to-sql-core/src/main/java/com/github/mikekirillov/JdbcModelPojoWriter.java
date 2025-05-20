@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static com.github.mikekirillov.enums.UmlRelationType.EXACTLY_ONE;
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 
@@ -123,6 +122,17 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 if (allowForeignKeyAsEmbeddedEntityByAggregate) {
                     writer.write("import org.springframework.data.relational.core.mapping.Column;\n");
                     writer.write("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
+
+                    // add for main entity for many-to-many cases
+                    findMainRelationEntity(entity).ifPresent(relation -> {
+                        try {
+                            writer.write("import org.springframework.data.relational.core.mapping.MappedCollection;\n");
+                            writer.write("import java.util.HashSet;\n");
+                            writer.write("import java.util.Set;\n");
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
                 } else {
                     writer.write("import org.springframework.data.relational.core.mapping.MappedCollection;\n");
                 }
@@ -164,12 +174,12 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 fieldName = snakeToCamel(foundOne.getName(), false);
 
                 if (allowForeignKeyAsEmbeddedEntityByAggregate) {
+                    String[] propertySplit = property.getName().split("_");
+
                     // add not secondary entity reference field only: for training_client add client field, not training,
                     // because training class will contain set of training_client entity
-                    String[] split = property.getName().split("_");
-
-                    if (filterRelationAsBridgeEntity(entity).isEmpty()
-                            || split.length == 2 && entity.getName().endsWith(split[0])) {
+                    if (filterRelationsAsBridgeEntity(entity).isEmpty()
+                            || propertySplit.length == 2 && entity.getName().endsWith(propertySplit[0])) {
                         writer.write("\t@Column(\"" + property.getName() + "\")\n");
                         fieldType = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
                         writeField(writer, properties, fieldType, fieldName);
@@ -190,10 +200,45 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 writeField(writer, properties, fieldType, fieldName);
             }
         }
+
+        // add bonus field to main entity for many-to-many cases: when we've got training/client/training_client entities
+        // training class will also contain set of training_client entity
+        if (requiresSpringDataJdbcAnnotations && allowForeignKeyAsEmbeddedEntity && allowForeignKeyAsEmbeddedEntityByAggregate) {
+            findMainRelationEntity(entity).ifPresent(relation -> {
+                List<EntityRelation> entityRelations = new ArrayList<>();
+                entityRelations.add(relation.getLeftEntity());
+                entityRelations.add(relation.getRightEntity());
+
+                Optional<String> propertyName = entityRelations.stream()
+                        .flatMap(it -> it.getEntity().getProperties().stream())
+                        .map(Property::getName)
+                        .filter(property -> property.startsWith(entity.getName()))
+                        .findFirst();
+                Optional<String> entityName = entityRelations.stream()
+                        .map(entityRelation -> entityRelation.getEntity().getName())
+                        .filter(it -> it.startsWith(entity.getName()))
+                        .findFirst();
+                if (propertyName.isPresent() && entityName.isPresent()) {
+                    try {
+                        writer.write("\t@MappedCollection(idColumn = \"" + propertyName.get() + "\")\n");
+                        String fieldName = snakeToCamel(entityName.get(), false) + "s";
+                        String fieldType = "Set<" + snakeToCamel(entityName.get(), true) + ">";
+                        writeManyToManyField(writer, properties, fieldType, fieldName);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
     }
 
     private void writeField(Writer writer, Map<String, String> properties, String type, String name) throws IOException {
         writer.write("\tprivate " + type + " " + name + ";\n");
+        properties.put(name, type);
+    }
+
+    private void writeManyToManyField(Writer writer, Map<String, String> properties, String type, String name) throws IOException {
+        writer.write("\tprivate " + type + " " + name + " = new HashSet<>();\n");
         properties.put(name, type);
     }
 
@@ -315,11 +360,16 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 || entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY_REVERTED);
     }
 
+    private boolean checkRelationIsExactlyOne(EntityRelation entityRelation) {
+        return entityRelation.getRelationType().equals(UmlRelationType.EXACTLY_ONE);
+    }
+
+
     private boolean checkBridgeContainsOtherEntityName(EntityRelation bridgeEntity, EntityRelation otherEntity) {
         return bridgeEntity.getEntity().getName().toLowerCase().contains(otherEntity.getEntity().getName().toLowerCase());
     }
 
-    private List<Relation> filterRelationAsBridgeEntity(Entity entity) {
+    private List<Relation> filterRelationsAsBridgeEntity(Entity entity) {
         return relations.stream()
                 .filter(relation -> {
                     var right = relation.getRightEntity();
@@ -331,8 +381,25 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                 .toList();
     }
 
+    private Optional<Relation> findMainRelationEntity(Entity entity) {
+        return relations.stream()
+                .filter(relation -> {
+                    var right = relation.getRightEntity();
+                    var left = relation.getLeftEntity();
+
+                    return checkRelationIsOneOrMany(right) && checkRelationEqualsMainEntity(right, entity)
+                            || checkRelationIsOneOrMany(left) && checkRelationEqualsMainEntity(left, entity);
+                })
+                .findFirst();
+    }
+
     private boolean checkRelationEqualsEntity(EntityRelation relation, Entity entity) {
         var relationName = relation.getEntity().getName();
         return relationName.contains("_") && relationName.equalsIgnoreCase(entity.getName());
+    }
+
+    private boolean checkRelationEqualsMainEntity(EntityRelation relation, Entity entity) {
+        var relationName = relation.getEntity().getName();
+        return !entity.getName().contains("_") && relationName.startsWith(entity.getName());
     }
 }
