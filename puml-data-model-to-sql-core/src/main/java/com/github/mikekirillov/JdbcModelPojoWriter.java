@@ -1,7 +1,10 @@
 package com.github.mikekirillov;
 
+import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
+import com.github.mikekirillov.model.EntityRelation;
 import com.github.mikekirillov.model.Property;
+import com.github.mikekirillov.model.Relation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -16,6 +19,7 @@ import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final String outputModelPath;
     private final List<Entity> entities;
+    private final List<Relation> relations;
     private final boolean requiresSpringDataJdbcAnnotations;
     private final boolean allowForeignKeyAsEmbeddedEntity;
     private final boolean allowForeignKeyAsEmbeddedEntityByAggregate;
@@ -28,6 +32,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     public JdbcModelPojoWriter(String outputModelPath,
                                List<Entity> entities,
+                               List<Relation> relations,
                                boolean requiresSpringDataJdbcAnnotations,
                                boolean allowForeignKeyAsEmbeddedEntity,
                                boolean allowForeignKeyAsEmbeddedEntityByAggregate,
@@ -39,6 +44,7 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
                                boolean requiresToStringMethod) {
         this.outputModelPath = outputModelPath;
         this.entities = entities;
+        this.relations = getBridgeEntities(relations);
         this.allowForeignKeyAsEmbeddedEntity = allowForeignKeyAsEmbeddedEntity;
         this.allowForeignKeyAsEmbeddedEntityByAggregate = allowForeignKeyAsEmbeddedEntityByAggregate;
         this.requiresSpringDataJdbcAnnotations = requiresSpringDataJdbcAnnotations;
@@ -261,5 +267,36 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
 
     private void writeClosingFile(Writer writer) throws IOException {
         writer.write("}\n");
+    }
+
+    private List<Relation> getBridgeEntities(List<Relation> relations) {
+        return relations.stream()
+                .filter(relation -> checkEntityAsBridge(relation.getRightEntity())
+                        && checkBridgeContainsOtherName(relation.getRightEntity(), relation.getLeftEntity())
+                        || checkEntityAsBridge(relation.getLeftEntity())
+                        && checkBridgeContainsOtherName(relation.getLeftEntity(), relation.getRightEntity()))
+                .toList();
+    }
+
+    private boolean checkEntityAsBridge(EntityRelation entityRelation) {
+        String name = entityRelation.getEntity().getName();
+        if (name.contains("_")) {
+            String[] split = name.split("_");
+            if (split.length == 2) {
+                List<String> entNames = entities.stream()
+                        .map(Entity::getName)
+                        .toList();
+                return (entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY)
+                        || entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY_REVERTED))
+                        && entNames.contains(split[0])
+                        && entNames.contains(split[1]);
+            }
+            return false;
+        }
+        return false;
+    }
+
+    private boolean checkBridgeContainsOtherName(EntityRelation bridgeEntity, EntityRelation otherEntity) {
+        return bridgeEntity.getEntity().getName().contains(otherEntity.getEntity().getName());
     }
 }

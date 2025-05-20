@@ -44,11 +44,11 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
-        PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer(entitiesParser);
-
         try {
-            List<Entity> entities = analyzer.analyze(inputFilePath);
+            PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer();
+            List<String> lines = analyzer.analyze(inputFilePath);
+            PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
+            List<Entity> entities = entitiesParser.parseLinesFrom(lines);
             SqlSchemaProcessor processor = new SqlSchemaProcessor(entities);
             String sqlSchema = processor.generateSchema();
 

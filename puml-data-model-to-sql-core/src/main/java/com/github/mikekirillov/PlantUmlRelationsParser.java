@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
+
     private final static Predicate<String> LINE_CONTAINS_RELATION_TYPE = line ->
             UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
 
@@ -57,7 +58,13 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
 
     private Optional<Entity> findEntity(String tag) {
         return entities.stream()
-                .filter(entity -> entity.getName().equals(tag) || entity.getAlias().equals(tag))
+                .filter(entity -> anyContains(tag, entity.getName(), entity.getAlias()))
                 .findFirst();
+    }
+
+    private boolean anyContains(String tag, String... name) {
+        return Arrays.stream(name)
+                .filter(Objects::nonNull)
+                .anyMatch(it -> it.equals(tag));
     }
 }
