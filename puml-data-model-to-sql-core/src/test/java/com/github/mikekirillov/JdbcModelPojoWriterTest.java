@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
@@ -25,6 +26,7 @@ class JdbcModelPojoWriterTest {
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
                 entities,
+                new ArrayList<>(),
                 requiresSpringDataJdbcAnnotations,
                 allowForeignKeyAsEmbeddedEntity,
                 false,
@@ -47,6 +49,7 @@ class JdbcModelPojoWriterTest {
         JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
                 POJO_GENERATOR_DIR,
                 entities,
+                new ArrayList<>(),
                 requiresSpringDataJdbcAnnotations,
                 allowForeignKeyAsEmbeddedEntity,
                 false,

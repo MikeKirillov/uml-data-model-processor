@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
+
     private final static Predicate<String> LINE_IS_START_OR_END = line ->
             line.toLowerCase().contains(PlantUmlSchemaTag.START)
             || line.toLowerCase().contains(PlantUmlSchemaTag.END)

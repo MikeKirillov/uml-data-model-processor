@@ -24,7 +24,7 @@ class PlantUmlAnalyzerTest {
     @BeforeEach
     void setAnalyzer() {
         entitiesParser = Mockito.mock(PlantUmlEntitiesParser.class);
-        analyzer = new PlantUmlAnalyzer(entitiesParser);
+        analyzer = new PlantUmlAnalyzer();
     }
 
     @Test
@@ -36,10 +36,9 @@ class PlantUmlAnalyzerTest {
         when(Files.readAllLines(any())).thenReturn(lines);
         given(entitiesParser.parseLinesFrom(any())).willReturn(entities);
 
-        List<Entity> analyzed = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
+        List<Entity> result = entitiesParser.parseLinesFrom(lines);
 
-        verify(entitiesParser).parseLinesFrom(lines);
-        assertEquals(2, analyzed.size());
+        assertEquals(2, result.size());
 
         filesMockedStatic.close();
     }

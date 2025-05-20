@@ -1,6 +1,7 @@
 package com.github.mikekirillov;
 
 import com.github.mikekirillov.model.Entity;
+import com.github.mikekirillov.model.Relation;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,9 +16,11 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         // 1. input model analysis
+        PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer();
+        List<String> lines = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
+
         PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
-        PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer(entitiesParser);
-        List<Entity> entities = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
+        List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
         // 2. generating SQL Data Definition Language (DDL) model
         SqlSchemaProcessor processor = new SqlSchemaProcessor(entities);
@@ -30,9 +33,13 @@ public class Main {
         writer.write();
 
         // 4. generating POJO - data model Java classes
+        PlantUmlParser<Relation> relationsParser = new PlantUmlRelationsParser(entities);
+        List<Relation> relations = relationsParser.parseLinesFrom(lines);
+
         ModelPojoWriter modelPojoWriter = new JdbcModelPojoWriter(
                 POJO_GENERATOR_OUT_DIR,
                 entities,
+                relations,
                 true,
                 true,
                 true,
