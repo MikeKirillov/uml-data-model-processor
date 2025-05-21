@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ModelPojoWriterUtils {
+public class PojoProcessorUtils {
 
     public static String convertType(String type) {
         return switch (type.toLowerCase()) {
