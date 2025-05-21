@@ -22,11 +22,9 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
     @Override
     public List<Relation> parseLinesFrom(List<String> lines) {
         List<Relation> relations = new ArrayList<>();
-
         for (String line : lines) {
             processLine(line, relations);
         }
-
         return relations;
     }
 

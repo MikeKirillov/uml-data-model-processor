@@ -10,16 +10,16 @@ public class Property {
     private final boolean isPrimaryKey;
     private final boolean isForeignKey;
 
-    public Property(String name, String type, boolean isMandatory, boolean isGenerated, boolean isForeignKey) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(type, "type");
+    private Property(Builder builder) {
+        Objects.requireNonNull(builder.name, "name");
+        Objects.requireNonNull(builder.type, "type");
 
-        this.name = name;
-        this.type = type;
-        this.isMandatory = isMandatory;
-        this.isGenerated = isGenerated;
-        this.isPrimaryKey = isMandatory && isGenerated;
-        this.isForeignKey = isForeignKey;
+        this.name = builder.name;
+        this.type = builder.type;
+        this.isMandatory = builder.isMandatory;
+        this.isGenerated = builder.isGenerated;
+        this.isPrimaryKey = builder.isMandatory && builder.isGenerated;
+        this.isForeignKey = builder.isForeignKey;
     }
 
     public String getName() {
@@ -56,5 +56,42 @@ public class Property {
                 ", isPrimaryKey=" + isPrimaryKey +
                 ", isForeignKey=" + isForeignKey +
                 '}';
+    }
+
+    public static class Builder {
+        private String name;
+        private String type;
+        private boolean isMandatory;
+        private boolean isGenerated;
+        private boolean isForeignKey;
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder isMandatory(boolean isMandatory) {
+            this.isMandatory = isMandatory;
+            return this;
+        }
+
+        public Builder isGenerated(boolean isGenerated) {
+            this.isGenerated = isGenerated;
+            return this;
+        }
+
+        public Builder isForeignKey(boolean isForeignKey) {
+            this.isForeignKey = isForeignKey;
+            return this;
+        }
+
+        public Property build() {
+            return new Property(this);
+        }
     }
 }

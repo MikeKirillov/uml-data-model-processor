@@ -4,7 +4,6 @@ import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.*;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.util.*;
 
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;

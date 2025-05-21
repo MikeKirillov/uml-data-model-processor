@@ -4,7 +4,6 @@ import com.github.mikekirillov.constants.PlantUmlSchemaTag;
 import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.Property;
-import com.github.mikekirillov.model.PropertyBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -14,15 +13,15 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
 
     private final static Predicate<String> LINE_IS_START_OR_END = line ->
             line.toLowerCase().contains(PlantUmlSchemaTag.START)
-            || line.toLowerCase().contains(PlantUmlSchemaTag.END)
-            || StringUtils.containsOnly(line, "-");
+                    || line.toLowerCase().contains(PlantUmlSchemaTag.END)
+                    || StringUtils.containsOnly(line, "-");
     private final static Predicate<String> LINE_IS_ENTITY_OR_CLASS = line ->
             line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY)
-            || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS);
+                    || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS);
     private final static Predicate<String> LINE_HAS_ENTITY_OR_CLASS_OR_RELATION_TYPE = line ->
             line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_ENTITY)
-            || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS)
-            || UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
+                    || line.toLowerCase().contains(PlantUmlSchemaTag.OBJECT_TYPE_CLASS)
+                    || UmlRelationType.getRelations().stream().anyMatch(it -> line.contains(it.getType()));
 
     @Override
     public List<Entity> parseLinesFrom(List<String> lines) {
@@ -75,15 +74,15 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
                 .filter(it -> !it.isBlank() && !it.contains(":"))
                 .toList();
 
-        PropertyBuilder propertyBuilder = new PropertyBuilder();
+        Property.Builder propertyBuilder = new Property.Builder();
         if (!strings.get(0).equals(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED)) {
             if (strings.get(0).contains(PlantUmlSchemaTag.MANDATORY)) {
-                propertyBuilder.isMandatory(true);
-                propertyBuilder.name(strings.get(1));
-                propertyBuilder.type(strings.get(2));
+                propertyBuilder.isMandatory(true)
+                        .name(strings.get(1))
+                        .type(strings.get(2));
             } else {
-                propertyBuilder.name(strings.get(0));
-                propertyBuilder.type(strings.get(1));
+                propertyBuilder.name(strings.get(0))
+                        .type(strings.get(1));
             }
 
             if (strings.stream().anyMatch(it -> it.toLowerCase().contains(PlantUmlSchemaTag.GENERATED))) {
