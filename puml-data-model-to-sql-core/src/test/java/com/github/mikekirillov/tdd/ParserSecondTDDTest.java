@@ -1,6 +1,5 @@
 package com.github.mikekirillov.tdd;
 
-import com.github.mikekirillov.model.PropertyBuilder;
 import com.github.mikekirillov.constants.PlantUmlSchemaTag;
 import com.github.mikekirillov.constants.SqlSchemaTag;
 import com.github.mikekirillov.enums.UmlRelationType;
@@ -88,7 +87,7 @@ class ParserSecondTDDTest {
                             .filter(it -> !it.isBlank() && !it.contains(":"))
                             .toList();
 
-                    PropertyBuilder propertyBuilder = new PropertyBuilder();
+                    Property.Builder propertyBuilder = new Property.Builder();
                     if (!array.get(0).equals(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED)) {
                         if (array.get(0).contains(PlantUmlSchemaTag.MANDATORY)) {
                             propertyBuilder.isMandatory(true);

@@ -55,12 +55,12 @@ public class TestUtils {
     public static List<Entity> returnEntities() {
         return List.of(
                 new Entity("gender", "g", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(10)", true, false, false)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(10)", true, false, false)
                 )),
                 new Entity("state", "st", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(128)", true, false, false)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(128)", true, false, false)
                 ))
         );
     }
@@ -68,13 +68,13 @@ public class TestUtils {
     public static List<Entity> returnEntitiesWithFk() {
         return List.of(
                 new Entity("gender", "g", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(10)", true, false, false)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(10)", true, false, false)
                 )),
                 new Entity("state", "st", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(128)", true, false, false),
-                        new Property("gender_id", "INT", true, false, true)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(128)", true, false, false),
+                        getProperty("gender_id", "INT", true, false, true)
                 ))
         );
     }
@@ -82,13 +82,13 @@ public class TestUtils {
     public static List<Entity> returnEntitiesDamagedFkEntityName() {
         return List.of(
                 new Entity("gender", "g", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(10)", true, false, false)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(10)", true, false, false)
                 )),
                 new Entity("state", "st", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(128)", true, false, false),
-                        new Property("random_id", "VARCHAR(128)", true, false, true)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(128)", true, false, false),
+                        getProperty("random_id", "VARCHAR(128)", true, false, true)
                 ))
         );
     }
@@ -96,13 +96,13 @@ public class TestUtils {
     public static List<Entity> returnEntitiesDamagedFkEntityId() {
         return List.of(
                 new Entity("gender", "g", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(10)", true, false, false)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(10)", true, false, false)
                 )),
                 new Entity("state", "st", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(128)", true, false, false),
-                        new Property("gender_xx", "VARCHAR(128)", true, false, true)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(128)", true, false, false),
+                        getProperty("gender_xx", "VARCHAR(128)", true, false, true)
                 ))
         );
     }
@@ -110,18 +110,18 @@ public class TestUtils {
     public static List<Entity> returnEntitiesWithFkSnake() {
         return List.of(
                 new Entity("gender_es", "g", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(10)", true, false, false)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(10)", true, false, false)
                 )),
                 new Entity("state", "st", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(128)", true, false, false),
-                        new Property("gender_es_id", "INT", true, false, true)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(128)", true, false, false),
+                        getProperty("gender_es_id", "INT", true, false, true)
                 )),
                 new Entity("coach", "st", List.of(
-                        new Property("id", "INT", true, true, false),
-                        new Property("name", "VARCHAR(128)", true, false, false),
-                        new Property("state_id", "INT", true, false, true)
+                        getProperty("id", "INT", true, true, false),
+                        getProperty("name", "VARCHAR(128)", true, false, false),
+                        getProperty("state_id", "INT", true, false, true)
                 ))
         );
     }
@@ -131,5 +131,15 @@ public class TestUtils {
                 "id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,\n" +
                 "name VARCHAR(10) NOT NULL\n" +
                 ");";
+    }
+
+    private static Property getProperty(String name, String type, boolean isMandatory, boolean isGenerated, boolean isForeignKey) {
+        return new Property.Builder()
+                .name(name)
+                .type(type)
+                .isMandatory(isMandatory)
+                .isGenerated(isGenerated)
+                .isForeignKey(isForeignKey)
+                .build();
     }
 }

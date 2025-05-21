@@ -21,21 +21,20 @@ public class Main {
         // 1. input model analysis
         PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer();
         List<String> lines = analyzer.analyze(RESOURCES_PATH_IN + TXT_FILE_PATH_IN);
-
+        // parsing entities as objects from string lines
         PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
         List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
         // 2. generating SQL Data Definition Language (DDL) model
         EntityProcessor processor = new SqlSchemaProcessor(entities);
         String sqlSchema = processor.process();
-        // System.out.println(sqlSchema);
-
-        // 3. creating and writing DDL script as separate document
+        // creating and writing DDL script as separate document
         FileWriter ddlScriptWriter = new FileWriter(sqlSchema, RESOURCES_PATH_OUT, TXT_FILE_PATH_OUT);
         ddlScriptWriter.write();
 
-        // 4. generating POJO - data model Java classes
+        // 3. generating POJO - data model Java classes
         PojoConfig pojoConfig = getPojoConfig();
+        // parsing entities relations as objects from string lines
         PlantUmlParser<Relation> relationsParser = new PlantUmlRelationsParser(entities);
         List<Relation> relations = relationsParser.parseLinesFrom(lines);
         for (Entity entity : entities) {

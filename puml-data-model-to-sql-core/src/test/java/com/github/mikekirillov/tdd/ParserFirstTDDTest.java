@@ -1,6 +1,5 @@
 package com.github.mikekirillov.tdd;
 
-import com.github.mikekirillov.model.PropertyBuilder;
 import com.github.mikekirillov.constants.PlantUmlSchemaTag;
 import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Relation;
@@ -119,7 +118,7 @@ public class ParserFirstTDDTest {
                 // check for other lines except entity name and curly brackets
                 // and parse properties
                 if (!line.contains(PlantUmlSchemaTag.AS_BETWEEN_SPACES) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_OPENED) && !line.contains(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED) && !StringUtils.containsOnly(line, "-")) {
-                    PropertyBuilder propertyBuilder = new PropertyBuilder();
+                    Property.Builder propertyBuilder = new Property.Builder();
                     propertyBuilder.isMandatory(line.startsWith(PlantUmlSchemaTag.MANDATORY));
                     propertyBuilder.isForeignKey(line.contains(PlantUmlSchemaTag.FOREIGN_KEY));
 
