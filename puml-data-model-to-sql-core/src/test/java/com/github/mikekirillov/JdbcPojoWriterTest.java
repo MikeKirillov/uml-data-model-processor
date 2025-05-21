@@ -11,19 +11,19 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
-import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class JdbcModelPojoWriterTest {
+class JdbcPojoWriterTest {
 
     @Test
     public void shouldProcessEntityEasyPojo() throws IOException {
         boolean requiresSpringDataJdbcAnnotations = false;
         boolean allowForeignKeyAsEmbeddedEntity = false;
         List<Entity> entities = returnEntitiesWithFk();
-        JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
+        JdbcPojoWriter writer = new JdbcPojoWriter(
                 POJO_GENERATOR_DIR,
                 entities,
                 new ArrayList<>(),
@@ -46,7 +46,7 @@ class JdbcModelPojoWriterTest {
         boolean requiresSpringDataJdbcAnnotations = true;
         boolean allowForeignKeyAsEmbeddedEntity = true;
         List<Entity> entities = returnEntitiesWithFkSnake();
-        JdbcModelPojoWriter writer = new JdbcModelPojoWriter(
+        JdbcPojoWriter writer = new JdbcPojoWriter(
                 POJO_GENERATOR_DIR,
                 entities,
                 new ArrayList<>(),

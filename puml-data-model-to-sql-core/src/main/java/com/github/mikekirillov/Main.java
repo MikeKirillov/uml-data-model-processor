@@ -7,7 +7,7 @@ import com.github.mikekirillov.model.Relation;
 import java.io.IOException;
 import java.util.List;
 
-import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
 
 public class Main {
     private static final String RESOURCES_PATH_IN = "puml-data-model-to-sql-core/src/test/resources/";
@@ -39,13 +39,12 @@ public class Main {
         List<Relation> relations = relationsParser.parseLinesFrom(lines);
         for (Entity entity : entities) {
             // generating POJO file content
-            EntityProcessor jdbcModelPojoProcessor = new JdbcModelPojoProcessor(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, relations);
+            EntityProcessor jdbcModelPojoProcessor = new JdbcPojoProcessor(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, relations);
             String pojoFileContent = jdbcModelPojoProcessor.process();
             // creating and writing POJO files
             FileWriter pojoWriter = new FileWriter(pojoFileContent, POJO_GENERATOR_OUT_DIR, snakeToCamel(entity.getName(), true) + ".java");
             pojoWriter.write();
         }
-
     }
 
     private static PojoConfig getPojoConfig() {

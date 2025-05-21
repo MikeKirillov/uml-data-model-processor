@@ -13,10 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
-import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
 
-public class JdbcModelPojoWriter implements ModelPojoWriter {
+public class JdbcPojoWriter {
     private final String outputModelPath;
     private final List<Entity> entities;
     private final List<Relation> relations;
@@ -30,18 +30,18 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
     private final boolean requiresSetters;
     private final boolean requiresToStringMethod;
 
-    public JdbcModelPojoWriter(String outputModelPath,
-                               List<Entity> entities,
-                               List<Relation> relations,
-                               boolean requiresSpringDataJdbcAnnotations,
-                               boolean allowForeignKeyAsEmbeddedEntity,
-                               boolean allowForeignKeyAsEmbeddedEntityByAggregate,
-                               boolean requiresNoArgsConstructor,
-                               boolean requiresIdArgConstructor,
-                               boolean requiresAllArgsConstructor,
-                               boolean requiresGetters,
-                               boolean requiresSetters,
-                               boolean requiresToStringMethod) {
+    public JdbcPojoWriter(String outputModelPath,
+                          List<Entity> entities,
+                          List<Relation> relations,
+                          boolean requiresSpringDataJdbcAnnotations,
+                          boolean allowForeignKeyAsEmbeddedEntity,
+                          boolean allowForeignKeyAsEmbeddedEntityByAggregate,
+                          boolean requiresNoArgsConstructor,
+                          boolean requiresIdArgConstructor,
+                          boolean requiresAllArgsConstructor,
+                          boolean requiresGetters,
+                          boolean requiresSetters,
+                          boolean requiresToStringMethod) {
         this.outputModelPath = outputModelPath;
         this.entities = entities;
         this.relations = getBridgeEntities(relations);
@@ -56,7 +56,6 @@ public class JdbcModelPojoWriter implements ModelPojoWriter {
         this.requiresToStringMethod = requiresToStringMethod;
     }
 
-    @Override
     public void write() {
         for (Entity entity : entities) {
             processEntity(entity);

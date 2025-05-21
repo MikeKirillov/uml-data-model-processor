@@ -6,21 +6,21 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
-import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
 
-public class JdbcModelPojoProcessor implements EntityProcessor {
+public class JdbcPojoProcessor implements EntityProcessor {
     private final PojoConfig pojoConfig;
     private final String outputFilePath;
     private final Entity entity;
     private final List<Entity> entities;
     private final List<Relation> relations;
 
-    public JdbcModelPojoProcessor(PojoConfig pojoConfig,
-                                  String outputFilePath,
-                                  Entity entity,
-                                  List<Entity> entities,
-                                  List<Relation> relations) {
+    public JdbcPojoProcessor(PojoConfig pojoConfig,
+                             String outputFilePath,
+                             Entity entity,
+                             List<Entity> entities,
+                             List<Relation> relations) {
         this.entity = entity;
         this.outputFilePath = outputFilePath;
         this.entities = entities;
@@ -37,35 +37,31 @@ public class JdbcModelPojoProcessor implements EntityProcessor {
 
     private void processEntity(StringBuilder stringBuilder) {
         String entityName = snakeToCamel(entity.getName(), true);
-
         writePackage(stringBuilder);
         writeImports(stringBuilder, entity);
         writeClassDeclaration(stringBuilder, entity, entityName);
 
-        if (!entity.getProperties().isEmpty()) {
-            Map<String, String> properties = new HashMap<>();
-
-            writeFields(stringBuilder, entity, properties);
-
-            if (pojoConfig.isRequiresNoArgsConstructor()) {
-                writeNoArgsConstructor(stringBuilder, entityName);
-            }
-            if (pojoConfig.isRequiresIdArgConstructor()) {
-                writeIdConstructor(stringBuilder, entity, entityName);
-            }
-            if (pojoConfig.isRequiresAllArgsConstructor()) {
-                writeAllArgsConstructor(stringBuilder, properties, entityName);
-            }
-            if (pojoConfig.isRequiresGetters() || pojoConfig.isRequiresSetters()) {
-                writeGettersSetters(stringBuilder, properties);
-            }
-            if (pojoConfig.isRequiresToStringMethod()) {
-                writeToStringMethod(stringBuilder, properties, entityName);
-            }
-        } else if (pojoConfig.isRequiresNoArgsConstructor()) {
+        if (entity.getProperties().isEmpty()) {
+            writeClosingFile(stringBuilder);
+            return;
+        }
+        Map<String, String> properties = new HashMap<>();
+        writeFields(stringBuilder, entity, properties);
+        if (pojoConfig.isRequiresNoArgsConstructor()) {
             writeNoArgsConstructor(stringBuilder, entityName);
         }
-
+        if (pojoConfig.isRequiresIdArgConstructor()) {
+            writeIdConstructor(stringBuilder, entity, entityName);
+        }
+        if (pojoConfig.isRequiresAllArgsConstructor()) {
+            writeAllArgsConstructor(stringBuilder, properties, entityName);
+        }
+        if (pojoConfig.isRequiresGetters() || pojoConfig.isRequiresSetters()) {
+            writeGettersSetters(stringBuilder, properties);
+        }
+        if (pojoConfig.isRequiresToStringMethod()) {
+            writeToStringMethod(stringBuilder, properties, entityName);
+        }
         writeClosingFile(stringBuilder);
     }
 
@@ -101,11 +97,9 @@ public class JdbcModelPojoProcessor implements EntityProcessor {
             if (propertyList.stream().anyMatch(property -> property.getType().equals("DATETIME"))) {
                 stringBuilder.append("import java.sql.Date;\n");
             }
-
             if (propertyList.stream().anyMatch(property -> property.getType().equals("TIMESTAMP"))) {
                 stringBuilder.append("import java.util.Date;\n");
             }
-
             // TODO REMEMBER that scheme could contain both of date types
         }
     }
