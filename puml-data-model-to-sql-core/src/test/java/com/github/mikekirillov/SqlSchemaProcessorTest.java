@@ -1,7 +1,6 @@
 package com.github.mikekirillov;
 
 import com.github.mikekirillov.model.Entity;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,7 +16,7 @@ class SqlSchemaProcessorTest {
     public void shouldReturnSqlSchemaString() {
         List<Entity> entities = returnEntities();
         processor = new SqlSchemaProcessor(entities);
-        String sqlSchema = processor.generateSchema();
+        String sqlSchema = processor.process();
 
         assertNotNull(sqlSchema);
     }
@@ -27,7 +26,7 @@ class SqlSchemaProcessorTest {
         List<Entity> entities = returnEntitiesDamagedFkEntityName();
         processor = new SqlSchemaProcessor(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.generateSchema());
+        assertThrows(NoSuchElementException.class, () -> processor.process());
     }
 
     @Test
@@ -35,6 +34,6 @@ class SqlSchemaProcessorTest {
         List<Entity> entities = returnEntitiesDamagedFkEntityId();
         processor = new SqlSchemaProcessor(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.generateSchema());
+        assertThrows(NoSuchElementException.class, () -> processor.process());
     }
 }

@@ -13,7 +13,7 @@ public class SqlSchemaProcessor {
         this.entities = entities;
     }
 
-    public String generateSchema() {
+    public String process() {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (Entity entity : entities) {

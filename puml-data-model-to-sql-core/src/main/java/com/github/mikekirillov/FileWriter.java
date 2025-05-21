@@ -7,13 +7,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class SqlSchemaFileWriter {
-    private final String sqlSchema;
+public class FileWriter {
+    private final String fileContent;
     private final String outputFilePath;
     private final String outputFile;
 
-    public SqlSchemaFileWriter(String sqlSchema, String outputFilePath, String outputFile) {
-        this.sqlSchema = sqlSchema;
+    public FileWriter(String fileContent, String outputFilePath, String outputFile) {
+        this.fileContent = fileContent;
         this.outputFilePath = outputFilePath;
         this.outputFile = outputFile;
     }
@@ -27,7 +27,7 @@ public class SqlSchemaFileWriter {
         }
 
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
-            writer.write(sqlSchema, 0, sqlSchema.length());
+            writer.write(fileContent, 0, fileContent.length());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
