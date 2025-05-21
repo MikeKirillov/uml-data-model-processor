@@ -19,6 +19,18 @@ class SqlSchemaProcessorTest {
         String sqlSchema = processor.process();
 
         assertNotNull(sqlSchema);
+
+        System.out.println(sqlSchema);
+
+        String[] split = sqlSchema.split(System.lineSeparator());
+        assertEquals("CREATE TABLE IF NOT EXISTS gender(", split[0]);
+        assertEquals("id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,", split[1]);
+        assertEquals("name VARCHAR(10) NOT NULL", split[2]);
+        assertEquals(");", split[3]);
+        assertEquals("CREATE TABLE IF NOT EXISTS state(", split[4]);
+        assertEquals("id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,", split[5]);
+        assertEquals("name VARCHAR(128) NOT NULL", split[6]);
+        assertEquals(");", split[7]);
     }
 
     @Test
