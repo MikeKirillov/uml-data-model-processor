@@ -4,6 +4,7 @@ import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.*;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
 import java.util.*;
 
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
@@ -11,15 +12,18 @@ import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 
 public class JdbcModelPojoProcessor implements EntityProcessor {
     private final PojoConfig pojoConfig;
+    private final String outputFilePath;
     private final Entity entity;
     private final List<Entity> entities;
     private final List<Relation> relations;
 
     public JdbcModelPojoProcessor(PojoConfig pojoConfig,
+                                  String outputFilePath,
                                   Entity entity,
                                   List<Entity> entities,
                                   List<Relation> relations) {
         this.entity = entity;
+        this.outputFilePath = outputFilePath;
         this.entities = entities;
         this.relations = getBridgeEntities(relations);
         this.pojoConfig = pojoConfig;
@@ -67,7 +71,8 @@ public class JdbcModelPojoProcessor implements EntityProcessor {
     }
 
     private void writePackage(StringBuilder stringBuilder) {
-        stringBuilder.append("package com.github.mikekirillov.tdd.model;\n\n");
+        String filePath = outputFilePath.replace("/", ".");
+        stringBuilder.append("package ").append(filePath).append(";\n\n");
     }
 
     private void writeImports(StringBuilder stringBuilder, Entity entity) {
