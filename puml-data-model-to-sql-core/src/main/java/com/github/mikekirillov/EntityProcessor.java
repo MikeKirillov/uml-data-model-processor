@@ -1,6 +1,6 @@
 package com.github.mikekirillov;
 
 @FunctionalInterface
-public interface ModelPojoWriter {
-    void write();
+public interface EntityProcessor {
+    String process();
 }

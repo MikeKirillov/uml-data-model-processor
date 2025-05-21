@@ -10,7 +10,7 @@ import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class SqlSchemaProcessorTest {
-    private SqlSchemaProcessor processor;
+    private EntityProcessor processor;
 
     @Test
     public void shouldReturnSqlSchemaString() {
