@@ -2,7 +2,6 @@ package com.github.mikekirillov;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -14,15 +13,15 @@ import java.util.List;
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class SqlSchemaFileWriterTest {
-    private SqlSchemaFileWriter writer;
+class FileWriterTest {
+    private FileWriter writer;
     private File file;
-    private String sqlSchema;
+    private String fileContent;
 
     @BeforeEach
     void init() {
-        sqlSchema = returnSqlSchema();
-        writer = new SqlSchemaFileWriter(sqlSchema, RESOURCES_PATH_OUT, TXT_FILE_PATH_OUT);
+        fileContent = returnSqlSchema();
+        writer = new FileWriter(fileContent, RESOURCES_PATH_OUT, TXT_FILE_PATH_OUT);
         Path path = Path.of(RESOURCES_PATH_OUT, TXT_FILE_PATH_OUT);
         file = new File(path.toUri());
     }
@@ -43,7 +42,7 @@ class SqlSchemaFileWriterTest {
         assertEquals(TXT_FILE_PATH_OUT, file.getName());
 
         List<String> lines = Files.readAllLines(file.toPath()).stream().toList();
-        String[] splitSchema = sqlSchema.split("\n");
+        String[] splitSchema = fileContent.split("\n");
 
         assertTrue(() -> lines.get(0).contains(splitSchema[0])
                 && lines.get(1).contains(splitSchema[1])

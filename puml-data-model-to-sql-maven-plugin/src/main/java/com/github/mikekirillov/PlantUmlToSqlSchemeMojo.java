@@ -50,13 +50,13 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
             PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
             List<Entity> entities = entitiesParser.parseLinesFrom(lines);
             SqlSchemaProcessor processor = new SqlSchemaProcessor(entities);
-            String sqlSchema = processor.generateSchema();
+            String sqlSchema = processor.process();
 
             getLog().info("Generated schema:\n" + sqlSchema);
 
             // TODO CONFIG SKIP of sql ddl-script-gen OR pojo-gen
-            SqlSchemaFileWriter writer = new SqlSchemaFileWriter(sqlSchema, outputFilePath, outputFileName + "." + outputFileExtension);
-            writer.write();
+            FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputFilePath, outputFileName + "." + outputFileExtension);
+            ddlScriptWriter.write();
 
             getLog().info(getCompleteMsg());
         } catch (IOException e) {
