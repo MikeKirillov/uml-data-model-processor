@@ -26,7 +26,7 @@ public class Main {
         List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
         // 2. generating SQL Data Definition Language (DDL) model
-        SqlSchemaProcessor processor = new SqlSchemaProcessor(entities);
+        EntityProcessor processor = new SqlSchemaProcessor(entities);
         String sqlSchema = processor.process();
         // System.out.println(sqlSchema);
 
@@ -35,11 +35,14 @@ public class Main {
         ddlScriptWriter.write();
 
         // 4. generating POJO - data model Java classes
+        PojoConfig pojoConfig = getPojoConfig();
         PlantUmlParser<Relation> relationsParser = new PlantUmlRelationsParser(entities);
         List<Relation> relations = relationsParser.parseLinesFrom(lines);
         for (Entity entity : entities) {
-            JdbcModelPojoProcessor jdbcModelPojoProcessor = new JdbcModelPojoProcessor(getPojoConfig(), entity, entities, relations);
+            // generating POJO file content
+            EntityProcessor jdbcModelPojoProcessor = new JdbcModelPojoProcessor(pojoConfig, entity, entities, relations);
             String pojoFileContent = jdbcModelPojoProcessor.process();
+            // creating and writing POJO files
             FileWriter pojoWriter = new FileWriter(pojoFileContent, POJO_GENERATOR_OUT_DIR, snakeToCamel(entity.getName(), true) + ".java");
             pojoWriter.write();
         }

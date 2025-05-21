@@ -9,7 +9,7 @@ import java.util.*;
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.convertType;
 import static com.github.mikekirillov.utils.ModelPojoWriterUtils.snakeToCamel;
 
-public class JdbcModelPojoProcessor {
+public class JdbcModelPojoProcessor implements EntityProcessor {
     private final PojoConfig pojoConfig;
     private final Entity entity;
     private final List<Entity> entities;
@@ -25,6 +25,7 @@ public class JdbcModelPojoProcessor {
         this.pojoConfig = pojoConfig;
     }
 
+    @Override
     public String process() {
         StringBuilder stringBuilder = new StringBuilder();
         processEntity(stringBuilder);

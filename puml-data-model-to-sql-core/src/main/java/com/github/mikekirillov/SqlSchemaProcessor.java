@@ -6,20 +6,19 @@ import com.github.mikekirillov.model.Property;
 
 import java.util.List;
 
-public class SqlSchemaProcessor {
+public class SqlSchemaProcessor implements EntityProcessor {
     private final List<Entity> entities;
 
     public SqlSchemaProcessor(List<Entity> entities) {
         this.entities = entities;
     }
 
+    @Override
     public String process() {
         StringBuilder stringBuilder = new StringBuilder();
-
         for (Entity entity : entities) {
             processEntity(stringBuilder, entity);
         }
-
         return stringBuilder.toString();
     }
 
