@@ -1,38 +1,38 @@
 package com.github.mikekirillov.model;
 
 public class PojoConfig {
-    private final boolean requiresSpringDataJdbcAnnotations;
+    private final boolean allowSpringDataJdbcAnnotations;
     private final boolean allowForeignKeyAsEmbeddedEntity;
     private final boolean allowForeignKeyAsEmbeddedEntityByAggregate;
-    private final boolean requiresNoArgsConstructor;
-    private final boolean requiresIdArgConstructor;
-    private final boolean requiresAllArgsConstructor;
-    private final boolean requiresGetters;
-    private final boolean requiresSetters;
-    private final boolean requiresToStringMethod;
+    private final boolean allowNoArgsConstructor;
+    private final boolean allowIdArgConstructor;
+    private final boolean allowAllArgsConstructor;
+    private final boolean allowGetters;
+    private final boolean allowSetters;
+    private final boolean allowToStringMethod;
 
-    public PojoConfig(boolean requiresSpringDataJdbcAnnotations,
+    public PojoConfig(boolean allowSpringDataJdbcAnnotations,
                       boolean allowForeignKeyAsEmbeddedEntity,
                       boolean allowForeignKeyAsEmbeddedEntityByAggregate,
-                      boolean requiresNoArgsConstructor,
-                      boolean requiresIdArgConstructor,
-                      boolean requiresAllArgsConstructor,
-                      boolean requiresGetters,
-                      boolean requiresSetters,
-                      boolean requiresToStringMethod) {
-        this.requiresSpringDataJdbcAnnotations = requiresSpringDataJdbcAnnotations;
+                      boolean allowNoArgsConstructor,
+                      boolean allowIdArgConstructor,
+                      boolean allowAllArgsConstructor,
+                      boolean allowGetters,
+                      boolean allowSetters,
+                      boolean allowToStringMethod) {
+        this.allowSpringDataJdbcAnnotations = allowSpringDataJdbcAnnotations;
         this.allowForeignKeyAsEmbeddedEntity = allowForeignKeyAsEmbeddedEntity;
         this.allowForeignKeyAsEmbeddedEntityByAggregate = allowForeignKeyAsEmbeddedEntityByAggregate;
-        this.requiresNoArgsConstructor = requiresNoArgsConstructor;
-        this.requiresIdArgConstructor = requiresIdArgConstructor;
-        this.requiresAllArgsConstructor = requiresAllArgsConstructor;
-        this.requiresGetters = requiresGetters;
-        this.requiresSetters = requiresSetters;
-        this.requiresToStringMethod = requiresToStringMethod;
+        this.allowNoArgsConstructor = allowNoArgsConstructor;
+        this.allowIdArgConstructor = allowIdArgConstructor;
+        this.allowAllArgsConstructor = allowAllArgsConstructor;
+        this.allowGetters = allowGetters;
+        this.allowSetters = allowSetters;
+        this.allowToStringMethod = allowToStringMethod;
     }
 
-    public boolean isRequiresSpringDataJdbcAnnotations() {
-        return requiresSpringDataJdbcAnnotations;
+    public boolean isAllowSpringDataJdbcAnnotations() {
+        return allowSpringDataJdbcAnnotations;
     }
 
     public boolean isAllowForeignKeyAsEmbeddedEntity() {
@@ -43,27 +43,27 @@ public class PojoConfig {
         return allowForeignKeyAsEmbeddedEntityByAggregate;
     }
 
-    public boolean isRequiresNoArgsConstructor() {
-        return requiresNoArgsConstructor;
+    public boolean isAllowNoArgsConstructor() {
+        return allowNoArgsConstructor;
     }
 
-    public boolean isRequiresIdArgConstructor() {
-        return requiresIdArgConstructor;
+    public boolean isAllowIdArgConstructor() {
+        return allowIdArgConstructor;
     }
 
-    public boolean isRequiresAllArgsConstructor() {
-        return requiresAllArgsConstructor;
+    public boolean isAllowAllArgsConstructor() {
+        return allowAllArgsConstructor;
     }
 
-    public boolean isRequiresGetters() {
-        return requiresGetters;
+    public boolean isAllowGetters() {
+        return allowGetters;
     }
 
-    public boolean isRequiresSetters() {
-        return requiresSetters;
+    public boolean isAllowSetters() {
+        return allowSetters;
     }
 
-    public boolean isRequiresToStringMethod() {
-        return requiresToStringMethod;
+    public boolean isAllowToStringMethod() {
+        return allowToStringMethod;
     }
 }
