@@ -47,19 +47,19 @@ public class JdbcPojoProcessor implements EntityProcessor {
         }
         Map<String, String> properties = new HashMap<>();
         writeFields(stringBuilder, entity, properties);
-        if (pojoConfig.isRequiresNoArgsConstructor()) {
+        if (pojoConfig.isAllowNoArgsConstructor()) {
             writeNoArgsConstructor(stringBuilder, entityName);
         }
-        if (pojoConfig.isRequiresIdArgConstructor()) {
+        if (pojoConfig.isAllowIdArgConstructor()) {
             writeIdConstructor(stringBuilder, entity, entityName);
         }
-        if (pojoConfig.isRequiresAllArgsConstructor()) {
+        if (pojoConfig.isAllowAllArgsConstructor()) {
             writeAllArgsConstructor(stringBuilder, properties, entityName);
         }
-        if (pojoConfig.isRequiresGetters() || pojoConfig.isRequiresSetters()) {
+        if (pojoConfig.isAllowGetters() || pojoConfig.isAllowSetters()) {
             writeGettersSetters(stringBuilder, properties);
         }
-        if (pojoConfig.isRequiresToStringMethod()) {
+        if (pojoConfig.isAllowToStringMethod()) {
             writeToStringMethod(stringBuilder, properties, entityName);
         }
         writeClosingFile(stringBuilder);
@@ -73,7 +73,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
     private void writeImports(StringBuilder stringBuilder, Entity entity) {
         List<Property> propertyList = entity.getProperties();
 
-        if (pojoConfig.isRequiresSpringDataJdbcAnnotations()) {
+        if (pojoConfig.isAllowSpringDataJdbcAnnotations()) {
             stringBuilder.append("import org.springframework.data.annotation.Id;\n");
             stringBuilder.append("import org.springframework.data.relational.core.mapping.Table;\n");
             if (pojoConfig.isAllowForeignKeyAsEmbeddedEntity() && entity.getProperties().stream().anyMatch(Property::isForeignKey)) {
@@ -134,11 +134,11 @@ public class JdbcPojoProcessor implements EntityProcessor {
         for (Property property : entity.getProperties()) {
             String fieldName, fieldType;
 
-            if (pojoConfig.isRequiresSpringDataJdbcAnnotations() && property.isPrimaryKey()) {
+            if (pojoConfig.isAllowSpringDataJdbcAnnotations() && property.isPrimaryKey()) {
                 stringBuilder.append("\t@Id\n");
             }
 
-            if (pojoConfig.isRequiresSpringDataJdbcAnnotations() && pojoConfig.isAllowForeignKeyAsEmbeddedEntity() && property.isForeignKey()) {
+            if (pojoConfig.isAllowSpringDataJdbcAnnotations() && pojoConfig.isAllowForeignKeyAsEmbeddedEntity() && property.isForeignKey()) {
                 String propertyName = property.getName().toLowerCase();
                 Entity foundOne = this.entities.stream()
                         .filter(it -> propertyName.contains(it.getName().toLowerCase()))
@@ -176,7 +176,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
 
         // add bonus field to main entity for many-to-many cases: when we've got training/client/training_client entities
         // training class will also contain set of training_client entity
-        if (pojoConfig.isRequiresSpringDataJdbcAnnotations() && pojoConfig.isAllowForeignKeyAsEmbeddedEntity() && pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
+        if (pojoConfig.isAllowSpringDataJdbcAnnotations() && pojoConfig.isAllowForeignKeyAsEmbeddedEntity() && pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
             findMainRelationEntity(entity).ifPresent(relation -> {
                 List<EntityRelation> entityRelations = new ArrayList<>();
                 entityRelations.add(relation.getLeftEntity());
@@ -261,12 +261,12 @@ public class JdbcPojoProcessor implements EntityProcessor {
         properties.forEach((name, type) -> {
             String getterName = "get" + StringUtils.capitalize(name);
             String setterName = "set" + StringUtils.capitalize(name);
-            if (pojoConfig.isRequiresGetters()) {
+            if (pojoConfig.isAllowGetters()) {
                 stringBuilder.append("\n\tpublic ").append(type).append(" ").append(getterName).append("() {\n");
                 stringBuilder.append("\t\treturn ").append(name).append(";\n");
                 stringBuilder.append("\t}\n");
             }
-            if (pojoConfig.isRequiresSetters()) {
+            if (pojoConfig.isAllowSetters()) {
                 stringBuilder.append("\n\tpublic void ").append(setterName).append("(").append(type).append(" ").append(name).append(") {\n");
                 stringBuilder.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
                 stringBuilder.append("\t}\n");
