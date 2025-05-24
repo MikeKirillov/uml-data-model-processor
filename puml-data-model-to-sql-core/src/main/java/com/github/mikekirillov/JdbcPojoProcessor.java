@@ -38,20 +38,20 @@ public class JdbcPojoProcessor implements EntityProcessor {
     private void processEntity(StringBuilder stringBuilder) {
         String entityName = snakeToCamel(entity.getName(), true);
         writePackage(stringBuilder);
-        writeImports(stringBuilder, entity);
-        writeClassDeclaration(stringBuilder, entity, entityName);
+        writeImports(stringBuilder);
+        writeClassDeclaration(stringBuilder, entityName);
 
         if (entity.getProperties().isEmpty()) {
             writeClosingFile(stringBuilder);
             return;
         }
         Map<String, String> properties = new HashMap<>();
-        writeFields(stringBuilder, entity, properties);
+        writeFields(stringBuilder, properties);
         if (pojoConfig.isAllowNoArgsConstructor()) {
             writeNoArgsConstructor(stringBuilder, entityName);
         }
         if (pojoConfig.isAllowIdArgConstructor()) {
-            writeIdConstructor(stringBuilder, entity, entityName);
+            writeIdConstructor(stringBuilder, entityName);
         }
         if (pojoConfig.isAllowAllArgsConstructor()) {
             writeAllArgsConstructor(stringBuilder, properties, entityName);
@@ -70,7 +70,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
         stringBuilder.append("package ").append(filePath).append(";\n\n");
     }
 
-    private void writeImports(StringBuilder stringBuilder, Entity entity) {
+    private void writeImports(StringBuilder stringBuilder) {
         List<Property> propertyList = entity.getProperties();
 
         if (pojoConfig.isAllowSpringDataJdbcAnnotations()) {
@@ -82,7 +82,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
                     stringBuilder.append("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
 
                     // add for main entity for many-to-many cases
-                    findMainRelationEntity(entity).ifPresent(relation -> {
+                    findMainRelationEntity().ifPresent(relation -> {
                         stringBuilder.append("import org.springframework.data.relational.core.mapping.MappedCollection;\n");
                         stringBuilder.append("import java.util.HashSet;\n");
                         stringBuilder.append("import java.util.Set;\n");
@@ -104,13 +104,13 @@ public class JdbcPojoProcessor implements EntityProcessor {
         }
     }
 
-    private Optional<Relation> findMainRelationEntity(Entity entity) {
+    private Optional<Relation> findMainRelationEntity() {
         return relations.stream()
                 .filter(relation -> {
                     var right = relation.getRightEntity();
                     var left = relation.getLeftEntity();
-                    return checkRelationIsOneOrMany(right) && checkRelationEqualsMainEntity(right, entity)
-                            || checkRelationIsOneOrMany(left) && checkRelationEqualsMainEntity(left, entity);
+                    return checkRelationIsOneOrMany(right) && checkRelationEqualsMainEntity(right)
+                            || checkRelationIsOneOrMany(left) && checkRelationEqualsMainEntity(left);
                 })
                 .findFirst();
     }
@@ -120,17 +120,17 @@ public class JdbcPojoProcessor implements EntityProcessor {
                 || entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY_REVERTED);
     }
 
-    private boolean checkRelationEqualsMainEntity(EntityRelation relation, Entity entity) {
+    private boolean checkRelationEqualsMainEntity(EntityRelation relation) {
         var relationName = relation.getEntity().getName();
         return !entity.getName().contains("_") && relationName.startsWith(entity.getName());
     }
 
-    private void writeClassDeclaration(StringBuilder stringBuilder, Entity entity, String entityName) {
+    private void writeClassDeclaration(StringBuilder stringBuilder, String entityName) {
         stringBuilder.append("\n@Table(\"").append(entity.getName()).append("\")");
         stringBuilder.append("\npublic class ").append(entityName).append(" {\n");
     }
 
-    private void writeFields(StringBuilder stringBuilder, Entity entity, Map<String, String> properties) {
+    private void writeFields(StringBuilder stringBuilder, Map<String, String> properties) {
         for (Property property : entity.getProperties()) {
             String fieldName, fieldType;
 
@@ -151,7 +151,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
 
                     // add not secondary entity reference field only: for training_client add client field, not training,
                     // because training class will contain set of training_client entity
-                    if (filterRelationsAsBridgeEntity(entity).isEmpty()
+                    if (filterRelationsAsBridgeEntity().isEmpty()
                             || propertySplit.length == 2 && entity.getName().endsWith(propertySplit[0])) {
                         stringBuilder.append("\t@Column(\"").append(property.getName()).append("\")\n");
                         fieldType = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
@@ -177,7 +177,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
         // add bonus field to main entity for many-to-many cases: when we've got training/client/training_client entities
         // training class will also contain set of training_client entity
         if (pojoConfig.isAllowSpringDataJdbcAnnotations() && pojoConfig.isAllowForeignKeyAsEmbeddedEntity() && pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
-            findMainRelationEntity(entity).ifPresent(relation -> {
+            findMainRelationEntity().ifPresent(relation -> {
                 List<EntityRelation> entityRelations = new ArrayList<>();
                 entityRelations.add(relation.getLeftEntity());
                 entityRelations.add(relation.getRightEntity());
@@ -201,7 +201,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
         }
     }
 
-    private List<Relation> filterRelationsAsBridgeEntity(Entity entity) {
+    private List<Relation> filterRelationsAsBridgeEntity() {
         return relations.stream()
                 .filter(relation -> {
                     var right = relation.getRightEntity();
@@ -231,7 +231,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
         stringBuilder.append("\n\tpublic ").append(entityName).append("() {}\n");
     }
 
-    private void writeIdConstructor(StringBuilder stringBuilder, Entity entity, String entityName) {
+    private void writeIdConstructor(StringBuilder stringBuilder, String entityName) {
         entity.getProperties().stream()
                 .filter(Property::isPrimaryKey)
                 .findFirst()
