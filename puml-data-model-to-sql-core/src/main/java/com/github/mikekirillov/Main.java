@@ -35,11 +35,12 @@ public class Main {
         // 3. generating POJO - data model Java classes
         PojoConfig pojoConfig = getPojoConfig();
         // parsing entities relations as objects from string lines
-        PlantUmlParser<Relation> relationsParser = new PlantUmlRelationsParser(entities);
+        PlantUmlRelationsParser relationsParser = new PlantUmlRelationsParser(entities);
         List<Relation> relations = relationsParser.parseLinesFrom(lines);
+        List<Relation> filteredRelsAsBridges = relationsParser.getBridgeEntities(relations);
         for (Entity entity : entities) {
             // generating POJO file content
-            EntityProcessor jdbcModelPojoProcessor = new JdbcPojoProcessor(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, relations);
+            EntityProcessor jdbcModelPojoProcessor = new JdbcPojoProcessor(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, filteredRelsAsBridges);
             String pojoFileContent = jdbcModelPojoProcessor.process();
             // creating and writing POJO files
             FileWriter pojoWriter = new FileWriter(pojoFileContent, POJO_GENERATOR_OUT_DIR, snakeToCamel(entity.getName(), true) + ".java");

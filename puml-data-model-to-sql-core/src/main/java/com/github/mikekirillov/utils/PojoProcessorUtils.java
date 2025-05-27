@@ -1,5 +1,7 @@
 package com.github.mikekirillov.utils;
 
+import com.github.mikekirillov.enums.UmlRelationType;
+import com.github.mikekirillov.model.EntityRelation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.stream.Collectors;
@@ -23,5 +25,10 @@ public class PojoProcessorUtils {
                     .collect(Collectors.joining());
         }
         return capitalize ? StringUtils.capitalize(camel) : StringUtils.uncapitalize(camel);
+    }
+
+    public static boolean checkRelationIsOneOrMany(EntityRelation entityRelation) {
+        return entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY)
+                || entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY_REVERTED);
     }
 }

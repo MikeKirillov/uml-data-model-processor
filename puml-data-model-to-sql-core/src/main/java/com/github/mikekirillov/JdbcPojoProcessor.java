@@ -1,13 +1,11 @@
 package com.github.mikekirillov;
 
-import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
-import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.*;
 
 public class JdbcPojoProcessor implements EntityProcessor {
     private final PojoConfig pojoConfig;
@@ -24,7 +22,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
         this.entity = entity;
         this.outputFilePath = outputFilePath;
         this.entities = entities;
-        this.relations = getBridgeEntities(relations);
+        this.relations = relations;
         this.pojoConfig = pojoConfig;
     }
 
@@ -104,27 +102,6 @@ public class JdbcPojoProcessor implements EntityProcessor {
         }
     }
 
-    private Optional<Relation> findMainRelationEntity() {
-        return relations.stream()
-                .filter(relation -> {
-                    var right = relation.getRightEntity();
-                    var left = relation.getLeftEntity();
-                    return checkRelationIsOneOrMany(right) && checkRelationEqualsMainEntity(right)
-                            || checkRelationIsOneOrMany(left) && checkRelationEqualsMainEntity(left);
-                })
-                .findFirst();
-    }
-
-    private boolean checkRelationIsOneOrMany(EntityRelation entityRelation) {
-        return entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY)
-                || entityRelation.getRelationType().equals(UmlRelationType.ONE_OR_MANY_REVERTED);
-    }
-
-    private boolean checkRelationEqualsMainEntity(EntityRelation relation) {
-        var relationName = relation.getEntity().getName();
-        return !entity.getName().contains("_") && relationName.startsWith(entity.getName());
-    }
-
     private void writeClassDeclaration(StringBuilder stringBuilder, String entityName) {
         stringBuilder.append("\n@Table(\"").append(entity.getName()).append("\")");
         stringBuilder.append("\npublic class ").append(entityName).append(" {\n");
@@ -199,22 +176,6 @@ public class JdbcPojoProcessor implements EntityProcessor {
                 }
             });
         }
-    }
-
-    private List<Relation> filterRelationsAsBridgeEntity() {
-        return relations.stream()
-                .filter(relation -> {
-                    var right = relation.getRightEntity();
-                    var left = relation.getLeftEntity();
-                    return checkRelationIsOneOrMany(right) && checkRelationEqualsEntity(right, entity)
-                            || checkRelationIsOneOrMany(left) && checkRelationEqualsEntity(left, entity);
-                })
-                .toList();
-    }
-
-    private boolean checkRelationEqualsEntity(EntityRelation relation, Entity entity) {
-        var relationName = relation.getEntity().getName();
-        return relationName.contains("_") && relationName.equalsIgnoreCase(entity.getName());
     }
 
     private void writeField(StringBuilder stringBuilder, Map<String, String> properties, String type, String name) {
@@ -295,33 +256,35 @@ public class JdbcPojoProcessor implements EntityProcessor {
         stringBuilder.append("}\n");
     }
 
-    private List<Relation> getBridgeEntities(List<Relation> relations) {
+    private Optional<Relation> findMainRelationEntity() {
         return relations.stream()
-                .filter(relation -> checkEntityIsBridge(relation.getRightEntity())
-                        && checkBridgeContainsOtherEntityName(relation.getRightEntity(), relation.getLeftEntity())
-                        || checkEntityIsBridge(relation.getLeftEntity())
-                        && checkBridgeContainsOtherEntityName(relation.getLeftEntity(), relation.getRightEntity()))
+                .filter(relation -> {
+                    var right = relation.getRightEntity();
+                    var left = relation.getLeftEntity();
+                    return checkRelationIsOneOrMany(right) && checkRelationEqualsMainEntity(right)
+                            || checkRelationIsOneOrMany(left) && checkRelationEqualsMainEntity(left);
+                })
+                .findFirst();
+    }
+
+    private boolean checkRelationEqualsMainEntity(EntityRelation relation) {
+        var relationName = relation.getEntity().getName();
+        return !entity.getName().contains("_") && relationName.startsWith(entity.getName());
+    }
+
+    private List<Relation> filterRelationsAsBridgeEntity() {
+        return relations.stream()
+                .filter(relation -> {
+                    var right = relation.getRightEntity();
+                    var left = relation.getLeftEntity();
+                    return checkRelationIsOneOrMany(right) && checkRelationEqualsEntity(right, entity)
+                            || checkRelationIsOneOrMany(left) && checkRelationEqualsEntity(left, entity);
+                })
                 .toList();
     }
 
-    private boolean checkEntityIsBridge(EntityRelation entityRelation) {
-        String name = entityRelation.getEntity().getName();
-        if (name.contains("_")) {
-            String[] split = name.split("_");
-            if (split.length == 2) {
-                List<String> entNames = entities.stream()
-                        .map(Entity::getName)
-                        .toList();
-                return checkRelationIsOneOrMany(entityRelation)
-                        && entNames.contains(split[0])
-                        && entNames.contains(split[1]);
-            }
-            return false;
-        }
-        return false;
-    }
-
-    private boolean checkBridgeContainsOtherEntityName(EntityRelation bridgeEntity, EntityRelation otherEntity) {
-        return bridgeEntity.getEntity().getName().toLowerCase().contains(otherEntity.getEntity().getName().toLowerCase());
+    private boolean checkRelationEqualsEntity(EntityRelation relation, Entity entity) {
+        var relationName = relation.getEntity().getName();
+        return relationName.contains("_") && relationName.equalsIgnoreCase(entity.getName());
     }
 }
