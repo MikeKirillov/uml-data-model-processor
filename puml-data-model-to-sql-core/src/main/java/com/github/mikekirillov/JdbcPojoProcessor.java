@@ -79,7 +79,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
                     stringBuilder.append("import org.springframework.data.relational.core.mapping.Column;\n");
                     stringBuilder.append("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
 
-                    // add for main entity for many-to-many cases
+                    // add these imports for main entity for many-to-many cases
                     findMainRelationEntity().ifPresent(relation -> {
                         stringBuilder.append("import org.springframework.data.relational.core.mapping.MappedCollection;\n");
                         stringBuilder.append("import java.util.HashSet;\n");
@@ -126,9 +126,12 @@ public class JdbcPojoProcessor implements EntityProcessor {
                 if (pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
                     String[] propertySplit = property.getName().split("_");
 
-                    // add not secondary entity reference field only: for training_client add client field, not training,
-                    // because training class will contain set of training_client entity
                     if (filterRelationsAsBridgeEntity().isEmpty()
+                            // for many-to-many cases:
+                            // to not adding main entity to bridge entities because bridge will be added to main and
+                            // add into bridge the secondary entity reference field only
+                            // then for training_client add client field, not training,
+                            // because training class will contain set of training_client entity
                             || propertySplit.length == 2 && entity.getName().endsWith(propertySplit[0])) {
                         stringBuilder.append("\t@Column(\"").append(property.getName()).append("\")\n");
                         fieldType = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
@@ -257,34 +260,18 @@ public class JdbcPojoProcessor implements EntityProcessor {
     }
 
     private Optional<Relation> findMainRelationEntity() {
+        // main is an entity that is chosen as entity that contains many-to-many mark of other entity.
+        // returns relation with main and bridge entities
         return relations.stream()
-                .filter(relation -> {
-                    var right = relation.getRightEntity();
-                    var left = relation.getLeftEntity();
-                    return checkRelationIsOneOrMany(right) && checkRelationEqualsMainEntity(right)
-                            || checkRelationIsOneOrMany(left) && checkRelationEqualsMainEntity(left);
-                })
+                .filter(relation -> checkRelationAndMainEntityEqByName(relation, entity))
                 .findFirst();
     }
 
-    private boolean checkRelationEqualsMainEntity(EntityRelation relation) {
-        var relationName = relation.getEntity().getName();
-        return !entity.getName().contains("_") && relationName.startsWith(entity.getName());
-    }
-
     private List<Relation> filterRelationsAsBridgeEntity() {
+        // filter relations with current bridge entity
+        // returns empty if current entity is not bridge
         return relations.stream()
-                .filter(relation -> {
-                    var right = relation.getRightEntity();
-                    var left = relation.getLeftEntity();
-                    return checkRelationIsOneOrMany(right) && checkRelationEqualsEntity(right, entity)
-                            || checkRelationIsOneOrMany(left) && checkRelationEqualsEntity(left, entity);
-                })
+                .filter(relation -> checkRelationAndEntityEqByName(relation, entity))
                 .toList();
-    }
-
-    private boolean checkRelationEqualsEntity(EntityRelation relation, Entity entity) {
-        var relationName = relation.getEntity().getName();
-        return relationName.contains("_") && relationName.equalsIgnoreCase(entity.getName());
     }
 }
