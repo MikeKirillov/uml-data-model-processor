@@ -40,4 +40,9 @@ class PlantUmlRelationsParserTest {
         assertEquals("gender", relations.get(0).getRightEntity().getEntity().getName());
         assertEquals(UmlRelationType.EXACTLY_ONE, relations.get(0).getRightEntity().getRelationType());
     }
+
+    @Test
+    public void shouldFilterRelationsWithBridgesEntities() {
+        // TODO TEST
+    }
 }
