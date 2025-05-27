@@ -8,6 +8,8 @@ import com.github.mikekirillov.model.Relation;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static com.github.mikekirillov.utils.PojoProcessorUtils.checkRelationIsOneOrMany;
+
 public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
 
     private final static Predicate<String> LINE_CONTAINS_RELATION_TYPE = line ->
@@ -26,6 +28,13 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
             processLine(line, relations);
         }
         return relations;
+    }
+
+    public List<Relation> getBridgeEntities(List<Relation> relations) {
+        return relations.stream()
+                .filter(relation -> checkEntityIsBridge(relation.getRightEntity())
+                        || checkEntityIsBridge(relation.getLeftEntity()))
+                .toList();
     }
 
     private void processLine(String line, List<Relation> relations) {
@@ -64,5 +73,24 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
         return Arrays.stream(name)
                 .filter(Objects::nonNull)
                 .anyMatch(it -> it.equals(tag));
+    }
+
+    private boolean checkEntityIsBridge(EntityRelation entityRelation) {
+        String name = entityRelation.getEntity().getName();
+        if (name.contains("_")) {
+            String[] split = name.split("_");
+            if (split.length == 2) {
+                // the entity is a bridge between two others if it consists of two real entities names
+                // that contains by 'entities' list
+                List<String> entNames = entities.stream()
+                        .map(Entity::getName)
+                        .toList();
+                return checkRelationIsOneOrMany(entityRelation)
+                        && entNames.contains(split[0])
+                        && entNames.contains(split[1]);
+            }
+            return false;
+        }
+        return false;
     }
 }
