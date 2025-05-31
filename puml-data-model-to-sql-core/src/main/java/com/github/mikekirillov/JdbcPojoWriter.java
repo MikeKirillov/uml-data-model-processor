@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
-import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
 
 public class JdbcPojoWriter {
     private final String outputModelPath;
@@ -63,7 +63,7 @@ public class JdbcPojoWriter {
     }
 
     private void processEntity(Entity entity) {
-        String entityName = snakeToCamel(entity.getName(), true);
+        String entityName = camelize(entity.getName(), true);
         Path path = Path.of(outputModelPath, entityName + ".java");
         File file = new File(path.toUri());
 
@@ -170,7 +170,7 @@ public class JdbcPojoWriter {
                         .filter(it -> propertyName.contains(it.getName().toLowerCase()))
                         .findFirst()
                         .orElseThrow();
-                fieldName = snakeToCamel(foundOne.getName(), false);
+                fieldName = camelize(foundOne.getName(), false);
 
                 if (allowForeignKeyAsEmbeddedEntityByAggregate) {
                     String[] propertySplit = property.getName().split("_");
@@ -180,7 +180,7 @@ public class JdbcPojoWriter {
                     if (filterRelationsAsBridgeEntity(entity).isEmpty()
                             || propertySplit.length == 2 && entity.getName().endsWith(propertySplit[0])) {
                         writer.write("\t@Column(\"" + property.getName() + "\")\n");
-                        fieldType = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
+                        fieldType = "AggregateReference<" + camelize(foundOne.getName(), true) + ", String>";
                         writeField(writer, properties, fieldType, fieldName);
                     }
                 } else {
@@ -190,11 +190,11 @@ public class JdbcPojoWriter {
                             .findFirst()
                             .orElseThrow();
                     writer.write("\t@MappedCollection(idColumn = \"" + pkName + "\")\n");
-                    fieldType = snakeToCamel(foundOne.getName(), true);
+                    fieldType = camelize(foundOne.getName(), true);
                     writeField(writer, properties, fieldType, fieldName);
                 }
             } else {
-                fieldName = snakeToCamel(property.getName(), false);
+                fieldName = camelize(property.getName(), false);
                 fieldType = convertType(property.getType());
                 writeField(writer, properties, fieldType, fieldName);
             }
@@ -220,8 +220,8 @@ public class JdbcPojoWriter {
                 if (propertyName.isPresent() && entityName.isPresent()) {
                     try {
                         writer.write("\t@MappedCollection(idColumn = \"" + propertyName.get() + "\")\n");
-                        String fieldName = snakeToCamel(entityName.get(), false) + "s";
-                        String fieldType = "Set<" + snakeToCamel(entityName.get(), true) + ">";
+                        String fieldName = camelize(entityName.get(), false) + "s";
+                        String fieldType = "Set<" + camelize(entityName.get(), true) + ">";
                         writeManyToManyField(writer, properties, fieldType, fieldName);
                     } catch (IOException e) {
                         throw new RuntimeException(e);

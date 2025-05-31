@@ -3,11 +3,12 @@ package com.github.mikekirillov;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.PojoConfig;
 import com.github.mikekirillov.model.Relation;
+import com.github.mikekirillov.pojo.ClassGenerator;
 
 import java.io.IOException;
 import java.util.List;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
 
 public class Main {
     private static final String RESOURCES_PATH_IN = "puml-data-model-to-sql-core/src/test/resources/";
@@ -40,25 +41,29 @@ public class Main {
         List<Relation> filteredRelsAsBridges = relationsParser.getBridgeEntities(relations);
         for (Entity entity : entities) {
             // generating POJO file content
-            EntityProcessor jdbcModelPojoProcessor = new JdbcPojoProcessor(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, filteredRelsAsBridges);
-            String pojoFileContent = jdbcModelPojoProcessor.process();
+            // EntityProcessor jdbcModelPojoProcessor = new JdbcPojoProcessor(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, filteredRelsAsBridges);
+            // String pojoFileContent = jdbcModelPojoProcessor.process();
+
+            ClassGenerator classGenerator = new ClassGenerator(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, filteredRelsAsBridges);
+            String pojoFileContent = classGenerator.generate();
+
             // creating and writing POJO files
-            FileWriter pojoWriter = new FileWriter(pojoFileContent, POJO_GENERATOR_OUT_DIR, snakeToCamel(entity.getName(), true) + ".java");
+            FileWriter pojoWriter = new FileWriter(pojoFileContent, POJO_GENERATOR_OUT_DIR, camelize(entity.getName(), true) + ".java");
             pojoWriter.write();
         }
     }
 
     private static PojoConfig getPojoConfig() {
         return new PojoConfig(
-                true,
-                true,
-                true,
                 false,
                 false,
                 false,
                 false,
                 false,
-                true
+                false,
+                false,
+                false,
+                false
         );
     }
 }
