@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
-import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,7 +68,7 @@ class JdbcPojoWriterTest {
                                 boolean requiresSpringDataJdbcAnnotations,
                                 boolean allowForeignKeyAsEmbeddedEntity) throws IOException {
         for (Entity entity : entities) {
-            String capitalizedEntityName = snakeToCamel(entity.getName(), true);
+            String capitalizedEntityName = camelize(entity.getName(), true);
             File createdFile = createJavaFile(capitalizedEntityName);
             assertTrue(createdFile.exists());
             assertTrue(createdFile.isFile());
@@ -110,12 +110,12 @@ class JdbcPojoWriterTest {
                         .orElseThrow();
                 if (allowForeignKeyAsEmbeddedEntity) {
                     assertEquals(
-                            "private " + snakeToCamel(foundOne, true) + " " + snakeToCamel(foundOne, false) + ";",
+                            "private " + camelize(foundOne, true) + " " + camelize(foundOne, false) + ";",
                             lines.get(8 + i)
                     );
                 } else {
                     assertEquals(
-                            "private " + snakeToCamel(foundOne, true) + " " + snakeToCamel(foundOne, false) + ";",
+                            "private " + camelize(foundOne, true) + " " + camelize(foundOne, false) + ";",
                             lines.get(3 + i)
                     );
                 }
@@ -123,18 +123,18 @@ class JdbcPojoWriterTest {
                 if (allowForeignKeyAsEmbeddedEntity) {
                     if (entity.getProperties().stream().anyMatch(Property::isForeignKey)) {
                         assertEquals(
-                                "private " + convertType(property.getType()) + " " + snakeToCamel(property.getName(), false) + ";",
+                                "private " + convertType(property.getType()) + " " + camelize(property.getName(), false) + ";",
                                 lines.get(7 + i)
                         );
                     } else {
                         assertEquals(
-                                "private " + convertType(property.getType()) + " " + snakeToCamel(property.getName(), false) + ";",
+                                "private " + convertType(property.getType()) + " " + camelize(property.getName(), false) + ";",
                                 lines.get(6 + i)
                         );
                     }
                 } else {
                     assertEquals(
-                            "private " + convertType(property.getType()) + " " + snakeToCamel(property.getName(), false) + ";",
+                            "private " + convertType(property.getType()) + " " + camelize(property.getName(), false) + ";",
                             lines.get(3 + i)
                     );
                 }

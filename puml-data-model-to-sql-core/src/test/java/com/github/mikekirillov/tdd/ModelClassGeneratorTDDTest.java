@@ -17,7 +17,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
-import static com.github.mikekirillov.utils.PojoProcessorUtils.snakeToCamel;
+import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,7 +73,7 @@ public class ModelClassGeneratorTDDTest {
     }
 
     private void generatePojo(Entity entity, boolean fkAsClass, List<Entity> entities) {
-        String entityName = snakeToCamel(entity.getName(), true);
+        String entityName = camelize(entity.getName(), true);
         Path path = createDirAndFile(entityName);
 
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
@@ -150,10 +150,10 @@ public class ModelClassGeneratorTDDTest {
                         .filter(itName -> propertyName.contains(itName.toLowerCase()))
                         .findFirst()
                         .orElseThrow();
-                name = snakeToCamel(foundOne, false);
-                type = snakeToCamel(foundOne, true);
+                name = camelize(foundOne, false);
+                type = camelize(foundOne, true);
             } else {
-                name = snakeToCamel(property.getName(), false);
+                name = camelize(property.getName(), false);
                 type = convertType(property.getType());
             }
 

@@ -34,7 +34,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
     }
 
     private void processEntity(StringBuilder stringBuilder) {
-        String entityName = snakeToCamel(entity.getName(), true);
+        String entityName = camelize(entity.getName(), true);
         writePackage(stringBuilder);
         writeImports(stringBuilder);
         writeClassDeclaration(stringBuilder, entityName);
@@ -103,7 +103,9 @@ public class JdbcPojoProcessor implements EntityProcessor {
     }
 
     private void writeClassDeclaration(StringBuilder stringBuilder, String entityName) {
-        stringBuilder.append("\n@Table(\"").append(entity.getName()).append("\")");
+        if (pojoConfig.isAllowSpringDataJdbcAnnotations()) {
+            stringBuilder.append("\n@Table(\"").append(entity.getName()).append("\")");
+        }
         stringBuilder.append("\npublic class ").append(entityName).append(" {\n");
     }
 
@@ -121,7 +123,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
                         .filter(it -> propertyName.contains(it.getName().toLowerCase()))
                         .findFirst()
                         .orElseThrow();
-                fieldName = snakeToCamel(foundOne.getName(), false);
+                fieldName = camelize(foundOne.getName(), false);
 
                 if (pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
                     String[] propertySplit = property.getName().split("_");
@@ -134,7 +136,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
                             // because training class will contain set of training_client entity
                             || propertySplit.length == 2 && entity.getName().endsWith(propertySplit[0])) {
                         stringBuilder.append("\t@Column(\"").append(property.getName()).append("\")\n");
-                        fieldType = "AggregateReference<" + snakeToCamel(foundOne.getName(), true) + ", String>";
+                        fieldType = "AggregateReference<" + camelize(foundOne.getName(), true) + ", String>";
                         writeField(stringBuilder, properties, fieldType, fieldName);
                     }
                 } else {
@@ -144,11 +146,11 @@ public class JdbcPojoProcessor implements EntityProcessor {
                             .findFirst()
                             .orElseThrow();
                     stringBuilder.append("\t@MappedCollection(idColumn = \"").append(pkName).append("\")\n");
-                    fieldType = snakeToCamel(foundOne.getName(), true);
+                    fieldType = camelize(foundOne.getName(), true);
                     writeField(stringBuilder, properties, fieldType, fieldName);
                 }
             } else {
-                fieldName = snakeToCamel(property.getName(), false);
+                fieldName = camelize(property.getName(), false);
                 fieldType = convertType(property.getType());
                 writeField(stringBuilder, properties, fieldType, fieldName);
             }
@@ -173,8 +175,8 @@ public class JdbcPojoProcessor implements EntityProcessor {
                         .findFirst();
                 if (propertyName.isPresent() && entityName.isPresent()) {
                     stringBuilder.append("\t@MappedCollection(idColumn = \"").append(propertyName.get()).append("\")\n");
-                    String fieldName = snakeToCamel(entityName.get(), false) + "s";
-                    String fieldType = "Set<" + snakeToCamel(entityName.get(), true) + ">";
+                    String fieldName = camelize(entityName.get(), false) + "s";
+                    String fieldType = "Set<" + camelize(entityName.get(), true) + ">";
                     writeManyToManyField(stringBuilder, properties, fieldType, fieldName);
                 }
             });

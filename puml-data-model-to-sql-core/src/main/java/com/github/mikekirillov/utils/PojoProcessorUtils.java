@@ -6,6 +6,8 @@ import com.github.mikekirillov.model.EntityRelation;
 import com.github.mikekirillov.model.Relation;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -20,13 +22,13 @@ public class PojoProcessorUtils {
         };
     }
 
-    public static String snakeToCamel(String camel, boolean capitalize) {
-        if (camel.contains("_")) {
-            camel = Stream.of(camel.split("_"))
+    public static String camelize(String line, boolean capitalize) {
+        if (line.contains("_")) {
+            line = Stream.of(line.split("_"))
                     .map(StringUtils::capitalize)
                     .collect(Collectors.joining());
         }
-        return capitalize ? StringUtils.capitalize(camel) : StringUtils.uncapitalize(camel);
+        return capitalize ? StringUtils.capitalize(line) : StringUtils.uncapitalize(line);
     }
 
     public static boolean checkRelationIsOneOrMany(EntityRelation entityRelation) {
@@ -54,5 +56,13 @@ public class PojoProcessorUtils {
     private static boolean checkRelationEqualsMainEntity(EntityRelation relation, Entity entity) {
         var relationName = relation.getEntity().getName();
         return !entity.getName().contains("_") && relationName.startsWith(entity.getName());
+    }
+
+    public static Optional<Relation> findCurrentEntityAsMainRelation(List<Relation> relations, Entity entity) {
+        // main is an entity that is chosen as entity that contains many-to-many mark of other entity.
+        // returns relation with main and bridge entities
+        return relations.stream()
+                .filter(relation -> checkRelationAndMainEntityEqByName(relation, entity))
+                .findFirst();
     }
 }
