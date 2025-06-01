@@ -20,7 +20,7 @@ public class ConstructorWriter {
         this.properties = properties;
     }
 
-    public void writeConstructor(StringBuilder stringBuilder) {
+    public void writeConstructors(StringBuilder stringBuilder) {
         String entityName = camelize(entity.getName(), true);
 
         if (pojoConfig.isAllowNoArgsConstructor()) {
@@ -35,7 +35,10 @@ public class ConstructorWriter {
     }
 
     private void writeNoArgsConstructor(StringBuilder stringBuilder, String entityName) {
-        stringBuilder.append("\n\tpublic ").append(entityName).append("() {}\n");
+        stringBuilder.append("\n\tpublic ")
+                .append(entityName)
+                .append("() {}")
+                .append("\n");
     }
 
     private void writeIdConstructor(StringBuilder stringBuilder, String entityName) {
@@ -45,23 +48,47 @@ public class ConstructorWriter {
                 .ifPresent(primaryKey -> {
                     String name = primaryKey.getName();
                     String type = convertType(primaryKey.getType());
-                    stringBuilder.append("\n\tpublic ").append(entityName).append("(").append(type).append(" ").append(name).append(") {\n");
-                    stringBuilder.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
-                    stringBuilder.append("\t}\n");
+                    stringBuilder.append("\n\tpublic ")
+                            .append(entityName)
+                            .append("(")
+                            .append(type)
+                            .append(" ")
+                            .append(name)
+                            .append(") {\n")
+                            .append("\t\tthis.")
+                            .append(name)
+                            .append(" = ")
+                            .append(name)
+                            .append(";")
+                            .append("\n\t}")
+                            .append("\n");
                 });
     }
 
     private void writeAllArgsConstructor(StringBuilder stringBuilder, String entityName) {
-        StringBuilder constructorParameters = new StringBuilder();
-        StringBuilder declaring = new StringBuilder();
-        properties.forEach((name, type) -> {
-            constructorParameters.append(type).append(" ").append(name).append(", ");
-            declaring.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
+        StringBuilder parameters = new StringBuilder();
+        StringBuilder body = new StringBuilder();
+
+        properties.forEach((fieldName, fieldType) -> {
+            parameters.append(fieldType)
+                    .append(" ")
+                    .append(fieldName)
+                    .append(", ");
+            body.append("\t\tthis.")
+                    .append(fieldName)
+                    .append(" = ")
+                    .append(fieldName)
+                    .append(";\n");
         });
 
-        String typeNameString = constructorParameters.substring(0, constructorParameters.length() - 2);
-        stringBuilder.append("\n\tpublic ").append(entityName).append("(").append(typeNameString).append(") {\n");
-        stringBuilder.append(declaring);
-        stringBuilder.append("\t}\n");
+        parameters.setLength(parameters.length() - 2);
+
+        stringBuilder.append("\n\tpublic ")
+                .append(entityName)
+                .append("(")
+                .append(parameters)
+                .append(") {\n")
+                .append(body)
+                .append("\t}\n");
     }
 }

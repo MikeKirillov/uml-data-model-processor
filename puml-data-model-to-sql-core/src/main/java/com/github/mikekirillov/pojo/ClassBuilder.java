@@ -69,7 +69,7 @@ public class ClassBuilder {
 
     private void writeConstructors(StringBuilder stringBuilder, Map<String, String> properties) {
         ConstructorWriter writer = new ConstructorWriter(pojoConfig, entity, properties);
-        writer.writeConstructor(stringBuilder);
+        writer.writeConstructors(stringBuilder);
     }
 
     private void writeMethods(StringBuilder stringBuilder, Map<String, String> properties) {

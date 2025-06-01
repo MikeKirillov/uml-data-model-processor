@@ -6,4 +6,9 @@ public class Gender {
 	private String name;
 
 	public Gender() {}
+
+	public Gender(String name, int id) {
+		this.name = name;
+		this.id = id;
+	}
 }
