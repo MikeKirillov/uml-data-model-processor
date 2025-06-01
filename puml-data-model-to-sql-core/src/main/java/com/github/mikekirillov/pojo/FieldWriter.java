@@ -36,7 +36,7 @@ public class FieldWriter {
 
     private void writeSimpleFields(StringBuilder stringBuilder, Map<String, String> properties) {
         for (Property property : entity.getProperties()) {
-            if (!property.isForeignKey() || !pojoConfig.isAllowSpringDataJdbcAnnotations() && !pojoConfig.isAllowForeignKeyAsEmbeddedEntity()) {
+            if (!property.isForeignKey() || !pojoConfig.isAllowForeignKeyAsEmbeddedEntity()) {
                 annotateIdForPkField(stringBuilder, property);
 
                 String fieldName = camelize(property.getName(), false);
