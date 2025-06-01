@@ -133,7 +133,7 @@ public class TestUtils {
                 ");";
     }
 
-    private static Property getProperty(String name, String type, boolean isMandatory, boolean isGenerated, boolean isForeignKey) {
+    public static Property getProperty(String name, String type, boolean isMandatory, boolean isGenerated, boolean isForeignKey) {
         return new Property.Builder()
                 .name(name)
                 .type(type)
