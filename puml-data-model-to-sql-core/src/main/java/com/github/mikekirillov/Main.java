@@ -55,14 +55,14 @@ public class Main {
 
     private static PojoConfig getPojoConfig() {
         return new PojoConfig(
+                true,
+                true,
+                true,
                 false,
                 false,
                 false,
-                false,
-                false,
-                false,
-                false,
-                false,
+                true,
+                true,
                 false
         );
     }

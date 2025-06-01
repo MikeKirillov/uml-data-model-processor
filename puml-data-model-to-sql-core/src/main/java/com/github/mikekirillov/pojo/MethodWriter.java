@@ -31,24 +31,25 @@ public class MethodWriter {
 
     private void writeGettersSetters(StringBuilder stringBuilder, Map<String, String> properties) {
         properties.forEach((name, type) -> {
-            String methodName = StringUtils.capitalize(name);
             if (pojoConfig.isAllowGetters()) {
-                writeGetMethod(stringBuilder, type, methodName);
+                writeGetMethod(stringBuilder, type, name);
             }
             if (pojoConfig.isAllowSetters()) {
-                writeSetMethod(stringBuilder, type, methodName);
+                writeSetMethod(stringBuilder, type, name);
             }
         });
     }
 
     private void writeGetMethod(StringBuilder stringBuilder, String type, String name) {
-        stringBuilder.append("\n\tpublic ").append(type).append(" ").append("get").append(name).append("() {\n");
+        String methodName = StringUtils.capitalize(name);
+        stringBuilder.append("\n\tpublic ").append(type).append(" ").append("get").append(methodName).append("() {\n");
         stringBuilder.append("\t\treturn ").append(name).append(";\n");
         stringBuilder.append("\t}\n");
     }
 
     private void writeSetMethod(StringBuilder stringBuilder, String type, String name) {
-        stringBuilder.append("\n\tpublic void ").append("set").append(name).append("(").append(type).append(" ").append(name).append(") {\n");
+        String methodName = StringUtils.capitalize(name);
+        stringBuilder.append("\n\tpublic void ").append("set").append(methodName).append("(").append(type).append(" ").append(name).append(") {\n");
         stringBuilder.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
         stringBuilder.append("\t}\n");
     }
