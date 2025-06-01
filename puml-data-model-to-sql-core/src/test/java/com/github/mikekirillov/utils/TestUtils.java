@@ -5,8 +5,6 @@ import com.github.mikekirillov.model.*;
 
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
-
 public class TestUtils {
     public static final String RESOURCES_PATH_IN = "src/test/resources/";
     public static final String TXT_FILE_PATH_IN = "data-base-model.txt";
@@ -202,14 +200,5 @@ public class TestUtils {
                         new EntityRelation(bridge, UmlRelationType.EXACTLY_ONE)
                 )
         );
-    }
-
-    public static void setPojoConfig(PojoConfig pojoConfig, boolean allowSpringDataJdbcAnnotations, boolean allowForeignKeyAsEmbeddedEntity, boolean allowForeignKeyAsEmbeddedEntityByAggregate) {
-        given(pojoConfig.isAllowSpringDataJdbcAnnotations())
-                .willReturn(allowSpringDataJdbcAnnotations);
-        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntity())
-                .willReturn(allowForeignKeyAsEmbeddedEntity);
-        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate())
-                .willReturn(allowForeignKeyAsEmbeddedEntityByAggregate);
     }
 }

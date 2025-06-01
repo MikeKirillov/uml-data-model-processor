@@ -21,7 +21,6 @@ class ImportWriterTest {
 
     @BeforeEach
     public void init() {
-        pojoConfig = Mockito.mock(PojoConfig.class);
         stringBuilder = new StringBuilder();
     }
 
@@ -32,14 +31,19 @@ class ImportWriterTest {
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false,
                 false,
                 false);
+        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
         writer.writeImports(stringBuilder);
 
-        assertTrue(stringBuilder.toString().isEmpty());
+        assertTrue(stringBuilder.isEmpty());
     }
 
     @Test
@@ -50,11 +54,16 @@ class ImportWriterTest {
                 getProperty("createdDate", "TIMESTAMP", false, false, false)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false,
                 false,
                 false);
+        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
         writer.writeImports(stringBuilder);
 
         assertEquals("import java.util.Date;\n", stringBuilder.toString());
@@ -68,11 +77,16 @@ class ImportWriterTest {
                 getProperty("createdDate", "DATETIME", false, false, false)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false,
                 false,
                 false);
+        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
         writer.writeImports(stringBuilder);
 
         assertEquals("import java.sql.Date;\n", stringBuilder.toString());
@@ -85,11 +99,16 @@ class ImportWriterTest {
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(pojoConfig,
-                true,
+        pojoConfig = new PojoConfig(true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false,
                 false);
+        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -106,11 +125,16 @@ class ImportWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(true,
                 true,
-                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false);
+        writer = new ImportWriter(pojoConfig, entity, List.of(relation));
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -128,11 +152,16 @@ class ImportWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = returnUnfitRelation();
+        pojoConfig = new PojoConfig(true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(pojoConfig,
-                true,
-                true,
-                true);
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -151,11 +180,16 @@ class ImportWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = returnFitRelation(entity);
+        pojoConfig = new PojoConfig(true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(pojoConfig,
-                true,
-                true,
-                true);
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
