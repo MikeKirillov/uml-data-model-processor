@@ -22,18 +22,18 @@ public class ImportWriter {
 
     public void writeImports(StringBuilder stringBuilder) {
         if (pojoConfig.isAllowSpringDataJdbcAnnotations()) {
-            stringBuilder.append("import org.springframework.data.annotation.Id;\n");
-            stringBuilder.append("import org.springframework.data.relational.core.mapping.Table;\n");
+            stringBuilder.append("import org.springframework.data.annotation.Id;\n")
+                    .append("import org.springframework.data.relational.core.mapping.Table;\n");
             if (pojoConfig.isAllowForeignKeyAsEmbeddedEntity() && hasForeignKey()) {
                 if (pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
-                    stringBuilder.append("import org.springframework.data.relational.core.mapping.Column;\n");
-                    stringBuilder.append("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
+                    stringBuilder.append("import org.springframework.data.relational.core.mapping.Column;\n")
+                            .append("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
 
                     // add these imports for main entity for many-to-many cases
                     findCurrentEntityAsMainRelation(relations, entity).ifPresent(relation -> {
-                        stringBuilder.append("import org.springframework.data.relational.core.mapping.MappedCollection;\n");
-                        stringBuilder.append("import java.util.HashSet;\n");
-                        stringBuilder.append("import java.util.Set;\n");
+                        stringBuilder.append("import org.springframework.data.relational.core.mapping.MappedCollection;\n")
+                                .append("import java.util.HashSet;\n")
+                                .append("import java.util.Set;\n");
                     });
                 } else {
                     stringBuilder.append("import org.springframework.data.relational.core.mapping.MappedCollection;\n");

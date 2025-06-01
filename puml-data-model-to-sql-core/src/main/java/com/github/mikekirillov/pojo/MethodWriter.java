@@ -42,34 +42,69 @@ public class MethodWriter {
 
     private void writeGetMethod(StringBuilder stringBuilder, String type, String name) {
         String methodName = StringUtils.capitalize(name);
-        stringBuilder.append("\n\tpublic ").append(type).append(" ").append("get").append(methodName).append("() {\n");
-        stringBuilder.append("\t\treturn ").append(name).append(";\n");
-        stringBuilder.append("\t}\n");
+        stringBuilder.append("\n\tpublic ")
+                .append(type)
+                .append(" ")
+                .append("get")
+                .append(methodName)
+                .append("() {")
+                .append("\n")
+                .append("\t\treturn ")
+                .append(name)
+                .append(";")
+                .append("\n")
+                .append("\t}")
+                .append("\n");
     }
 
     private void writeSetMethod(StringBuilder stringBuilder, String type, String name) {
         String methodName = StringUtils.capitalize(name);
-        stringBuilder.append("\n\tpublic void ").append("set").append(methodName).append("(").append(type).append(" ").append(name).append(") {\n");
-        stringBuilder.append("\t\tthis.").append(name).append(" = ").append(name).append(";\n");
-        stringBuilder.append("\t}\n");
+        stringBuilder.append("\n\tpublic void ")
+                .append("set")
+                .append(methodName)
+                .append("(")
+                .append(type)
+                .append(" ")
+                .append(name)
+                .append(") {")
+                .append("\n")
+                .append("\t\tthis.")
+                .append(name)
+                .append(" = ")
+                .append(name)
+                .append(";")
+                .append("\n")
+                .append("\t}")
+                .append("\n");
     }
 
     private void writeToStringMethod(StringBuilder stringBuilder, Map<String, String> properties) {
         String entityName = camelize(entity.getName(), true);
 
-        stringBuilder.append("\n\t@Override");
-        stringBuilder.append("\n\tpublic String toString() {");
-        stringBuilder.append("\n\t\treturn \"").append(entityName).append("{\" +");
+        stringBuilder.append("\n\t@Override")
+                .append("\n\tpublic String toString() {")
+                .append("\n\t\treturn \"")
+                .append(entityName)
+                .append("{\" +");
 
         Optional<String> firstKey = properties.keySet().stream().findFirst();
         properties.keySet().forEach(name -> {
             if (name.equals(firstKey.get())) {
-                stringBuilder.append("\n\t\t\t\"").append(name).append("='\" + ").append(name).append(" + '\\'' +");
+                stringBuilder.append("\n\t\t\t\"")
+                        .append(name)
+                        .append("='\" + ")
+                        .append(name)
+                        .append(" + '\\'' +");
             } else {
-                stringBuilder.append("\n\t\t\t\", ").append(name).append("='\" + ").append(name).append(" + '\\'' +");
+                stringBuilder.append("\n\t\t\t\", ")
+                        .append(name)
+                        .append("='\" + ")
+                        .append(name)
+                        .append(" + '\\'' +");
             }
         });
-        stringBuilder.append("\n\t\t\t'}';");
-        stringBuilder.append("\n\t}\n");
+        stringBuilder.append("\n\t\t\t'}';")
+                .append("\n\t}")
+                .append("\n");
     }
 }
