@@ -1,6 +1,10 @@
 package com.github.mikekirillov;
 
 import com.github.mikekirillov.model.Entity;
+import com.github.mikekirillov.sql.SqlSchemaGenerator;
+import com.github.mikekirillov.uml.PlantUmlAnalyzer;
+import com.github.mikekirillov.uml.PlantUmlEntitiesParser;
+import com.github.mikekirillov.uml.PlantUmlParser;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;

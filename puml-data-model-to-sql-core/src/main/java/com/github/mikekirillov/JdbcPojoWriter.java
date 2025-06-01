@@ -13,9 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
-import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.convertType;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 
+// TODO DELETE
 public class JdbcPojoWriter {
     private final String outputModelPath;
     private final List<Entity> entities;

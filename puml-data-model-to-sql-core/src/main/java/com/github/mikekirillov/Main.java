@@ -4,11 +4,16 @@ import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.PojoConfig;
 import com.github.mikekirillov.model.Relation;
 import com.github.mikekirillov.pojo.ClassGenerator;
+import com.github.mikekirillov.sql.SqlSchemaGenerator;
+import com.github.mikekirillov.uml.PlantUmlAnalyzer;
+import com.github.mikekirillov.uml.PlantUmlEntitiesParser;
+import com.github.mikekirillov.uml.PlantUmlParser;
+import com.github.mikekirillov.uml.PlantUmlRelationsParser;
 
 import java.io.IOException;
 import java.util.List;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 
 public class Main {
     private static final String RESOURCES_PATH_IN = "puml-data-model-to-sql-core/src/test/resources/";

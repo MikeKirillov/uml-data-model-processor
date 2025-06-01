@@ -16,8 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
-import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.convertType;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

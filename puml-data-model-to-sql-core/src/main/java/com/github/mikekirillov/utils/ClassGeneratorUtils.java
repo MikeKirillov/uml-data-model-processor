@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PojoProcessorUtils {
+public class ClassGeneratorUtils {
 
     public static String convertType(String type) {
         return switch (type.toLowerCase()) {

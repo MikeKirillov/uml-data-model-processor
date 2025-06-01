@@ -1,4 +1,4 @@
-package com.github.mikekirillov;
+package com.github.mikekirillov.uml;
 
 import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
@@ -8,7 +8,7 @@ import com.github.mikekirillov.model.Relation;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.checkRelationIsOneOrMany;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.checkRelationIsOneOrMany;
 
 public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
 

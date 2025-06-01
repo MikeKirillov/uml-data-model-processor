@@ -6,8 +6,8 @@ import com.github.mikekirillov.model.Property;
 
 import java.util.Map;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
-import static com.github.mikekirillov.utils.PojoProcessorUtils.convertType;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.convertType;
 
 public class ConstructorWriter {
     private final PojoConfig pojoConfig;
