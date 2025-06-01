@@ -165,7 +165,7 @@ class ParserSecondTDDTest {
 
         for (Entity entity : entities) {
             stringBuilder.append(SqlSchemaTag.CREATE_TABLE_IF_NOT_EXISTS);
-            stringBuilder.append(SqlSchemaTag.SPACE);
+            stringBuilder.append(' ');
             stringBuilder.append(entity.getName());
             stringBuilder.append(SqlSchemaTag.BRACKET_OPENED);
 
@@ -175,21 +175,21 @@ class ParserSecondTDDTest {
             for (Property property : properties) {
                 stringBuilder.append(SqlSchemaTag.NEW_LINE);
                 stringBuilder.append(property.getName());
-                stringBuilder.append(SqlSchemaTag.SPACE);
+                stringBuilder.append(' ');
                 stringBuilder.append(property.getType());
 
                 if (property.isMandatory()) {
-                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(' ');
                     stringBuilder.append(SqlSchemaTag.NOT_NULL);
                 } else {
-                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(' ');
                     stringBuilder.append(SqlSchemaTag.NULL);
                 }
 
                 if (property.isPrimaryKey()) {
-                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(' ');
                     stringBuilder.append(SqlSchemaTag.AUTO_INCREMENT);
-                    stringBuilder.append(SqlSchemaTag.SPACE);
+                    stringBuilder.append(' ');
                     stringBuilder.append(SqlSchemaTag.PRIMARY_KEY);
                 }
 
@@ -208,9 +208,9 @@ class ParserSecondTDDTest {
                     secondSb.append(SqlSchemaTag.BRACKET_OPENED);
                     secondSb.append(property.getName());
                     secondSb.append(SqlSchemaTag.BRACKET_CLOSED);
-                    secondSb.append(SqlSchemaTag.SPACE);
+                    secondSb.append(' ');
                     secondSb.append(SqlSchemaTag.REFERENCES);
-                    secondSb.append(SqlSchemaTag.SPACE);
+                    secondSb.append(' ');
                     secondSb.append(referencedEntity.getName());
                     secondSb.append(SqlSchemaTag.BRACKET_OPENED);
                     secondSb.append(referencedProperty.getName());
