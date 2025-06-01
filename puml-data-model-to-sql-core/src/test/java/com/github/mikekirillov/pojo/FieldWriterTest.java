@@ -1,8 +1,6 @@
 package com.github.mikekirillov.pojo;
 
-import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
-import com.github.mikekirillov.model.EntityRelation;
 import com.github.mikekirillov.model.PojoConfig;
 import com.github.mikekirillov.model.Relation;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +13,6 @@ import java.util.Map;
 
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 
 class FieldWriterTest {
     private FieldWriter writer;
@@ -40,7 +37,10 @@ class FieldWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(false, false, false);
+        setPojoConfig(pojoConfig,
+                false,
+                false,
+                false);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -58,7 +58,10 @@ class FieldWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(false, false, false);
+        setPojoConfig(pojoConfig,
+                false,
+                false,
+                false);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -77,7 +80,10 @@ class FieldWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(true, false, false);
+        setPojoConfig(pojoConfig,
+                true,
+                false,
+                false);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -97,7 +103,10 @@ class FieldWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(true, true, false);
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                false);
 
         assertThrows(IllegalArgumentException.class,
                 () -> writer.writeFields(stringBuilder, properties),
@@ -113,7 +122,10 @@ class FieldWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
-        setPojoConfig(true, true, false);
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                false);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -134,7 +146,10 @@ class FieldWriterTest {
         ));
         relation = returnUnfitRelation();
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
-        setPojoConfig(true, true, true);
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                true);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -155,7 +170,10 @@ class FieldWriterTest {
         ));
         relation = returnFitRelation(entity);
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
-        setPojoConfig(true, true, true);
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                true);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -169,47 +187,28 @@ class FieldWriterTest {
         assertEquals("\tprivate AggregateReference<Gender, String> gender;", lines[4]);
     }
 
-    private void setPojoConfig(boolean allowSpringDataJdbcAnnotations, boolean allowForeignKeyAsEmbeddedEntity, boolean allowForeignKeyAsEmbeddedEntityByAggregate) {
-        given(pojoConfig.isAllowSpringDataJdbcAnnotations())
-                .willReturn(allowSpringDataJdbcAnnotations);
-        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntity())
-                .willReturn(allowForeignKeyAsEmbeddedEntity);
-        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate())
-                .willReturn(allowForeignKeyAsEmbeddedEntityByAggregate);
-    }
+    @Test
+    public void shouldAddFieldForManyToManyCase() {
+        entity = new Entity("state", "st", List.of(
+                getProperty("id", "INT", true, true, false),
+                getProperty("name", "VARCHAR(128)", true, false, false),
+                getProperty("gender_id", "INT", true, false, true)
+        ));
+        writer = new FieldWriter(pojoConfig, entity, returnEntitiesWithFk(), returnFitRelationForManyToMany(entity));
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                true);
+        writer.writeFields(stringBuilder, properties);
+        String[] lines = stringBuilder.toString().split("\n");
 
-    private Relation returnUnfitRelation() {
-        return new Relation(
-                new EntityRelation(
-                        new Entity("disc", null, List.of(
-                                getProperty("id", "INT", true, true, false),
-                                getProperty("name", "VARCHAR(128)", true, false, false)
-                        )),
-                        UmlRelationType.ONE_OR_MANY
-                ),
-                new EntityRelation(
-                        new Entity("location", null, List.of(
-                                getProperty("id", "INT", true, true, false),
-                                getProperty("name", "VARCHAR(128)", true, false, false)
-                        )),
-                        UmlRelationType.EXACTLY_ONE
-                )
-        );
-    }
-
-    private Relation returnFitRelation(Entity entity) {
-        return new Relation(
-                new EntityRelation(
-                        entity,
-                        UmlRelationType.ONE_OR_MANY
-                ),
-                new EntityRelation(
-                        new Entity("location", null, List.of(
-                                getProperty("id", "INT", true, true, false),
-                                getProperty("name", "VARCHAR(128)", true, false, false)
-                        )),
-                        UmlRelationType.EXACTLY_ONE
-                )
-        );
+        assertEquals(7, lines.length);
+        assertEquals("\t@Id", lines[0]);
+        assertEquals("\tprivate int id;", lines[1]);
+        assertEquals("\tprivate String name;", lines[2]);
+        assertEquals("\t@Column(\"gender_id\")", lines[3]);
+        assertEquals("\tprivate AggregateReference<Gender, String> gender;", lines[4]);
+        assertEquals("\t@MappedCollection(idColumn = \"state_id\")", lines[5]);
+        assertEquals("\tprivate Set<State> states = new HashSet<>();", lines[6]);
     }
 }

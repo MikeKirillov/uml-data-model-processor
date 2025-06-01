@@ -1,8 +1,6 @@
 package com.github.mikekirillov.pojo;
 
-import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
-import com.github.mikekirillov.model.EntityRelation;
 import com.github.mikekirillov.model.PojoConfig;
 import com.github.mikekirillov.model.Relation;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +9,8 @@ import org.mockito.Mockito;
 
 import java.util.List;
 
-import static com.github.mikekirillov.utils.TestUtils.getProperty;
+import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 
 class ImportWriterTest {
     private ImportWriter writer;
@@ -36,7 +33,10 @@ class ImportWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(false, false, false);
+        setPojoConfig(pojoConfig,
+                false,
+                false,
+                false);
         writer.writeImports(stringBuilder);
 
         assertTrue(stringBuilder.toString().isEmpty());
@@ -51,7 +51,10 @@ class ImportWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(false, false, false);
+        setPojoConfig(pojoConfig,
+                false,
+                false,
+                false);
         writer.writeImports(stringBuilder);
 
         assertEquals("import java.util.Date;\n", stringBuilder.toString());
@@ -66,7 +69,10 @@ class ImportWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(false, false, false);
+        setPojoConfig(pojoConfig,
+                false,
+                false,
+                false);
         writer.writeImports(stringBuilder);
 
         assertEquals("import java.sql.Date;\n", stringBuilder.toString());
@@ -80,7 +86,10 @@ class ImportWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(true, false, false);
+        setPojoConfig(pojoConfig,
+                true,
+                false,
+                false);
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -98,7 +107,10 @@ class ImportWriterTest {
         ));
         relation = Mockito.mock(Relation.class);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(true, true, false);
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                false);
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -117,7 +129,10 @@ class ImportWriterTest {
         ));
         relation = returnUnfitRelation();
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(true, true, true);
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                true);
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -137,7 +152,10 @@ class ImportWriterTest {
         ));
         relation = returnFitRelation(entity);
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
-        setPojoConfig(true, true, true);
+        setPojoConfig(pojoConfig,
+                true,
+                true,
+                true);
         writer.writeImports(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -149,49 +167,5 @@ class ImportWriterTest {
         assertEquals("import org.springframework.data.relational.core.mapping.MappedCollection;", lines[4]);
         assertEquals("import java.util.HashSet;", lines[5]);
         assertEquals("import java.util.Set;", lines[6]);
-    }
-
-    private void setPojoConfig(boolean allowSpringDataJdbcAnnotations, boolean allowForeignKeyAsEmbeddedEntity, boolean allowForeignKeyAsEmbeddedEntityByAggregate) {
-        given(pojoConfig.isAllowSpringDataJdbcAnnotations())
-                .willReturn(allowSpringDataJdbcAnnotations);
-        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntity())
-                .willReturn(allowForeignKeyAsEmbeddedEntity);
-        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate())
-                .willReturn(allowForeignKeyAsEmbeddedEntityByAggregate);
-    }
-
-    private Relation returnUnfitRelation() {
-        return new Relation(
-                new EntityRelation(
-                        new Entity("disc", null, List.of(
-                                getProperty("id", "INT", true, true, false),
-                                getProperty("name", "VARCHAR(128)", true, false, false)
-                        )),
-                        UmlRelationType.ONE_OR_MANY
-                ),
-                new EntityRelation(
-                        new Entity("location", null, List.of(
-                                getProperty("id", "INT", true, true, false),
-                                getProperty("name", "VARCHAR(128)", true, false, false)
-                        )),
-                        UmlRelationType.EXACTLY_ONE
-                )
-        );
-    }
-
-    private Relation returnFitRelation(Entity entity) {
-        return new Relation(
-                new EntityRelation(
-                        entity,
-                        UmlRelationType.ONE_OR_MANY
-                ),
-                new EntityRelation(
-                        new Entity("location", null, List.of(
-                                getProperty("id", "INT", true, true, false),
-                                getProperty("name", "VARCHAR(128)", true, false, false)
-                        )),
-                        UmlRelationType.EXACTLY_ONE
-                )
-        );
     }
 }

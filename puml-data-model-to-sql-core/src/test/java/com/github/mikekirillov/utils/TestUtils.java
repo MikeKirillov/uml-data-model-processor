@@ -1,9 +1,11 @@
 package com.github.mikekirillov.utils;
 
-import com.github.mikekirillov.model.Entity;
-import com.github.mikekirillov.model.Property;
+import com.github.mikekirillov.enums.UmlRelationType;
+import com.github.mikekirillov.model.*;
 
 import java.util.List;
+
+import static org.mockito.BDDMockito.given;
 
 public class TestUtils {
     public static final String RESOURCES_PATH_IN = "src/test/resources/";
@@ -141,5 +143,73 @@ public class TestUtils {
                 .isGenerated(isGenerated)
                 .isForeignKey(isForeignKey)
                 .build();
+    }
+
+    public static Relation returnUnfitRelation() {
+        return new Relation(
+                new EntityRelation(
+                        new Entity("disc", null, List.of(
+                                getProperty("id", "INT", true, true, false),
+                                getProperty("name", "VARCHAR(128)", true, false, false)
+                        )),
+                        UmlRelationType.ONE_OR_MANY
+                ),
+                new EntityRelation(
+                        new Entity("location", null, List.of(
+                                getProperty("id", "INT", true, true, false),
+                                getProperty("name", "VARCHAR(128)", true, false, false)
+                        )),
+                        UmlRelationType.EXACTLY_ONE
+                )
+        );
+    }
+
+    public static Relation returnFitRelation(Entity entity) {
+        return new Relation(
+                new EntityRelation(
+                        entity,
+                        UmlRelationType.ONE_OR_MANY
+                ),
+                new EntityRelation(
+                        new Entity("location", null, List.of(
+                                getProperty("id", "INT", true, true, false),
+                                getProperty("name", "VARCHAR(128)", true, false, false)
+                        )),
+                        UmlRelationType.EXACTLY_ONE
+                )
+        );
+    }
+
+    public static List<Relation> returnFitRelationForManyToMany(Entity entity) {
+        Entity bridge = new Entity(entity.getName() + "_location", null, List.of(
+                getProperty("id", "INT", true, true, false),
+                getProperty(entity.getName() + "_id", "VARCHAR(128)", true, false, false),
+                getProperty("location_id", "VARCHAR(128)", true, false, false)
+        ));
+        return List.of(
+                new Relation(
+                        new EntityRelation(entity, UmlRelationType.ONE_OR_MANY),
+                        new EntityRelation(bridge, UmlRelationType.EXACTLY_ONE)
+                ),
+                new Relation(
+                        new EntityRelation(
+                                new Entity("location", null, List.of(
+                                        getProperty("id", "INT", true, true, false),
+                                        getProperty("name", "VARCHAR(128)", true, false, false)
+                                )),
+                                UmlRelationType.ONE_OR_MANY
+                        ),
+                        new EntityRelation(bridge, UmlRelationType.EXACTLY_ONE)
+                )
+        );
+    }
+
+    public static void setPojoConfig(PojoConfig pojoConfig, boolean allowSpringDataJdbcAnnotations, boolean allowForeignKeyAsEmbeddedEntity, boolean allowForeignKeyAsEmbeddedEntityByAggregate) {
+        given(pojoConfig.isAllowSpringDataJdbcAnnotations())
+                .willReturn(allowSpringDataJdbcAnnotations);
+        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntity())
+                .willReturn(allowForeignKeyAsEmbeddedEntity);
+        given(pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate())
+                .willReturn(allowForeignKeyAsEmbeddedEntityByAggregate);
     }
 }
