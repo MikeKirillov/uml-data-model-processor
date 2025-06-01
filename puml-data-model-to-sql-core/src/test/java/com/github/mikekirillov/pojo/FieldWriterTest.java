@@ -24,7 +24,6 @@ class FieldWriterTest {
 
     @BeforeEach
     public void init() {
-        pojoConfig = Mockito.mock(PojoConfig.class);
         stringBuilder = new StringBuilder();
         properties = new HashMap<>();
     }
@@ -36,11 +35,16 @@ class FieldWriterTest {
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false,
                 false,
                 false);
+        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -57,11 +61,16 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false,
                 false,
                 false);
+        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -79,11 +88,16 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(pojoConfig,
-                true,
+        pojoConfig = new PojoConfig(true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false,
                 false);
+        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -102,11 +116,16 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(true,
                 true,
-                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false);
+        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
 
         assertThrows(IllegalArgumentException.class,
                 () -> writer.writeFields(stringBuilder, properties),
@@ -121,11 +140,16 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
-        setPojoConfig(pojoConfig,
+        pojoConfig = new PojoConfig(true,
                 true,
-                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false);
+        writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -145,11 +169,16 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = returnUnfitRelation();
+        pojoConfig = new PojoConfig(true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
-        setPojoConfig(pojoConfig,
-                true,
-                true,
-                true);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -169,11 +198,16 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = returnFitRelation(entity);
+        pojoConfig = new PojoConfig(true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
-        setPojoConfig(pojoConfig,
-                true,
-                true,
-                true);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
@@ -194,11 +228,16 @@ class FieldWriterTest {
                 getProperty("name", "VARCHAR(128)", true, false, false),
                 getProperty("gender_id", "INT", true, false, true)
         ));
+        pojoConfig = new PojoConfig(true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false);
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesWithFk(), returnFitRelationForManyToMany(entity));
-        setPojoConfig(pojoConfig,
-                true,
-                true,
-                true);
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
