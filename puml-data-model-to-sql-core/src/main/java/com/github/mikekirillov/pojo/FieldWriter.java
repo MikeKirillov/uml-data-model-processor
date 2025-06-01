@@ -74,7 +74,7 @@ public class FieldWriter {
         Entity entityByFkPropName = allEntities.stream()
                 .filter(it -> propertyName.contains(it.getName().toLowerCase()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Referenced entity not found"));
         // Использовать конкретные сценарии для разных способов настройки внешнего ключа
         if (pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
             // Вариант с AggregateReference
@@ -109,11 +109,12 @@ public class FieldWriter {
     }
 
     private void handleDirectReferenceField(StringBuilder stringBuilder, Map<String, String> properties, Entity entityByFkPropName) {
+        System.out.println(entityByFkPropName);
         String pkName = entityByFkPropName.getProperties().stream()
                 .filter(Property::isPrimaryKey)
                 .map(Property::getName)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("PK property not found"));
         stringBuilder.append("\t@MappedCollection(idColumn = \"")
                 .append(pkName)
                 .append("\")")

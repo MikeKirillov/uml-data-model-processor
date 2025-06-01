@@ -88,7 +88,7 @@ public class SqlSchemaGenerator implements EntityProcessor {
         return entities.stream()
                 .filter(e -> property.getName().contains(e.getName()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Referenced entity not found"));
     }
 
     private Property findReferencedProperty(Property property) {
@@ -96,7 +96,7 @@ public class SqlSchemaGenerator implements EntityProcessor {
         return entity.getProperties().stream()
                 .filter(p -> property.getName().contains(p.getName()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Referenced property not found"));
     }
 
     private void removeLastComma(StringBuilder stringBuilder) {

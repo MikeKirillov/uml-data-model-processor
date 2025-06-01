@@ -39,7 +39,7 @@ class SqlSchemaGeneratorTest {
         List<Entity> entities = returnEntitiesDamagedFkEntityName();
         processor = new SqlSchemaGenerator(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.generate());
+        assertThrows(IllegalArgumentException.class, () -> processor.generate());
     }
 
     @Test
@@ -47,6 +47,6 @@ class SqlSchemaGeneratorTest {
         List<Entity> entities = returnEntitiesDamagedFkEntityId();
         processor = new SqlSchemaGenerator(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.generate());
+        assertThrows(IllegalArgumentException.class, () -> processor.generate());
     }
 }
