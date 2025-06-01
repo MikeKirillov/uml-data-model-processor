@@ -7,4 +7,10 @@ public class State {
 	private int genderId;
 
 	public State() {}
+
+	public State(String name, int genderId, int id) {
+		this.name = name;
+		this.genderId = genderId;
+		this.id = id;
+	}
 }
