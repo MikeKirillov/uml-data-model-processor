@@ -64,7 +64,7 @@ public class FieldWriter {
 
     private void annotateIdForPkField(StringBuilder stringBuilder, Property property) {
         if (pojoConfig.isAllowSpringDataJdbcAnnotations() && property.isPrimaryKey()) {
-            stringBuilder.append("\t@Id\n");
+            stringBuilder.append("\t@Id").append("\n");
         }
     }
 
@@ -92,7 +92,10 @@ public class FieldWriter {
         // then for training_client add client field, not training,
         // because training class will contain set of training_client entity
         if (filterRelationsAsBridgeForCurrentEntity().isEmpty() || propertyIsBridgeAndEntityIsMain(foreignKeyProperty)) {
-            stringBuilder.append("\t@Column(\"").append(foreignKeyProperty.getName()).append("\")\n");
+            stringBuilder.append("\t@Column(\"")
+                    .append(foreignKeyProperty.getName())
+                    .append("\")")
+                    .append("\n");
 
             String fieldType = "AggregateReference<" + camelize(entityByFkPropName.getName(), true) + ", String>";
             String fieldName = camelize(entityByFkPropName.getName(), false);
@@ -111,7 +114,10 @@ public class FieldWriter {
                 .map(Property::getName)
                 .findFirst()
                 .orElseThrow();
-        stringBuilder.append("\t@MappedCollection(idColumn = \"").append(pkName).append("\")\n");
+        stringBuilder.append("\t@MappedCollection(idColumn = \"")
+                .append(pkName)
+                .append("\")")
+                .append("\n");
 
         String fieldType = camelize(entityByFkPropName.getName(), true);
         String fieldName = camelize(entityByFkPropName.getName(), false);
@@ -120,7 +126,12 @@ public class FieldWriter {
 
     // Общая логика записи простого поля
     private void writeField(StringBuilder stringBuilder, Map<String, String> properties, String type, String name) {
-        stringBuilder.append("\tprivate ").append(type).append(" ").append(name).append(";\n");
+        stringBuilder.append("\tprivate ")
+                .append(type)
+                .append(" ")
+                .append(name)
+                .append(";")
+                .append("\n");
         properties.put(name, type);
     }
 
@@ -139,11 +150,19 @@ public class FieldWriter {
                 .filter(it -> it.startsWith(entity.getName()))
                 .findFirst();
         if (propertyName.isPresent() && entityName.isPresent()) {
-            stringBuilder.append("\t@MappedCollection(idColumn = \"").append(propertyName.get()).append("\")\n");
+            stringBuilder.append("\t@MappedCollection(idColumn = \"")
+                    .append(propertyName.get())
+                    .append("\")")
+                    .append("\n");
             String fieldName = camelize(entityName.get(), false) + "s";
             String fieldType = "Set<" + camelize(entityName.get(), true) + ">";
 
-            stringBuilder.append("\tprivate ").append(fieldType).append(" ").append(fieldName).append(" = new HashSet<>();\n");
+            stringBuilder.append("\tprivate ")
+                    .append(fieldType)
+                    .append(" ")
+                    .append(fieldName)
+                    .append(" = new HashSet<>();")
+                    .append("\n");
             properties.put(fieldName, fieldType);
         }
     }

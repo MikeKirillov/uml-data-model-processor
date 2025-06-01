@@ -45,7 +45,9 @@ public class ClassBuilder {
 
     private void writePackage(StringBuilder stringBuilder) {
         String filePath = outputFilePath.replace("/", ".");
-        stringBuilder.append("package ").append(filePath).append(";\n\n");
+        stringBuilder.append("package ")
+                .append(filePath)
+                .append(";\n\n");
     }
 
     private void writeImports(StringBuilder stringBuilder) {
@@ -55,11 +57,14 @@ public class ClassBuilder {
 
     private void writeClassDeclaration(StringBuilder stringBuilder) {
         String entityName = camelize(entity.getName(), true);
-
         if (pojoConfig.isAllowSpringDataJdbcAnnotations()) {
-            stringBuilder.append("\n@Table(\"").append(entity.getName()).append("\")");
+            stringBuilder.append("\n@Table(\"")
+                    .append(entity.getName())
+                    .append("\")");
         }
-        stringBuilder.append("\npublic class ").append(entityName).append(" {\n");
+        stringBuilder.append("\npublic class ")
+                .append(entityName)
+                .append(" {\n");
     }
 
     private void writeFields(StringBuilder stringBuilder, Map<String, String> properties) {
