@@ -1,5 +1,6 @@
-package com.github.mikekirillov;
+package com.github.mikekirillov.sql;
 
+import com.github.mikekirillov.EntityProcessor;
 import com.github.mikekirillov.constants.SqlSchemaTag;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.Property;

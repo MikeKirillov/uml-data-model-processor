@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 
 public class ClassBuilder {
     private final PojoConfig pojoConfig;

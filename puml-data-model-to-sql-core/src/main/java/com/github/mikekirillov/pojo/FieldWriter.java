@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.*;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.*;
 
 public class FieldWriter {
     private final PojoConfig pojoConfig;

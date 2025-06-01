@@ -7,7 +7,7 @@ import com.github.mikekirillov.model.Relation;
 
 import java.util.List;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.findCurrentEntityAsMainRelation;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.findCurrentEntityAsMainRelation;
 
 public class ImportWriter {
     private final PojoConfig pojoConfig;

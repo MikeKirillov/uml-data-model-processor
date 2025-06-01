@@ -5,8 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.*;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.*;
 
+// TODO DELETE
 public class JdbcPojoProcessor implements EntityProcessor {
     private final PojoConfig pojoConfig;
     private final String outputFilePath;

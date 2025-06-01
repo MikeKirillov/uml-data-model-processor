@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 
 public class MethodWriter {
     private final PojoConfig pojoConfig;

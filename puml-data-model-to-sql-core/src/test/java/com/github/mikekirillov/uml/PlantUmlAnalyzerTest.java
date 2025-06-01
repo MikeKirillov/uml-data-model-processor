@@ -1,4 +1,4 @@
-package com.github.mikekirillov;
+package com.github.mikekirillov.uml;
 
 import com.github.mikekirillov.model.Entity;
 import org.junit.jupiter.api.BeforeEach;

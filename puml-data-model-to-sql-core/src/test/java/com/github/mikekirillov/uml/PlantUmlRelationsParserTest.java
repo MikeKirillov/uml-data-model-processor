@@ -1,4 +1,4 @@
-package com.github.mikekirillov;
+package com.github.mikekirillov.uml;
 
 import com.github.mikekirillov.enums.UmlRelationType;
 import com.github.mikekirillov.model.Entity;
