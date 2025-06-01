@@ -1,4 +1,3 @@
-/*
 package com.github.mikekirillov.pojo;
 
 import com.github.mikekirillov.model.Entity;
@@ -32,7 +31,7 @@ class FieldWriterTest {
     }
 
     @Test
-    public void should() {
+    public void shouldAddSimpleFieldsOnly() {
         entity = new Entity("gender_es", "g", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
@@ -41,8 +40,30 @@ class FieldWriterTest {
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
         setPojoConfig(false, false, false);
         writer.writeFields(stringBuilder, properties);
+        String[] lines = stringBuilder.toString().split("\n");
 
-        System.out.println(stringBuilder);
+        assertEquals(2, lines.length);
+        assertEquals("\tprivate int id;", lines[0]);
+        assertEquals("\tprivate String name;", lines[1]);
+    }
+
+    @Test
+    public void shouldAddSimpleFieldsAndFkOnly() {
+        entity = new Entity("gender_es", "g", List.of(
+                getProperty("id", "INT", true, true, false),
+                getProperty("name", "VARCHAR(128)", true, false, false),
+                getProperty("gender_id", "INT", true, false, true)
+        ));
+        relation = Mockito.mock(Relation.class);
+        writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
+        setPojoConfig(false, false, false);
+        writer.writeFields(stringBuilder, properties);
+        String[] lines = stringBuilder.toString().split("\n");
+
+        assertEquals(3, lines.length);
+        assertEquals("\tprivate int id;", lines[0]);
+        assertEquals("\tprivate String name;", lines[1]);
+        assertEquals("\tprivate int genderId;", lines[2]);
     }
 
     private void setPojoConfig(boolean allowSpringDataJdbcAnnotations, boolean allowForeignKeyAsEmbeddedEntity, boolean allowForeignKeyAsEmbeddedEntityByAggregate) {
@@ -53,4 +74,4 @@ class FieldWriterTest {
         given(pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate())
                 .willReturn(allowForeignKeyAsEmbeddedEntityByAggregate);
     }
-}*/
+}
