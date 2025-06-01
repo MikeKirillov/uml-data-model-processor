@@ -49,8 +49,8 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
             List<String> lines = analyzer.analyze(inputFilePath);
             PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
             List<Entity> entities = entitiesParser.parseLinesFrom(lines);
-            EntityProcessor processor = new SqlSchemaProcessor(entities);
-            String sqlSchema = processor.process();
+            EntityProcessor processor = new SqlSchemaGenerator(entities);
+            String sqlSchema = processor.generate();
 
             getLog().info("Generated schema:\n" + sqlSchema);
 

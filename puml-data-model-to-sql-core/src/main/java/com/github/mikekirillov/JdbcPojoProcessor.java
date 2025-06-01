@@ -27,7 +27,7 @@ public class JdbcPojoProcessor implements EntityProcessor {
     }
 
     @Override
-    public String process() {
+    public String generate() {
         StringBuilder stringBuilder = new StringBuilder();
         processEntity(stringBuilder);
         return stringBuilder.toString();

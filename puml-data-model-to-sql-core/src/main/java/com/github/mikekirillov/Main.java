@@ -12,8 +12,8 @@ import static com.github.mikekirillov.utils.PojoProcessorUtils.camelize;
 
 public class Main {
     private static final String RESOURCES_PATH_IN = "puml-data-model-to-sql-core/src/test/resources/";
-    // private static final String TXT_FILE_PATH_IN = "data-base-model.txt";
-    private static final String TXT_FILE_PATH_IN = "data-base-model.puml";
+    private static final String TXT_FILE_PATH_IN = "data-base-model.txt";
+    // private static final String TXT_FILE_PATH_IN = "data-base-model.puml";
     private static final String RESOURCES_PATH_OUT = "puml-data-model-to-sql-core/src/main/resources/generated/";
     private static final String TXT_FILE_PATH_OUT = "schema.sql";
     private static final String POJO_GENERATOR_OUT_DIR = "puml-data-model-to-sql-core/src/main/resources/generated/model";
@@ -27,8 +27,8 @@ public class Main {
         List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
         // 2. generating SQL Data Definition Language (DDL) model
-        EntityProcessor processor = new SqlSchemaProcessor(entities);
-        String sqlSchema = processor.process();
+        EntityProcessor processor = new SqlSchemaGenerator(entities);
+        String sqlSchema = processor.generate();
         // creating and writing DDL script as separate document
         FileWriter ddlScriptWriter = new FileWriter(sqlSchema, RESOURCES_PATH_OUT, TXT_FILE_PATH_OUT);
         ddlScriptWriter.write();
@@ -55,14 +55,14 @@ public class Main {
 
     private static PojoConfig getPojoConfig() {
         return new PojoConfig(
-                true,
-                true,
-                true,
                 false,
                 false,
                 false,
                 true,
-                true,
+                false,
+                false,
+                false,
+                false,
                 false
         );
     }

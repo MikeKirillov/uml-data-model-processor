@@ -1,12 +1,13 @@
 package com.github.mikekirillov.pojo;
 
+import com.github.mikekirillov.EntityProcessor;
 import com.github.mikekirillov.model.Entity;
 import com.github.mikekirillov.model.PojoConfig;
 import com.github.mikekirillov.model.Relation;
 
 import java.util.List;
 
-public class ClassGenerator {
+public class ClassGenerator implements EntityProcessor {
     private final PojoConfig pojoConfig;
     private final String outputFilePath;
     private final Entity entity;
@@ -21,6 +22,7 @@ public class ClassGenerator {
         this.relations = relations;
     }
 
+    @Override
     public String generate() {
         ClassBuilder builder = new ClassBuilder(pojoConfig, outputFilePath, entity, allEntities, relations);
         return builder.build();

@@ -9,14 +9,14 @@ import java.util.NoSuchElementException;
 import static com.github.mikekirillov.utils.TestUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-class SqlSchemaProcessorTest {
+class SqlSchemaGeneratorTest {
     private EntityProcessor processor;
 
     @Test
     public void shouldReturnSqlSchemaString() {
         List<Entity> entities = returnEntities();
-        processor = new SqlSchemaProcessor(entities);
-        String sqlSchema = processor.process();
+        processor = new SqlSchemaGenerator(entities);
+        String sqlSchema = processor.generate();
 
         assertNotNull(sqlSchema);
 
@@ -36,16 +36,16 @@ class SqlSchemaProcessorTest {
     @Test
     public void shouldThrowExceptionByDamagedPropertyFkEntityName() {
         List<Entity> entities = returnEntitiesDamagedFkEntityName();
-        processor = new SqlSchemaProcessor(entities);
+        processor = new SqlSchemaGenerator(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.process());
+        assertThrows(NoSuchElementException.class, () -> processor.generate());
     }
 
     @Test
     public void shouldThrowExceptionByDamagedPropertyFkEntityId() {
         List<Entity> entities = returnEntitiesDamagedFkEntityId();
-        processor = new SqlSchemaProcessor(entities);
+        processor = new SqlSchemaGenerator(entities);
 
-        assertThrows(NoSuchElementException.class, () -> processor.process());
+        assertThrows(NoSuchElementException.class, () -> processor.generate());
     }
 }
