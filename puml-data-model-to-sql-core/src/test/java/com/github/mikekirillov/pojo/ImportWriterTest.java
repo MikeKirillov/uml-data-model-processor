@@ -20,6 +20,7 @@ class ImportWriterTest {
     private PojoConfig pojoConfig;
     private Relation relation;
     private StringBuilder stringBuilder;
+    private Entity entity;
 
     @BeforeEach
     public void init() {
@@ -29,7 +30,7 @@ class ImportWriterTest {
 
     @Test
     public void shouldReturnEmptyString() {
-        Entity entity = new Entity("gender_es", "g", List.of(
+        entity = new Entity("gender_es", "g", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
@@ -43,7 +44,7 @@ class ImportWriterTest {
 
     @Test
     public void shouldAddImportUtilDate() {
-        Entity entity = new Entity("gender_es", "g", List.of(
+        entity = new Entity("gender_es", "g", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false),
                 getProperty("createdDate", "TIMESTAMP", false, false, false)
@@ -58,7 +59,7 @@ class ImportWriterTest {
 
     @Test
     public void shouldAddImportSqlDate() {
-        Entity entity = new Entity("gender_es", "g", List.of(
+        entity = new Entity("gender_es", "g", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false),
                 getProperty("createdDate", "DATETIME", false, false, false)
@@ -73,7 +74,7 @@ class ImportWriterTest {
 
     @Test
     public void shouldAddImportSpringDataJdbcAnnotations() {
-        Entity entity = new Entity("gender_es", "g", List.of(
+        entity = new Entity("gender_es", "g", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
@@ -90,7 +91,7 @@ class ImportWriterTest {
 
     @Test
     public void shouldAddImportMappedCollection() {
-        Entity entity = new Entity("state", "st", List.of(
+        entity = new Entity("state", "st", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(128)", true, false, false),
                 getProperty("gender_id", "INT", true, false, true)
@@ -109,7 +110,7 @@ class ImportWriterTest {
 
     @Test
     public void shouldAddImportColumnAndAggregateReference() {
-        Entity entity = new Entity("state", "st", List.of(
+        entity = new Entity("state", "st", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(128)", true, false, false),
                 getProperty("gender_id", "INT", true, false, true)
@@ -129,7 +130,7 @@ class ImportWriterTest {
 
     @Test
     public void shouldAddImportMappedCollectionAndSet() {
-        Entity entity = new Entity("state", "st", List.of(
+        entity = new Entity("state", "st", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(128)", true, false, false),
                 getProperty("gender_id", "INT", true, false, true)
