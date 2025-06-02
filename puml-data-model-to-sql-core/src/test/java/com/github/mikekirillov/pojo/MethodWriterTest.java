@@ -12,8 +12,8 @@ import java.util.Map;
 import static com.github.mikekirillov.utils.TestUtils.getProperty;
 import static org.junit.jupiter.api.Assertions.*;
 
-class ConstructorWriterTest {
-    private ConstructorWriter writer;
+class MethodWriterTest {
+    private MethodWriter writer;
     private PojoConfig pojoConfig;
     private Entity entity;
     private StringBuilder stringBuilder;
@@ -40,85 +40,105 @@ class ConstructorWriterTest {
                 false,
                 false,
                 false);
-        writer = new ConstructorWriter(pojoConfig, entity, properties);
-        writer.writeConstructors(stringBuilder);
+        writer = new MethodWriter(pojoConfig, entity, properties);
+        writer.writeMethods(stringBuilder);
 
         assertTrue(stringBuilder.isEmpty());
     }
 
     @Test
-    public void shouldAddNoArgsConstructor() {
+    public void shouldAddGetters() {
         entity = new Entity("gender_es", "g", List.of(
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false);
-        writer = new ConstructorWriter(pojoConfig, entity, properties);
-        writer.writeConstructors(stringBuilder);
-
-        assertEquals("\n\tpublic GenderEs() {}\n", stringBuilder.toString());
-    }
-
-    @Test
-    public void shouldAddIdArgsConstructor() {
-        entity = new Entity("gender_es", "g", List.of(
-                getProperty("id", "INT", true, true, false),
-                getProperty("name", "VARCHAR(10)", true, false, false)
-        ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false);
-        writer = new ConstructorWriter(pojoConfig, entity, properties);
-        writer.writeConstructors(stringBuilder);
-        String[] lines = stringBuilder.toString().split("\n");
-
-        assertEquals(4, lines.length);
-        assertEquals("", lines[0]);
-        assertEquals("\tpublic GenderEs(int id) {", lines[1]);
-        assertEquals("\t\tthis.id = id;", lines[2]);
-        assertEquals("\t}", lines[3]);
-    }
-
-    @Test
-    public void shouldAddAllArgsConstructor() {
-        entity = new Entity("gender_es", "g", List.of(
-                getProperty("id", "INT", true, true, false),
-                getProperty("name", "VARCHAR(10)", true, false, false)
-        ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false);
         properties.put("id", "int");
         properties.put("name", "String");
-        writer = new ConstructorWriter(pojoConfig, entity, properties);
-        writer.writeConstructors(stringBuilder);
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                false,
+                false);
+        writer = new MethodWriter(pojoConfig, entity, properties);
+        writer.writeMethods(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
 
-        assertEquals(5, lines.length);
+        assertEquals(8, lines.length);
         assertEquals("", lines[0]);
-        assertEquals("\tpublic GenderEs(String name, int id) {", lines[1]);
+        assertEquals("\tpublic String getName() {", lines[1]);
+        assertEquals("\t\treturn name;", lines[2]);
+        assertEquals("\t}", lines[3]);
+        assertEquals("", lines[4]);
+        assertEquals("\tpublic int getId() {", lines[5]);
+        assertEquals("\t\treturn id;", lines[6]);
+        assertEquals("\t}", lines[7]);
+    }
+
+    @Test
+    public void shouldAddSetters() {
+        entity = new Entity("gender_es", "g", List.of(
+                getProperty("id", "INT", true, true, false),
+                getProperty("name", "VARCHAR(10)", true, false, false)
+        ));
+        properties.put("id", "int");
+        properties.put("name", "String");
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true,
+                false);
+        writer = new MethodWriter(pojoConfig, entity, properties);
+        writer.writeMethods(stringBuilder);
+        String[] lines = stringBuilder.toString().split("\n");
+
+        assertEquals(8, lines.length);
+        assertEquals("", lines[0]);
+        assertEquals("\tpublic void setName(String name) {", lines[1]);
         assertEquals("\t\tthis.name = name;", lines[2]);
-        assertEquals("\t\tthis.id = id;", lines[3]);
-        assertEquals("\t}", lines[4]);
+        assertEquals("\t}", lines[3]);
+        assertEquals("", lines[4]);
+        assertEquals("\tpublic void setId(int id) {", lines[5]);
+        assertEquals("\t\tthis.id = id;", lines[6]);
+        assertEquals("\t}", lines[7]);
+    }
+
+    @Test
+    public void shouldAddToString() {
+        entity = new Entity("gender_es", "g", List.of(
+                getProperty("id", "INT", true, true, false),
+                getProperty("name", "VARCHAR(10)", true, false, false)
+        ));
+        properties.put("id", "int");
+        properties.put("name", "String");
+        pojoConfig = new PojoConfig(false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true);
+        writer = new MethodWriter(pojoConfig, entity, properties);
+        writer.writeMethods(stringBuilder);
+        String[] lines = stringBuilder.toString().split("\n");
+
+        assertEquals(8, lines.length);
+        assertEquals("", lines[0]);
+        assertEquals("\t@Override", lines[1]);
+        assertEquals("\tpublic String toString() {", lines[2]);
+        assertEquals("\t\treturn \"GenderEs{\" +", lines[3]);
+        assertEquals("\t\t\t\"name='\" + name + '\\'' +", lines[4]);
+        assertEquals("\t\t\t\", id='\" + id + '\\'' +", lines[5]);
+        assertEquals("\t\t\t'}';", lines[6]);
+        assertEquals("\t}", lines[7]);
     }
 }
