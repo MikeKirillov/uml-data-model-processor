@@ -23,6 +23,8 @@ class ConstructorWriterTest {
     public void init() {
         stringBuilder = new StringBuilder();
         properties = new HashMap<>();
+        properties.put("id", "int");
+        properties.put("name", "String");
     }
 
     @Test
@@ -108,8 +110,6 @@ class ConstructorWriterTest {
                 false,
                 false,
                 false);
-        properties.put("id", "int");
-        properties.put("name", "String");
         writer = new ConstructorWriter(pojoConfig, entity, properties);
         writer.writeConstructors(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
