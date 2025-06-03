@@ -23,6 +23,8 @@ class MethodWriterTest {
     public void init() {
         stringBuilder = new StringBuilder();
         properties = new HashMap<>();
+        properties.put("id", "int");
+        properties.put("name", "String");
     }
 
     @Test
@@ -52,8 +54,6 @@ class MethodWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        properties.put("id", "int");
-        properties.put("name", "String");
         pojoConfig = new PojoConfig(false,
                 false,
                 false,
@@ -84,8 +84,6 @@ class MethodWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        properties.put("id", "int");
-        properties.put("name", "String");
         pojoConfig = new PojoConfig(false,
                 false,
                 false,
@@ -116,8 +114,6 @@ class MethodWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        properties.put("id", "int");
-        properties.put("name", "String");
         pojoConfig = new PojoConfig(false,
                 false,
                 false,

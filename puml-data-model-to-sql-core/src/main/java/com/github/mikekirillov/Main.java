@@ -46,12 +46,8 @@ public class Main {
         List<Relation> filteredRelsAsBridges = relationsParser.getBridgeEntities(relations);
         for (Entity entity : entities) {
             // generating POJO file content
-            // EntityProcessor jdbcModelPojoProcessor = new JdbcPojoProcessor(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, filteredRelsAsBridges);
-            // String pojoFileContent = jdbcModelPojoProcessor.process();
-
-            ClassGenerator classGenerator = new ClassGenerator(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, filteredRelsAsBridges);
+            EntityProcessor classGenerator = new ClassGenerator(pojoConfig, POJO_GENERATOR_OUT_DIR, entity, entities, filteredRelsAsBridges);
             String pojoFileContent = classGenerator.generate();
-
             // creating and writing POJO files
             FileWriter pojoWriter = new FileWriter(pojoFileContent, POJO_GENERATOR_OUT_DIR, camelize(entity.getName(), true) + ".java");
             pojoWriter.write();
