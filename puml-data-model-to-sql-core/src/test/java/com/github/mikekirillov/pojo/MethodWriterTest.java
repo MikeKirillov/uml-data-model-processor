@@ -33,15 +33,18 @@ class MethodWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new MethodWriter(pojoConfig, entity, properties);
         writer.writeMethods(stringBuilder);
 
@@ -54,15 +57,18 @@ class MethodWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                true,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(true);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new MethodWriter(pojoConfig, entity, properties);
         writer.writeMethods(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
@@ -84,15 +90,18 @@ class MethodWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                true,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(true);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new MethodWriter(pojoConfig, entity, properties);
         writer.writeMethods(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
@@ -114,15 +123,18 @@ class MethodWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                true);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(true);
+
         writer = new MethodWriter(pojoConfig, entity, properties);
         writer.writeMethods(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");

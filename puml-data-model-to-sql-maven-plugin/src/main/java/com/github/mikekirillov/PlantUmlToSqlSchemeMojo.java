@@ -27,29 +27,113 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     @Parameter(property = "generate.inputFilePath", required = true)
     private String inputFilePath;
 
-    @Parameter(property = "generate.outputFilePath", required = true)
-    private String outputFilePath;
+    @Parameter(property = "generate.outputDdlScriptFilePath", required = true)
+    private String outputDdlScriptFilePath;
 
-    @Parameter(property = "generate.outputFileName", defaultValue = "schema")
-    private String outputFileName;
+    @Parameter(property = "generate.outputDdlScriptFileName", defaultValue = "schema")
+    private String outputDdlScriptFileName;
 
-    @Parameter(property = "generate.outputFileExtension", defaultValue = "sql")
-    private String outputFileExtension;
+    @Parameter(property = "generate.outputDdlScriptFileExtension", defaultValue = "sql")
+    private String outputDdlScriptFileExtension;
+
+    @Parameter(property = "generate.allowSpringDataJdbcAnnotations")
+    private boolean allowSpringDataJdbcAnnotations;
+
+    @Parameter(property = "generate.allowForeignKeyAsEmbeddedEntity")
+    private boolean allowForeignKeyAsEmbeddedEntity;
+
+    @Parameter(property = "generate.allowForeignKeyAsEmbeddedEntityByAggregate")
+    private boolean allowForeignKeyAsEmbeddedEntityByAggregate;
+
+    @Parameter(property = "generate.allowNoArgsConstructor")
+    private boolean allowNoArgsConstructor;
+
+    @Parameter(property = "generate.allowIdArgConstructor")
+    private boolean allowIdArgConstructor;
+
+    @Parameter(property = "generate.allowAllArgsConstructor")
+    private boolean allowAllArgsConstructor;
+
+    @Parameter(property = "generate.allowGetters")
+    private boolean allowGetters;
+
+    @Parameter(property = "generate.allowSetters")
+    private boolean allowSetters;
+
+    @Parameter(property = "generate.allowToStringMethod")
+    private boolean allowToStringMethod;
+
+    @Parameter(property = "generate.outputPojoFilePath", required = true)
+    private String outputPojoFilePath;
+
+    @Parameter(property = "generate.generateDdlScript", defaultValue = "false")
+    private boolean generateDdlScript;
+
+    @Parameter(property = "generate.generatePojo", defaultValue = "false")
+    private boolean generatePojo;
 
     public String getInputFilePath() {
         return inputFilePath;
     }
 
-    public String getOutputFilePath() {
-        return outputFilePath;
+    public String getOutputDdlScriptFilePath() {
+        return outputDdlScriptFilePath;
     }
 
-    public String getOutputFileName() {
-        return outputFileName;
+    public String getOutputDdlScriptFileName() {
+        return outputDdlScriptFileName;
     }
 
-    public String getOutputFileExtension() {
-        return outputFileExtension;
+    public String getOutputDdlScriptFileExtension() {
+        return outputDdlScriptFileExtension;
+    }
+
+    public boolean isAllowSpringDataJdbcAnnotations() {
+        return allowSpringDataJdbcAnnotations;
+    }
+
+    public boolean isAllowForeignKeyAsEmbeddedEntity() {
+        return allowForeignKeyAsEmbeddedEntity;
+    }
+
+    public boolean isAllowForeignKeyAsEmbeddedEntityByAggregate() {
+        return allowForeignKeyAsEmbeddedEntityByAggregate;
+    }
+
+    public boolean isAllowNoArgsConstructor() {
+        return allowNoArgsConstructor;
+    }
+
+    public boolean isAllowIdArgConstructor() {
+        return allowIdArgConstructor;
+    }
+
+    public boolean isAllowAllArgsConstructor() {
+        return allowAllArgsConstructor;
+    }
+
+    public boolean isAllowGetters() {
+        return allowGetters;
+    }
+
+    public boolean isAllowSetters() {
+        return allowSetters;
+    }
+
+    public boolean isAllowToStringMethod() {
+        return allowToStringMethod;
+    }
+
+    public String getOutputPojoFilePath() {
+        return outputPojoFilePath;
+    }
+
+    public boolean isGenerateDdlScript() {
+        return generateDdlScript;
+    }
+
+    public boolean isGeneratePojo() {
+        return generatePojo;
     }
 
     @Override
@@ -62,37 +146,11 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
             PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
             List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
-            // TODO CONFIG SKIP of sql ddl-script-gen OR pojo-gen
-
-            // 2. generating SQL Data Definition Language (DDL) model
-            EntityProcessor processor = new SqlSchemaGenerator(entities);
-            String sqlSchema = processor.generate();
-            getLog().info("Generated schema:\n" + sqlSchema);
-            // creating and writing DDL script as separate document
-            FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputFilePath, outputFileName + "." + outputFileExtension);
-            ddlScriptWriter.write();
-            getLog().info(getCompleteMsg());
-
-            // 3. generating POJO - data model Java classes
-            PojoConfig pojoConfig = new PojoConfig(false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false,
-                    false);
-            PlantUmlRelationsParser relationsParser = new PlantUmlRelationsParser(entities);
-            List<Relation> relations = relationsParser.parseLinesFrom(lines);
-            List<Relation> filteredRelsAsBridges = relationsParser.getBridgeEntities(relations);
-            for (Entity entity : entities) {
-                // generating POJO file content
-                EntityProcessor classGenerator = new ClassGenerator(pojoConfig, "POJO_GENERATOR_OUT_DIR", entity, entities, filteredRelsAsBridges);
-                String pojoFileContent = classGenerator.generate();
-                // creating and writing POJO files
-                FileWriter pojoWriter = new FileWriter(pojoFileContent, "POJO_GENERATOR_OUT_DIR", camelize(entity.getName(), true) + ".java");
-                pojoWriter.write();
+            if (isGenerateDdlScript()) {
+                generateSql(entities);
+            }
+            if (isGeneratePojo()) {
+                generatePojo(entities, lines);
             }
         } catch (IOException e) {
             getLog().error(FAILED_MSG, e);
@@ -100,8 +158,47 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         }
     }
 
+    private void generateSql(List<Entity> entities) {
+        EntityProcessor processor = new SqlSchemaGenerator(entities);
+        String sqlSchema = processor.generate();
+        getLog().info("Generated schema:\n" + sqlSchema);
+        // creating and writing DDL script as separate document
+        FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputDdlScriptFilePath, outputDdlScriptFileName + "." + outputDdlScriptFileExtension);
+        ddlScriptWriter.write();
+        getLog().info(getCompleteMsg());
+    }
+
     private String getCompleteMsg() {
-        return String.format("Generating %s.%s is complete", outputFileName, outputFileExtension);
+        return String.format("Generating %s.%s is complete", outputDdlScriptFileName, outputDdlScriptFileExtension);
+    }
+
+    private void generatePojo(List<Entity> entities, List<String> lines) {
+        PojoConfig pojoConfig = getPojoConfig();
+        PlantUmlRelationsParser relationsParser = new PlantUmlRelationsParser(entities);
+        List<Relation> relations = relationsParser.parseLinesFrom(lines);
+        List<Relation> filteredRelsAsBridges = relationsParser.getBridgeEntities(relations);
+        for (Entity entity : entities) {
+            // generating POJO file content
+            EntityProcessor classGenerator = new ClassGenerator(pojoConfig, outputPojoFilePath, entity, entities, filteredRelsAsBridges);
+            String pojoFileContent = classGenerator.generate();
+            // creating and writing POJO files
+            FileWriter pojoWriter = new FileWriter(pojoFileContent, outputPojoFilePath, camelize(entity.getName(), true) + ".java");
+            pojoWriter.write();
+        }
+    }
+
+    private PojoConfig getPojoConfig() {
+        PojoConfig pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(isAllowSpringDataJdbcAnnotations());
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(isAllowForeignKeyAsEmbeddedEntity());
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(isAllowForeignKeyAsEmbeddedEntityByAggregate());
+        pojoConfig.setAllowNoArgsConstructor(isAllowNoArgsConstructor());
+        pojoConfig.setAllowIdArgConstructor(isAllowIdArgConstructor());
+        pojoConfig.setAllowAllArgsConstructor(isAllowAllArgsConstructor());
+        pojoConfig.setAllowGetters(isAllowGetters());
+        pojoConfig.setAllowSetters(isAllowSetters());
+        pojoConfig.setAllowToStringMethod(isAllowToStringMethod());
+        return pojoConfig;
     }
 
     private static final String FAILED_MSG = "Error of analyzing input schema";

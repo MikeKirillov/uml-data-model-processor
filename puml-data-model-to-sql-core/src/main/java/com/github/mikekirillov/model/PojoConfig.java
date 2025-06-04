@@ -1,35 +1,15 @@
 package com.github.mikekirillov.model;
 
 public class PojoConfig {
-    private final boolean allowSpringDataJdbcAnnotations;
-    private final boolean allowForeignKeyAsEmbeddedEntity;
-    private final boolean allowForeignKeyAsEmbeddedEntityByAggregate;
-    private final boolean allowNoArgsConstructor;
-    private final boolean allowIdArgConstructor;
-    private final boolean allowAllArgsConstructor;
-    private final boolean allowGetters;
-    private final boolean allowSetters;
-    private final boolean allowToStringMethod;
-
-    public PojoConfig(boolean allowSpringDataJdbcAnnotations,
-                      boolean allowForeignKeyAsEmbeddedEntity,
-                      boolean allowForeignKeyAsEmbeddedEntityByAggregate,
-                      boolean allowNoArgsConstructor,
-                      boolean allowIdArgConstructor,
-                      boolean allowAllArgsConstructor,
-                      boolean allowGetters,
-                      boolean allowSetters,
-                      boolean allowToStringMethod) {
-        this.allowSpringDataJdbcAnnotations = allowSpringDataJdbcAnnotations;
-        this.allowForeignKeyAsEmbeddedEntity = allowForeignKeyAsEmbeddedEntity;
-        this.allowForeignKeyAsEmbeddedEntityByAggregate = allowForeignKeyAsEmbeddedEntityByAggregate;
-        this.allowNoArgsConstructor = allowNoArgsConstructor;
-        this.allowIdArgConstructor = allowIdArgConstructor;
-        this.allowAllArgsConstructor = allowAllArgsConstructor;
-        this.allowGetters = allowGetters;
-        this.allowSetters = allowSetters;
-        this.allowToStringMethod = allowToStringMethod;
-    }
+    private boolean allowSpringDataJdbcAnnotations;
+    private boolean allowForeignKeyAsEmbeddedEntity;
+    private boolean allowForeignKeyAsEmbeddedEntityByAggregate;
+    private boolean allowNoArgsConstructor;
+    private boolean allowIdArgConstructor;
+    private boolean allowAllArgsConstructor;
+    private boolean allowGetters;
+    private boolean allowSetters;
+    private boolean allowToStringMethod;
 
     public boolean isAllowSpringDataJdbcAnnotations() {
         return allowSpringDataJdbcAnnotations;
@@ -65,5 +45,41 @@ public class PojoConfig {
 
     public boolean isAllowToStringMethod() {
         return allowToStringMethod;
+    }
+
+    public void setAllowSpringDataJdbcAnnotations(boolean allowSpringDataJdbcAnnotations) {
+        this.allowSpringDataJdbcAnnotations = allowSpringDataJdbcAnnotations;
+    }
+
+    public void setAllowForeignKeyAsEmbeddedEntity(boolean allowForeignKeyAsEmbeddedEntity) {
+        this.allowForeignKeyAsEmbeddedEntity = allowForeignKeyAsEmbeddedEntity;
+    }
+
+    public void setAllowForeignKeyAsEmbeddedEntityByAggregate(boolean allowForeignKeyAsEmbeddedEntityByAggregate) {
+        this.allowForeignKeyAsEmbeddedEntityByAggregate = allowForeignKeyAsEmbeddedEntityByAggregate;
+    }
+
+    public void setAllowNoArgsConstructor(boolean allowNoArgsConstructor) {
+        this.allowNoArgsConstructor = allowNoArgsConstructor;
+    }
+
+    public void setAllowIdArgConstructor(boolean allowIdArgConstructor) {
+        this.allowIdArgConstructor = allowIdArgConstructor;
+    }
+
+    public void setAllowAllArgsConstructor(boolean allowAllArgsConstructor) {
+        this.allowAllArgsConstructor = allowAllArgsConstructor;
+    }
+
+    public void setAllowGetters(boolean allowGetters) {
+        this.allowGetters = allowGetters;
+    }
+
+    public void setAllowSetters(boolean allowSetters) {
+        this.allowSetters = allowSetters;
+    }
+
+    public void setAllowToStringMethod(boolean allowToStringMethod) {
+        this.allowToStringMethod = allowToStringMethod;
     }
 }
