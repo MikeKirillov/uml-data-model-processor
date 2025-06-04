@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
+import static com.github.mikekirillov.utils.TestUtils.returnPojoConfigFullFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClassBuilderTest {
@@ -23,15 +24,7 @@ class ClassBuilderTest {
     @Test
     public void shouldAddClassBasicHeader() {
         entity = new Entity("gender_es", "g", new ArrayList<>());
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+        pojoConfig = returnPojoConfigFullFalse();
         builder = new ClassBuilder(pojoConfig, outputFilePath, entity, new ArrayList<>(), new ArrayList<>());
         String result = builder.build();
         String[] lines = result.split("\n");
@@ -47,15 +40,18 @@ class ClassBuilderTest {
     @Test
     public void shouldAddClassBasicHeaderAndSpringJdbc() {
         entity = new Entity("gender_es", "g", new ArrayList<>());
-        pojoConfig = new PojoConfig(true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         builder = new ClassBuilder(pojoConfig, outputFilePath, entity, new ArrayList<>(), new ArrayList<>());
         String result = builder.build();
         String[] lines = result.split("\n");

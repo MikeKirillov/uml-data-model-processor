@@ -201,4 +201,20 @@ public class TestUtils {
                 )
         );
     }
+
+    public static PojoConfig returnPojoConfigFullFalse() {
+        PojoConfig pojoConfig = new PojoConfig();
+
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
+        return pojoConfig;
+    }
 }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.mikekirillov.utils.TestUtils.getProperty;
+import static com.github.mikekirillov.utils.TestUtils.returnPojoConfigFullFalse;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ConstructorWriterTest {
@@ -33,15 +34,7 @@ class ConstructorWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+        pojoConfig = returnPojoConfigFullFalse();
         writer = new ConstructorWriter(pojoConfig, entity, properties);
         writer.writeConstructors(stringBuilder);
 
@@ -54,15 +47,18 @@ class ConstructorWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(true);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new ConstructorWriter(pojoConfig, entity, properties);
         writer.writeConstructors(stringBuilder);
 
@@ -75,15 +71,18 @@ class ConstructorWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(true);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new ConstructorWriter(pojoConfig, entity, properties);
         writer.writeConstructors(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");
@@ -101,15 +100,18 @@ class ConstructorWriterTest {
                 getProperty("id", "INT", true, true, false),
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                true,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(true);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new ConstructorWriter(pojoConfig, entity, properties);
         writer.writeConstructors(stringBuilder);
         String[] lines = stringBuilder.toString().split("\n");

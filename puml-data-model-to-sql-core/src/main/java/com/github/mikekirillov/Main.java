@@ -55,16 +55,18 @@ public class Main {
     }
 
     private static PojoConfig getPojoConfig() {
-        return new PojoConfig(
-                false,
-                false,
-                false,
-                true,
-                false,
-                true,
-                false,
-                false,
-                false
-        );
+        PojoConfig pojoConfig = new PojoConfig();
+        
+        pojoConfig.setAllowSpringDataJdbcAnnotations(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(true);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(true);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
+        return pojoConfig;
     }
 }

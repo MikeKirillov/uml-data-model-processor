@@ -35,15 +35,7 @@ class FieldWriterTest {
                 getProperty("name", "VARCHAR(10)", true, false, false)
         ));
         relation = Mockito.mock(Relation.class);
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+        pojoConfig = returnPojoConfigFullFalse();
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
@@ -61,15 +53,7 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        pojoConfig = new PojoConfig(false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+        pojoConfig = returnPojoConfigFullFalse();
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
@@ -88,15 +72,18 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        pojoConfig = new PojoConfig(true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(false);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
@@ -116,15 +103,18 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        pojoConfig = new PojoConfig(true,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new FieldWriter(pojoConfig, entity, List.of(entity), List.of(relation));
 
         assertThrows(IllegalArgumentException.class,
@@ -140,15 +130,18 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = Mockito.mock(Relation.class);
-        pojoConfig = new PojoConfig(true,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(false);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
@@ -169,15 +162,18 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = returnUnfitRelation();
-        pojoConfig = new PojoConfig(true,
-                true,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(true);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
@@ -198,15 +194,18 @@ class FieldWriterTest {
                 getProperty("gender_id", "INT", true, false, true)
         ));
         relation = returnFitRelation(entity);
-        pojoConfig = new PojoConfig(true,
-                true,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(true);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesDamagedFkEntityName(), List.of(relation));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
@@ -228,15 +227,18 @@ class FieldWriterTest {
                 getProperty("name", "VARCHAR(128)", true, false, false),
                 getProperty("gender_id", "INT", true, false, true)
         ));
-        pojoConfig = new PojoConfig(true,
-                true,
-                true,
-                false,
-                false,
-                false,
-                false,
-                false,
-                false);
+
+        pojoConfig = new PojoConfig();
+        pojoConfig.setAllowSpringDataJdbcAnnotations(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntity(true);
+        pojoConfig.setAllowForeignKeyAsEmbeddedEntityByAggregate(true);
+        pojoConfig.setAllowNoArgsConstructor(false);
+        pojoConfig.setAllowIdArgConstructor(false);
+        pojoConfig.setAllowAllArgsConstructor(false);
+        pojoConfig.setAllowGetters(false);
+        pojoConfig.setAllowSetters(false);
+        pojoConfig.setAllowToStringMethod(false);
+
         writer = new FieldWriter(pojoConfig, entity, returnEntitiesWithFk(), returnFitRelationForManyToMany(entity));
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
