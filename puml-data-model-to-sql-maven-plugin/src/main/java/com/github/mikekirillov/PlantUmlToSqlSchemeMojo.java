@@ -1,10 +1,14 @@
 package com.github.mikekirillov;
 
 import com.github.mikekirillov.model.Entity;
+import com.github.mikekirillov.model.PojoConfig;
+import com.github.mikekirillov.model.Relation;
+import com.github.mikekirillov.pojo.ClassGenerator;
 import com.github.mikekirillov.sql.SqlSchemaGenerator;
 import com.github.mikekirillov.uml.PlantUmlAnalyzer;
 import com.github.mikekirillov.uml.PlantUmlEntitiesParser;
 import com.github.mikekirillov.uml.PlantUmlParser;
+import com.github.mikekirillov.uml.PlantUmlRelationsParser;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -14,6 +18,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.IOException;
 import java.util.List;
+
+import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
@@ -49,19 +55,45 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         try {
+            // 1. input model analysis
             PlantUmlAnalyzer analyzer = new PlantUmlAnalyzer();
             List<String> lines = analyzer.analyze(inputFilePath);
+            // parsing entities as objects from string lines
             PlantUmlParser<Entity> entitiesParser = new PlantUmlEntitiesParser();
             List<Entity> entities = entitiesParser.parseLinesFrom(lines);
-            EntityProcessor processor = new SqlSchemaGenerator(entities);
-            String sqlSchema = processor.generate();
-
-            getLog().info("Generated schema:\n" + sqlSchema);
 
             // TODO CONFIG SKIP of sql ddl-script-gen OR pojo-gen
+
+            // 2. generating SQL Data Definition Language (DDL) model
+            EntityProcessor processor = new SqlSchemaGenerator(entities);
+            String sqlSchema = processor.generate();
+            getLog().info("Generated schema:\n" + sqlSchema);
+            // creating and writing DDL script as separate document
             FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputFilePath, outputFileName + "." + outputFileExtension);
             ddlScriptWriter.write();
             getLog().info(getCompleteMsg());
+
+            // 3. generating POJO - data model Java classes
+            PojoConfig pojoConfig = new PojoConfig(false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false);
+            PlantUmlRelationsParser relationsParser = new PlantUmlRelationsParser(entities);
+            List<Relation> relations = relationsParser.parseLinesFrom(lines);
+            List<Relation> filteredRelsAsBridges = relationsParser.getBridgeEntities(relations);
+            for (Entity entity : entities) {
+                // generating POJO file content
+                EntityProcessor classGenerator = new ClassGenerator(pojoConfig, "POJO_GENERATOR_OUT_DIR", entity, entities, filteredRelsAsBridges);
+                String pojoFileContent = classGenerator.generate();
+                // creating and writing POJO files
+                FileWriter pojoWriter = new FileWriter(pojoFileContent, "POJO_GENERATOR_OUT_DIR", camelize(entity.getName(), true) + ".java");
+                pojoWriter.write();
+            }
         } catch (IOException e) {
             getLog().error(FAILED_MSG, e);
             throw new MojoExecutionException(FAILED_MSG, e);
