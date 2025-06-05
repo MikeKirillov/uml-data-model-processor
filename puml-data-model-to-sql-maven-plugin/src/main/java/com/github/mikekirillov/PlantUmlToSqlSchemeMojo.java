@@ -165,11 +165,7 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         // creating and writing DDL script as separate document
         FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputDdlScriptFilePath, outputDdlScriptFileName + "." + outputDdlScriptFileExtension);
         ddlScriptWriter.write();
-        getLog().info(getCompleteMsg());
-    }
-
-    private String getCompleteMsg() {
-        return String.format("Generating %s.%s is complete", outputDdlScriptFileName, outputDdlScriptFileExtension);
+        getLog().info(getCompleteMsg(outputDdlScriptFileName, outputDdlScriptFileExtension));
     }
 
     private void generatePojo(List<Entity> entities, List<String> lines) {
@@ -179,11 +175,14 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         List<Relation> filteredRelsAsBridges = relationsParser.getBridgeEntities(relations);
         for (Entity entity : entities) {
             // generating POJO file content
+            getLog().info("Generating POJO for " + entity.getName());
             EntityProcessor classGenerator = new ClassGenerator(pojoConfig, outputPojoFilePath, entity, entities, filteredRelsAsBridges);
             String pojoFileContent = classGenerator.generate();
             // creating and writing POJO files
-            FileWriter pojoWriter = new FileWriter(pojoFileContent, outputPojoFilePath, camelize(entity.getName(), true) + ".java");
+            String outputFileName = camelize(entity.getName(), true);
+            FileWriter pojoWriter = new FileWriter(pojoFileContent, outputPojoFilePath, outputFileName + ".java");
             pojoWriter.write();
+            getLog().info(getCompleteMsg(outputFileName, "java"));
         }
     }
 
@@ -199,6 +198,10 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         pojoConfig.setAllowSetters(isAllowSetters());
         pojoConfig.setAllowToStringMethod(isAllowToStringMethod());
         return pojoConfig;
+    }
+
+    private String getCompleteMsg(String name, String extension) {
+        return String.format("Generating %s.%s is complete", name, extension);
     }
 
     private static final String FAILED_MSG = "Error of analyzing input schema";

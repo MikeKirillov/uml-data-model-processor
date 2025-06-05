@@ -45,11 +45,9 @@ public class PlantUmlRelationsParser implements PlantUmlParser<Relation> {
             String left = array.get(0);
             String right = array.get(array.size() - 1);
             String relationArrow = array.get(1);
-
             if (!entities.isEmpty()) {
                 Optional<Entity> leftEntity = findEntity(left);
                 Optional<Entity> rightEntity = findEntity(right);
-
                 if (leftEntity.isPresent() && rightEntity.isPresent()) {
                     UmlRelationType leftRelationType = UmlRelationType.valueOfType(relationArrow.substring(0, 2));
                     UmlRelationType rightRelationType = UmlRelationType.valueOfType(relationArrow.substring(relationArrow.length() - 2));

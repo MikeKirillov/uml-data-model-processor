@@ -80,13 +80,11 @@ public class MethodWriter {
 
     private void writeToStringMethod(StringBuilder stringBuilder, Map<String, String> properties) {
         String entityName = camelize(entity.getName(), true);
-
         stringBuilder.append("\n\t@Override")
                 .append("\n\tpublic String toString() {")
                 .append("\n\t\treturn \"")
                 .append(entityName)
                 .append("{\" +");
-
         Optional<String> firstKey = properties.keySet().stream().findFirst();
         properties.keySet().forEach(name -> {
             if (name.equals(firstKey.get())) {

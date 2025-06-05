@@ -22,7 +22,6 @@ public class ConstructorWriter {
 
     public void writeConstructors(StringBuilder stringBuilder) {
         String entityName = camelize(entity.getName(), true);
-
         if (pojoConfig.isAllowNoArgsConstructor()) {
             writeNoArgsConstructor(stringBuilder, entityName);
         }
@@ -68,7 +67,6 @@ public class ConstructorWriter {
     private void writeAllArgsConstructor(StringBuilder stringBuilder, String entityName) {
         StringBuilder parameters = new StringBuilder();
         StringBuilder body = new StringBuilder();
-
         properties.forEach((fieldName, fieldType) -> {
             parameters.append(fieldType)
                     .append(" ")
@@ -80,9 +78,8 @@ public class ConstructorWriter {
                     .append(fieldName)
                     .append(";\n");
         });
-
+        // removing last not necessary comma from parameters line
         parameters.setLength(parameters.length() - 2);
-
         stringBuilder.append("\n\tpublic ")
                 .append(entityName)
                 .append("(")

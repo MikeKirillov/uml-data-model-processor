@@ -28,7 +28,6 @@ public class ImportWriter {
                 if (pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
                     stringBuilder.append("import org.springframework.data.relational.core.mapping.Column;\n")
                             .append("import org.springframework.data.jdbc.core.mapping.AggregateReference;\n");
-
                     // add these imports for main entity for many-to-many cases
                     findCurrentEntityAsMainRelation(relations, entity).ifPresent(relation -> {
                         stringBuilder.append("import org.springframework.data.relational.core.mapping.MappedCollection;\n")
@@ -40,7 +39,6 @@ public class ImportWriter {
                 }
             }
         }
-
         if (hasDateTime()) {
             stringBuilder.append("import java.sql.Date;\n");
         }
