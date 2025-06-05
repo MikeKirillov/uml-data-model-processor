@@ -28,18 +28,14 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
         List<Entity> entities = new ArrayList<>();
         List<Property> properties = new ArrayList<>();
         Entity entity = new Entity();
-
         for (String line : lines) {
             if (Predicate.not(LINE_IS_START_OR_END).test(line)) {
                 processEntity(entity, line);
-
                 if (LINE_HAS_ENTITY_OR_CLASS_OR_RELATION_TYPE.negate().test(line)) {
                     processProperty(line, properties);
-
                     if (!properties.isEmpty()) {
                         entity.setProperties(properties);
                     }
-
                     if (StringUtils.containsOnly(line, PlantUmlSchemaTag.CURLY_BRACKET_CLOSED)) {
                         entities.add(entity);
                         entity = new Entity();
@@ -48,7 +44,6 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
                 }
             }
         }
-
         return entities;
     }
 
@@ -59,9 +54,7 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
                     .map(string -> string.replace("\"", "").replace("'", "").replace("{", ""))
                     .filter(string -> !string.isBlank())
                     .toList();
-
             entity.setName(strings.get(1));
-
             if (strings.contains(PlantUmlSchemaTag.AS)) {
                 int as = strings.indexOf(PlantUmlSchemaTag.AS);
                 entity.setAlias(strings.get(as + 1));
@@ -73,7 +66,6 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
         List<String> strings = Arrays.stream(line.split(" "))
                 .filter(it -> !it.isBlank() && !it.contains(":"))
                 .toList();
-
         Property.Builder propertyBuilder = new Property.Builder();
         if (!strings.get(0).equals(PlantUmlSchemaTag.CURLY_BRACKET_CLOSED)) {
             if (strings.get(0).contains(PlantUmlSchemaTag.MANDATORY)) {
@@ -84,15 +76,12 @@ public class PlantUmlEntitiesParser implements PlantUmlParser<Entity> {
                 propertyBuilder.name(strings.get(0))
                         .type(strings.get(1));
             }
-
             if (strings.stream().anyMatch(it -> it.toLowerCase().contains(PlantUmlSchemaTag.GENERATED))) {
                 propertyBuilder.isGenerated(true);
             }
-
             if (strings.stream().anyMatch(it -> it.toUpperCase().contains(PlantUmlSchemaTag.FOREIGN_KEY))) {
                 propertyBuilder.isForeignKey(true);
             }
-
             properties.add(propertyBuilder.build());
         }
     }

@@ -21,11 +21,9 @@ public class FileWriter {
     public void write() {
         Path path = Path.of(outputFilePath, outputFile);
         File file = new File(path.toUri());
-
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             writer.write(fileContent, 0, fileContent.length());
         } catch (IOException e) {

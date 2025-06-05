@@ -29,17 +29,14 @@ public class ClassBuilder {
         writePackage(stringBuilder);
         writeImports(stringBuilder);
         writeClassDeclaration(stringBuilder);
-
         if (entity.getProperties().isEmpty()) {
             closeClass(stringBuilder);
             return stringBuilder.toString();
         }
-
         writeFields(stringBuilder, properties);
         writeConstructors(stringBuilder, properties);
         writeMethods(stringBuilder, properties);
         closeClass(stringBuilder);
-
         return stringBuilder.toString();
     }
 

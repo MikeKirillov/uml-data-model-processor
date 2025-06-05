@@ -27,16 +27,12 @@ public class SqlSchemaGenerator implements EntityProcessor {
         stringBuilder.append(SqlSchemaTag.CREATE_TABLE_IF_NOT_EXISTS)
                 .append(' ')
                 .append(entity.getName());
-
         stringBuilder.append(SqlSchemaTag.BRACKET_OPENED);
-
         List<Property> properties = entity.getProperties();
         for (Property property : properties) {
             createColumnDefinition(stringBuilder, property);
         }
-
         removeLastComma(stringBuilder);
-
         stringBuilder.append(SqlSchemaTag.NEW_LINE)
                 .append(SqlSchemaTag.BRACKET_CLOSED)
                 .append(SqlSchemaTag.SEMICOLON)
@@ -48,14 +44,12 @@ public class SqlSchemaGenerator implements EntityProcessor {
                 .append(property.getName())
                 .append(' ')
                 .append(property.getType());
-
         // NOT NULL / NULL
         if (property.isMandatory()) {
             stringBuilder.append(' ').append(SqlSchemaTag.NOT_NULL);
         } else {
             stringBuilder.append(' ').append(SqlSchemaTag.NULL);
         }
-
         // PRIMARY KEY
         if (property.isPrimaryKey()) {
             stringBuilder.append(' ')
@@ -63,7 +57,6 @@ public class SqlSchemaGenerator implements EntityProcessor {
                     .append(' ')
                     .append(SqlSchemaTag.PRIMARY_KEY);
         }
-
         // FOREIGN KEY
         if (property.isForeignKey()) {
             stringBuilder.append(SqlSchemaTag.COMMA)
@@ -80,7 +73,6 @@ public class SqlSchemaGenerator implements EntityProcessor {
                     .append(findReferencedProperty(property).getName())
                     .append(SqlSchemaTag.BRACKET_CLOSED);
         }
-
         stringBuilder.append(SqlSchemaTag.COMMA);
     }
 
@@ -101,7 +93,6 @@ public class SqlSchemaGenerator implements EntityProcessor {
 
     private void removeLastComma(StringBuilder stringBuilder) {
         int lastCommaIndex = stringBuilder.lastIndexOf(String.valueOf(SqlSchemaTag.COMMA));
-
         if (lastCommaIndex != -1) {
             stringBuilder.deleteCharAt(lastCommaIndex);
         }

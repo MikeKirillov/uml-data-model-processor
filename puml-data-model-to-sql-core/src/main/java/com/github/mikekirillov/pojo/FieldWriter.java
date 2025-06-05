@@ -24,10 +24,8 @@ public class FieldWriter {
 
     public void writeFields(StringBuilder stringBuilder, Map<String, String> properties) {
         writeSimpleFields(stringBuilder, properties);
-
         if (pojoConfig.isAllowSpringDataJdbcAnnotations() && pojoConfig.isAllowForeignKeyAsEmbeddedEntity()) {
             writeForeignKeyFields(stringBuilder, properties);
-
             if (pojoConfig.isAllowForeignKeyAsEmbeddedEntityByAggregate()) {
                 writeManyToManyFields(stringBuilder, properties);
             }
@@ -38,7 +36,6 @@ public class FieldWriter {
         for (Property property : entity.getProperties()) {
             if (!property.isForeignKey() || !pojoConfig.isAllowForeignKeyAsEmbeddedEntity()) {
                 annotateIdForPkField(stringBuilder, property);
-
                 String fieldName = camelize(property.getName(), false);
                 String fieldType = convertType(property.getType());
                 writeField(stringBuilder, properties, fieldType, fieldName);
@@ -96,7 +93,6 @@ public class FieldWriter {
                     .append(foreignKeyProperty.getName())
                     .append("\")")
                     .append("\n");
-
             String fieldType = "AggregateReference<" + camelize(entityByFkPropName.getName(), true) + ", String>";
             String fieldName = camelize(entityByFkPropName.getName(), false);
             writeField(stringBuilder, properties, fieldType, fieldName);
@@ -119,7 +115,6 @@ public class FieldWriter {
                 .append(pkName)
                 .append("\")")
                 .append("\n");
-
         String fieldType = camelize(entityByFkPropName.getName(), true);
         String fieldName = camelize(entityByFkPropName.getName(), false);
         writeField(stringBuilder, properties, fieldType, fieldName);
@@ -140,7 +135,6 @@ public class FieldWriter {
         List<EntityRelation> entityRelations = new ArrayList<>();
         entityRelations.add(relation.getLeftEntity());
         entityRelations.add(relation.getRightEntity());
-
         Optional<String> propertyName = entityRelations.stream()
                 .flatMap(it -> it.getEntity().getProperties().stream())
                 .map(Property::getName)
@@ -157,7 +151,6 @@ public class FieldWriter {
                     .append("\n");
             String fieldName = camelize(entityName.get(), false) + "s";
             String fieldType = "Set<" + camelize(entityName.get(), true) + ">";
-
             stringBuilder.append("\tprivate ")
                     .append(fieldType)
                     .append(" ")
