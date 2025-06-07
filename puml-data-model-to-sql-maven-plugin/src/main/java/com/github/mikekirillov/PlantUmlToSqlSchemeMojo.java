@@ -27,7 +27,7 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     @Parameter(property = "generate.inputFilePath", required = true)
     private String inputFilePath;
 
-    @Parameter(property = "generate.outputDdlScriptFilePath", required = true)
+    @Parameter(property = "generate.outputDdlScriptFilePath")
     private String outputDdlScriptFilePath;
 
     @Parameter(property = "generate.outputDdlScriptFileName", defaultValue = "schema")
@@ -63,7 +63,7 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     @Parameter(property = "generate.allowToStringMethod")
     private boolean allowToStringMethod;
 
-    @Parameter(property = "generate.outputPojoFilePath", required = true)
+    @Parameter(property = "generate.outputPojoFilePath")
     private String outputPojoFilePath;
 
     @Parameter(property = "generate.generateDdlScript", defaultValue = "false")
