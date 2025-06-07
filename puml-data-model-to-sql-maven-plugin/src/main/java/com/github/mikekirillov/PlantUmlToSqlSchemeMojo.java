@@ -147,9 +147,11 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
             List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
             if (isGenerateDdlScript()) {
+                getLog().info("Generating DB schema");
                 generateSql(entities);
             }
             if (isGeneratePojo()) {
+                getLog().info("Generating POJO's");
                 generatePojo(entities, lines);
             }
         } catch (IOException e) {
