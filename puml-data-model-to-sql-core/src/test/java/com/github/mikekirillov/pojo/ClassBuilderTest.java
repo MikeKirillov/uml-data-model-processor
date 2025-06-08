@@ -13,19 +13,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class ClassBuilderTest {
     private ClassBuilder builder;
     private PojoConfig pojoConfig;
-    private String outputFilePath;
+    private String outputPackageName;
     private Entity entity;
 
     @BeforeEach
     public void init() {
-        outputFilePath = "com/github/mikekirillov/pojo";
+        outputPackageName = "com.github.mikekirillov.pojo";
     }
 
     @Test
     public void shouldAddClassBasicHeader() {
         entity = new Entity("gender_es", "g", new ArrayList<>());
         pojoConfig = returnPojoConfigFullFalse();
-        builder = new ClassBuilder(pojoConfig, outputFilePath, entity, new ArrayList<>(), new ArrayList<>());
+        builder = new ClassBuilder(pojoConfig, outputPackageName, entity, new ArrayList<>(), new ArrayList<>());
         String result = builder.build();
         String[] lines = result.split("\n");
 
@@ -52,7 +52,7 @@ class ClassBuilderTest {
         pojoConfig.setAllowSetters(false);
         pojoConfig.setAllowToStringMethod(false);
 
-        builder = new ClassBuilder(pojoConfig, outputFilePath, entity, new ArrayList<>(), new ArrayList<>());
+        builder = new ClassBuilder(pojoConfig, outputPackageName, entity, new ArrayList<>(), new ArrayList<>());
         String result = builder.build();
         String[] lines = result.split("\n");
 

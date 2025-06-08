@@ -40,12 +40,11 @@ public class ImportWriter {
             }
         }
         if (hasDateTime()) {
-            stringBuilder.append("import java.sql.Date;\n");
+            stringBuilder.append("import java.time.LocalDateTime;\n");
         }
         if (hasTimeStamp()) {
             stringBuilder.append("import java.util.Date;\n");
         }
-        // TODO REMEMBER that scheme could contain both of date types
     }
 
     private boolean hasForeignKey() {

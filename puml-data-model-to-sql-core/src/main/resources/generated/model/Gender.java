@@ -1,4 +1,4 @@
-package puml-data-model-to-sql-core.src.main.resources.generated.model;
+package com.github.mikekirillov.icebox.pojo.model;
 
 
 public class Gender {

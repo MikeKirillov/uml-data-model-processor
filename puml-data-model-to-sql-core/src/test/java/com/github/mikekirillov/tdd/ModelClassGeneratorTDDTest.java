@@ -121,7 +121,7 @@ public class ModelClassGeneratorTDDTest {
 
         if (!propertyList.isEmpty()) {
             if (propertyList.stream().anyMatch(property -> property.getType().equals("DATETIME"))) {
-                writer.write("import java.sql.Date;\n");
+                writer.write("import java.time.LocalDateTime;\n");
             }
 
             if (propertyList.stream().anyMatch(property -> property.getType().equals("TIMESTAMP"))) {

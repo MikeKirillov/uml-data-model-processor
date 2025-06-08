@@ -17,7 +17,8 @@ public class ClassGeneratorUtils {
         return switch (type.toLowerCase()) {
             case "int", "integer" -> "int";
             case "boolean" -> "boolean";
-            case "datetime", "timestamp" -> "Date";
+            case "datetime" -> "LocalDateTime";
+            case "timestamp" -> "Date";
             default -> "String";
         };
     }

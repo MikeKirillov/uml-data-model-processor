@@ -65,7 +65,7 @@ class ImportWriterTest {
         writer = new ImportWriter(pojoConfig, entity, List.of(relation));
         writer.writeImports(stringBuilder);
 
-        assertEquals("import java.sql.Date;\n", stringBuilder.toString());
+        assertEquals("import java.time.LocalDateTime;\n", stringBuilder.toString());
     }
 
     @Test
