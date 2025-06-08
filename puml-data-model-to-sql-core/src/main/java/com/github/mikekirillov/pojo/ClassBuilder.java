@@ -10,14 +10,14 @@ import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 
 public class ClassBuilder {
     private final PojoConfig pojoConfig;
-    private final String outputFilePath;
+    private final String outputPackageName;
     private final Entity entity;
     private final List<Entity> allEntities;
     private final List<Relation> relations;
 
-    public ClassBuilder(PojoConfig pojoConfig, String outputFilePath, Entity entity, List<Entity> allEntities, List<Relation> relations) {
+    public ClassBuilder(PojoConfig pojoConfig, String outputPackageName, Entity entity, List<Entity> allEntities, List<Relation> relations) {
         this.pojoConfig = pojoConfig;
-        this.outputFilePath = outputFilePath;
+        this.outputPackageName = outputPackageName;
         this.entity = entity;
         this.allEntities = allEntities;
         this.relations = relations;
@@ -41,9 +41,8 @@ public class ClassBuilder {
     }
 
     private void writePackage(StringBuilder stringBuilder) {
-        String filePath = outputFilePath.replace("/", ".");
         stringBuilder.append("package ")
-                .append(filePath)
+                .append(outputPackageName)
                 .append(";\n\n");
     }
 

@@ -36,35 +36,38 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     @Parameter(property = "generate.outputDdlScriptFileExtension", defaultValue = "sql")
     private String outputDdlScriptFileExtension;
 
-    @Parameter(property = "generate.allowSpringDataJdbcAnnotations")
+    @Parameter(property = "generate.allowSpringDataJdbcAnnotations", defaultValue = "false")
     private boolean allowSpringDataJdbcAnnotations;
 
-    @Parameter(property = "generate.allowForeignKeyAsEmbeddedEntity")
+    @Parameter(property = "generate.allowForeignKeyAsEmbeddedEntity", defaultValue = "false")
     private boolean allowForeignKeyAsEmbeddedEntity;
 
-    @Parameter(property = "generate.allowForeignKeyAsEmbeddedEntityByAggregate")
+    @Parameter(property = "generate.allowForeignKeyAsEmbeddedEntityByAggregate", defaultValue = "false")
     private boolean allowForeignKeyAsEmbeddedEntityByAggregate;
 
-    @Parameter(property = "generate.allowNoArgsConstructor")
+    @Parameter(property = "generate.allowNoArgsConstructor", defaultValue = "false")
     private boolean allowNoArgsConstructor;
 
-    @Parameter(property = "generate.allowIdArgConstructor")
+    @Parameter(property = "generate.allowIdArgConstructor", defaultValue = "false")
     private boolean allowIdArgConstructor;
 
-    @Parameter(property = "generate.allowAllArgsConstructor")
+    @Parameter(property = "generate.allowAllArgsConstructor", defaultValue = "false")
     private boolean allowAllArgsConstructor;
 
-    @Parameter(property = "generate.allowGetters")
+    @Parameter(property = "generate.allowGetters", defaultValue = "false")
     private boolean allowGetters;
 
-    @Parameter(property = "generate.allowSetters")
+    @Parameter(property = "generate.allowSetters", defaultValue = "false")
     private boolean allowSetters;
 
-    @Parameter(property = "generate.allowToStringMethod")
+    @Parameter(property = "generate.allowToStringMethod", defaultValue = "false")
     private boolean allowToStringMethod;
 
     @Parameter(property = "generate.outputPojoFilePath")
     private String outputPojoFilePath;
+
+    @Parameter(property = "generate.outputPojoPackageName")
+    private String outputPojoPackageName;
 
     @Parameter(property = "generate.generateDdlScript", defaultValue = "false")
     private boolean generateDdlScript;
@@ -128,6 +131,10 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         return outputPojoFilePath;
     }
 
+    public String getOutputPojoPackageName() {
+        return outputPojoPackageName;
+    }
+
     public boolean isGenerateDdlScript() {
         return generateDdlScript;
     }
@@ -147,11 +154,9 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
             List<Entity> entities = entitiesParser.parseLinesFrom(lines);
 
             if (isGenerateDdlScript()) {
-                getLog().info("Generating DB schema");
                 generateSql(entities);
             }
             if (isGeneratePojo()) {
-                getLog().info("Generating POJO's");
                 generatePojo(entities, lines);
             }
         } catch (IOException e) {
@@ -161,16 +166,23 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     }
 
     private void generateSql(List<Entity> entities) {
+        getLog().info("Generating DB schema");
+
         EntityProcessor processor = new SqlSchemaGenerator(entities);
         String sqlSchema = processor.generate();
+
         getLog().info("Generated schema:\n" + sqlSchema);
+
         // creating and writing DDL script as separate document
         FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputDdlScriptFilePath, outputDdlScriptFileName + "." + outputDdlScriptFileExtension);
         ddlScriptWriter.write();
+
         getLog().info(getCompleteMsg(outputDdlScriptFileName, outputDdlScriptFileExtension));
     }
 
     private void generatePojo(List<Entity> entities, List<String> lines) {
+        getLog().info("Generating POJO's");
+
         PojoConfig pojoConfig = getPojoConfig();
         PlantUmlRelationsParser relationsParser = new PlantUmlRelationsParser(entities);
         List<Relation> relations = relationsParser.parseLinesFrom(lines);
@@ -178,12 +190,14 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         for (Entity entity : entities) {
             // generating POJO file content
             getLog().info("Generating POJO for " + entity.getName());
-            EntityProcessor classGenerator = new ClassGenerator(pojoConfig, outputPojoFilePath, entity, entities, filteredRelsAsBridges);
+
+            EntityProcessor classGenerator = new ClassGenerator(pojoConfig, outputPojoPackageName, entity, entities, filteredRelsAsBridges);
             String pojoFileContent = classGenerator.generate();
             // creating and writing POJO files
             String outputFileName = camelize(entity.getName(), true);
             FileWriter pojoWriter = new FileWriter(pojoFileContent, outputPojoFilePath, outputFileName + ".java");
             pojoWriter.write();
+
             getLog().info(getCompleteMsg(outputFileName, "java"));
         }
     }
