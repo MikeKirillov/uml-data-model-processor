@@ -174,7 +174,7 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         getLog().info("Generated schema:\n" + sqlSchema);
 
         // creating and writing DDL script as separate document
-        FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputDdlScriptFilePath, outputDdlScriptFileName + "." + outputDdlScriptFileExtension);
+        FileWriter ddlScriptWriter = new FileWriter(sqlSchema, outputDdlScriptFilePath, getFileNameWithExtension(outputDdlScriptFileName, outputDdlScriptFileExtension));
         ddlScriptWriter.write();
 
         getLog().info(getCompleteMsg(outputDdlScriptFileName, outputDdlScriptFileExtension));
@@ -195,11 +195,16 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
             String pojoFileContent = classGenerator.generate();
             // creating and writing POJO files
             String outputFileName = camelize(entity.getName(), true);
-            FileWriter pojoWriter = new FileWriter(pojoFileContent, outputPojoFilePath, outputFileName + ".java");
+            FileWriter pojoWriter = new FileWriter(pojoFileContent, getPojoPackagePath(), getFileNameWithExtension(outputFileName, "java"));
             pojoWriter.write();
 
             getLog().info(getCompleteMsg(outputFileName, "java"));
         }
+    }
+
+    private String getPojoPackagePath() {
+        String outputPojoPackagePath = outputPojoPackageName.replace('.', '/');
+        return outputPojoFilePath + '/' + outputPojoPackagePath;
     }
 
     private PojoConfig getPojoConfig() {
@@ -214,6 +219,10 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
         pojoConfig.setAllowSetters(isAllowSetters());
         pojoConfig.setAllowToStringMethod(isAllowToStringMethod());
         return pojoConfig;
+    }
+
+    private String getFileNameWithExtension(String name, String extension) {
+        return name + '.' + extension;
     }
 
     private String getCompleteMsg(String name, String extension) {
