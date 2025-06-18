@@ -15,6 +15,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,6 +24,8 @@ import static com.github.mikekirillov.utils.ClassGeneratorUtils.camelize;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true)
 public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
+    @Parameter(readonly = true, required = true, defaultValue = "${project}")
+    private MavenProject project;
 
     @Parameter(property = "generate.inputFilePath", required = true)
     private String inputFilePath;
@@ -181,6 +184,10 @@ public class PlantUmlToSqlSchemeMojo extends AbstractMojo {
     }
 
     private void generatePojo(List<Entity> entities, List<String> lines) {
+        getLog().info("Adding the following generated output POJO path to the source root: " + outputPojoFilePath);
+
+        project.addCompileSourceRoot(outputPojoFilePath);
+
         getLog().info("Generating POJO's");
 
         PojoConfig pojoConfig = getPojoConfig();
