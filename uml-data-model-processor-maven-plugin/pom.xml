@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.mikekirillov</groupId>
-        <artifactId>puml-data-model-to-sql</artifactId>
+        <artifactId>uml-data-model-processor</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>puml-data-model-to-sql-maven-plugin</artifactId>
+    <artifactId>uml-data-model-processor-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
     <properties>
@@ -21,7 +21,7 @@
     <dependencies>
         <dependency>
             <groupId>com.github.mikekirillov</groupId>
-            <artifactId>puml-data-model-to-sql-core</artifactId>
+            <artifactId>uml-data-model-processor-core</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
         <dependency>
