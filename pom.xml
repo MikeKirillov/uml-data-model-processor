@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.mikekirillov</groupId>
-    <artifactId>puml-data-model-to-sql</artifactId>
+    <artifactId>uml-data-model-processor</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>puml-data-model-to-sql-maven-plugin</module>
-        <module>puml-data-model-to-sql-core</module>
+        <module>uml-data-model-processor-maven-plugin</module>
+        <module>uml-data-model-processor-core</module>
     </modules>
 
     <properties>
