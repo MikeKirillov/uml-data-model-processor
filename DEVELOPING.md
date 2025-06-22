@@ -17,9 +17,9 @@
 8. Выявление дополнительных задач, плановое решение вместе с изначально определенными задачами.
 9. Формирование релизного процесса, попытка выхода в [Maven Repository](https://mvnrepository.com/).
 
-#### puml-data-model-to-sql-maven-plugin CLI call example:
+#### uml-data-model-processor-maven-plugin CLI call example:
 
-* plugin and its generate goal: `com.github.mikekirillov:puml-data-model-to-sql-maven-plugin:generate`
+* plugin and its generate goal: `com.github.mikekirillov:uml-data-model-processor-maven-plugin:generate`
 * required field inputFilePath: `-Dgenerate.inputFilePath=/Users/michaelkirillov/...`
 * required field outputFilePath: `-Dgenerate.outputFilePath=/Users/michaelkirillov/...`
 * field outputFileName: `-Dgenerate.outputFileName=schema`
@@ -27,7 +27,7 @@
 
 full call:
 
-`% mvn com.github.mikekirillov:puml-data-model-to-sql-maven-plugin:generate -Dgenerate.inputFilePath=/Users/michaelkirillov/IdeaProjects/puml-data-model-to-sql/puml-data-model-to-sql-core/src/test/resources/data-base-model.txt -Dgenerate.outputFilePath=/Users/michaelkirillov/IdeaProjects/puml-data-model-to-sql/puml-data-model-to-sql-core/src/main/resources/generated`
+`% mvn com.github.mikekirillov:uml-data-model-processor-maven-plugin:generate -Dgenerate.inputFilePath=/Users/michaelkirillov/IdeaProjects/uml-data-model-processor/uml-data-model-processor-core/src/test/resources/data-base-model.txt -Dgenerate.outputFilePath=/Users/michaelkirillov/IdeaProjects/uml-data-model-processor/uml-data-model-processor-core/src/main/resources/generated`
 
 # Using with Spring Data JDBC
 
@@ -43,7 +43,7 @@ at [link](https://github.com/MikeKirillov/practice-pro-box/commit/1b1ebbeddcdab4
 
 <plugin>
     <groupId>com.github.mikekirillov</groupId>
-    <artifactId>puml-data-model-to-sql-maven-plugin</artifactId>
+    <artifactId>uml-data-model-processor-maven-plugin</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <configuration>
         <inputFilePath>${project.basedir}/db_schema.puml</inputFilePath>
