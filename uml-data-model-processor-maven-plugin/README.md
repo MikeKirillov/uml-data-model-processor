@@ -65,3 +65,19 @@
 | `outputPojoFilePath`                         | Directory where generated POJO classes are stored                               | false    |               |
 | `outputPojoPackageName`                      | Package name for the generated POJO classes                                     | false    |               |
 
+## Example of running plugin from Terminal
+
+First, build the project:
+
+`mvn clean install`
+
+Then run the command to generate a DDL script from a PlantUML file:
+
+```
+mvn com.github.mikekirillov:uml-data-model-processor-maven-plugin:generate
+-Dgenerate.inputFilePath=/Users/michaelkirillov/Downloads/db_schema.puml
+-Dgenerate.generateDdlScript=true
+-Dgenerate.outputDdlScriptFilePath=/Users/michaelkirillov/Downloads
+-Dgenerate.outputDdlScriptFileName=ddl-script
+-Dgenerate.outputDdlScriptFileExtension=txt
+```
