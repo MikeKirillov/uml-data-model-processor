@@ -13,6 +13,12 @@
         <module>uml-data-model-processor-core</module>
     </modules>
 
+    <scm>
+        <connection>scm:git:https://github.com/MikeKirillov/uml-data-model-processor.git</connection>
+        <developerConnection>scm:git:https://github.com/MikeKirillov/uml-data-model-processor.git</developerConnection>
+        <url>https://github.com/MikeKirillov/uml-data-model-processor</url>
+    </scm>
+
     <developers>
         <developer>
             <id>mike_kirillov</id>

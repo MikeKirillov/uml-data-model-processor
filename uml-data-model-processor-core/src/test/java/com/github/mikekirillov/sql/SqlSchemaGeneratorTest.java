@@ -21,8 +21,6 @@ class SqlSchemaGeneratorTest {
 
         assertNotNull(sqlSchema);
 
-        System.out.println(sqlSchema);
-
         String[] split = sqlSchema.split(System.lineSeparator());
         assertEquals("CREATE TABLE IF NOT EXISTS gender(", split[0]);
         assertEquals("id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,", split[1]);

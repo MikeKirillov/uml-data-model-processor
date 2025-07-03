@@ -105,7 +105,6 @@ public class FieldWriter {
     }
 
     private void handleDirectReferenceField(StringBuilder stringBuilder, Map<String, String> properties, Entity entityByFkPropName) {
-        System.out.println(entityByFkPropName);
         String pkName = entityByFkPropName.getProperties().stream()
                 .filter(Property::isPrimaryKey)
                 .map(Property::getName)
