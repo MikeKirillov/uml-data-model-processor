@@ -77,9 +77,9 @@
 На текущий момент инструмент поддерживает следующий спектр технологий:
 
 * Базы данных: MySQL, ~~PostgreSQL~~, ~~SQLite~~.
-* Языки программирования: Java 11+, ~~Kotlin~~, ~~Scala~~ и ~~другие JVM языки~~.
+* Языки программирования: Java 11+, ~~Kotlin~~.
 * Система сборки: Maven, ~~Gradle~~.
-* Фреймворки: Spring Data JDBC, ~~Spring Data JPA~~, ~~Hibernate~~ и ~~др~~.
+* Фреймворки: Spring Data JDBC, ~~Spring Data JPA~~, ~~Hibernate~~, ~~Kotlin Exposed~~ и ~~др~~.
 * Системы управления миграциями базы данных: Spring Data JDBC (автоматически выполняет скрипт schema.sql),
   ~~Liquibase~~.
 
