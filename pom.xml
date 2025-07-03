@@ -13,6 +13,13 @@
         <module>uml-data-model-processor-core</module>
     </modules>
 
+    <name>uml-data-model-processor</name>
+    <url>https://github.com/MikeKirillov/uml-data-model-processor</url>
+    <description>The uml-data-model-processor project provides automation tools for designing and implementing databases
+        based on UML diagrams created using the PlantUML format. Its goal is to reduce routine work for developers by
+        automatically generating essential artifacts such as DDL scripts and POJO class templates.
+    </description>
+
     <scm>
         <connection>scm:git:https://github.com/MikeKirillov/uml-data-model-processor.git</connection>
         <developerConnection>scm:git:https://github.com/MikeKirillov/uml-data-model-processor.git</developerConnection>
@@ -38,7 +45,7 @@
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>https://github.com/MikeKirillov/uml-data-model-processor/blob/master/LICENSE.md</url>
+            <url>LICENSE.md</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -56,4 +63,61 @@
             <version>3.17.0</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.12.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.13</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <!--<plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+            </plugin>-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.5.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>3.6.2</version>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
