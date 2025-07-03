@@ -52,8 +52,6 @@ class ParserSecondTDDTest {
 
         // generating schema.sql file
         String schemaSql = generateSchema(entities);
-
-        // System.out.println(schemaSql);
     }
 
     private void entitiesAndRelations(List<String> lines, List<Entity> entities, List<Relation> relations) {

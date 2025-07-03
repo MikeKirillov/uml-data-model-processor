@@ -210,8 +210,6 @@ class FieldWriterTest {
         writer.writeFields(stringBuilder, properties);
         String[] lines = stringBuilder.toString().split("\n");
 
-        System.out.println(stringBuilder);
-
         assertEquals(5, lines.length);
         assertEquals("\t@Id", lines[0]);
         assertEquals("\tprivate int id;", lines[1]);
