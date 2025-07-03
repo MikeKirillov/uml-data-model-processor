@@ -13,6 +13,17 @@
         <module>uml-data-model-processor-core</module>
     </modules>
 
+    <developers>
+        <developer>
+            <id>mike_kirillov</id>
+            <name>Mike Kirillov</name>
+            <email>kirilov.mikhail@gmail.com</email>
+            <properties>
+                <active>true</active>
+            </properties>
+        </developer>
+    </developers>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -24,20 +35,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.17.0</version>
-        </dependency>
-
-        <!--TEST-->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.12.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>5.17.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

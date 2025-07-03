@@ -71,9 +71,9 @@ the [practice-ice-box](https://github.com/MikeKirillov/practice-ice-box) project
 Currently supported technologies include:
 
 * Databases: MySQL, ~~PostgreSQL~~, ~~SQLite~~.
-* Programming languages: Java 11+, ~~Kotlin~~, ~~Scala~~, and ~~other JVM languages~~.
+* Programming languages: Java 11+, ~~Kotlin~~.
 * Build systems: Maven, ~~Gradle~~.
-* Frameworks: Spring Data JDBC, ~~Spring Data JPA~~, ~~Hibernate~~, ~~etc~~.
+* Frameworks: Spring Data JDBC, ~~Spring Data JPA~~, ~~Hibernate~~, ~~Kotlin Exposed~~, ~~etc~~.
 * Database migration management: Spring Data JDBC (automatically executes schema.sql), ~~Liquibase~~.
 
 > 🥷 ~~strikethrough technologies~~ indicate planned future developments
