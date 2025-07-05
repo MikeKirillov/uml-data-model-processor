@@ -45,7 +45,7 @@
     <licenses>
         <license>
             <name>MIT License</name>
-            <url>LICENSE.md</url>
+            <url>https://opensource.org/licenses/MIT</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
