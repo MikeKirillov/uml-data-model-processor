@@ -64,7 +64,7 @@ for [uml-data-model-processor-maven-plugin](https://github.com/MikeKirillov/uml-
 ## 🧐 Usage Examples
 
 For detailed examples of SQL and POJO class generation, see
-the [practice-ice-box](https://github.com/MikeKirillov/practice-gym-box) project.
+the [practice-gym-box](https://github.com/MikeKirillov/practice-gym-box) project.
 
 ## 🧰 Supported Technologies
 
