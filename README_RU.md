@@ -70,7 +70,7 @@
 ## 🧐 Примеры использования
 
 Ознакомиться подробнее с генерацией SQL и POJO-классов можно на примере
-проекта [practice-gym-box](https://github.com/MikeKirillov/practice-gym-box).
+проекта [gym-box-example](https://github.com/MikeKirillov/gym-box-example).
 
 ## 🧰 Поддерживаемые технологии
 
