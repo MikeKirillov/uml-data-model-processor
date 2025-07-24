@@ -8,7 +8,7 @@
     <plugins>
         ...
         <plugin>
-            <groupId>com.github.mikekirillov</groupId>
+            <groupId>io.github.mikekirillov</groupId>
             <artifactId>uml-data-model-processor-maven-plugin</artifactId>
             <version>1.0.0</version>
             <configuration>
@@ -28,7 +28,7 @@
                 <allowSetters>true</allowSetters>
                 <allowToStringMethod>true</allowToStringMethod>
                 <outputPojoFilePath>${project.build.directory}/generated-sources/model/</outputPojoFilePath>
-                <outputPojoPackageName>com.github.mikekirillov.model.jdbc</outputPojoPackageName>
+                <outputPojoPackageName>io.github.mikekirillov.model.jdbc</outputPojoPackageName>
             </configuration>
             <executions>
                 <execution>
@@ -74,7 +74,7 @@ First, build the project:
 Then run the command to generate a DDL script from a PlantUML file:
 
 ```
-mvn com.github.mikekirillov:uml-data-model-processor-maven-plugin:generate
+mvn io.github.mikekirillov:uml-data-model-processor-maven-plugin:generate
 -Dgenerate.inputFilePath=/Users/michaelkirillov/Downloads/db_schema.puml
 -Dgenerate.generateDdlScript=true
 -Dgenerate.outputDdlScriptFilePath=/Users/michaelkirillov/Downloads
