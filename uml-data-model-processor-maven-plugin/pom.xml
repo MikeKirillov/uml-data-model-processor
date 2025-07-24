@@ -12,6 +12,10 @@
     <artifactId>uml-data-model-processor-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>https://github.com/MikeKirillov/uml-data-model-processor</url>
+    <description>The uml-data-model-processor Maven plugin</description>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
