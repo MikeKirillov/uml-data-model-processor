@@ -11,6 +11,10 @@
 
     <artifactId>uml-data-model-processor-core</artifactId>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+    <url>https://github.com/MikeKirillov/uml-data-model-processor</url>
+    <description>The uml-data-model-processor core lib</description>
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
