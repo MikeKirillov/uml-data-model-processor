@@ -6,14 +6,14 @@
 
     <groupId>com.github.mikekirillov</groupId>
     <artifactId>uml-data-model-processor</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
         <module>uml-data-model-processor-maven-plugin</module>
         <module>uml-data-model-processor-core</module>
     </modules>
 
-    <name>uml-data-model-processor</name>
+    <name>${project.groupId}:${project.artifactId}</name>
     <url>https://github.com/MikeKirillov/uml-data-model-processor</url>
     <description>The uml-data-model-processor project provides automation tools for designing and implementing databases
         based on UML diagrams created using the PlantUML format. Its goal is to reduce routine work for developers by

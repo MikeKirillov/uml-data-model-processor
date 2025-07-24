@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.mikekirillov</groupId>
         <artifactId>uml-data-model-processor</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>uml-data-model-processor-core</artifactId>
