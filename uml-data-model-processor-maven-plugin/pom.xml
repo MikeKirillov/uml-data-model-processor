@@ -6,7 +6,7 @@
     <parent>
         <groupId>io.github.mikekirillov</groupId>
         <artifactId>uml-data-model-processor</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>uml-data-model-processor-maven-plugin</artifactId>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>io.github.mikekirillov</groupId>
             <artifactId>uml-data-model-processor-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
