@@ -6,7 +6,7 @@
 
     <groupId>io.github.mikekirillov</groupId>
     <artifactId>uml-data-model-processor</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.2</version>
     <packaging>pom</packaging>
     <modules>
         <module>uml-data-model-processor-maven-plugin</module>
